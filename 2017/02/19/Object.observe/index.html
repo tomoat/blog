@@ -89,21 +89,21 @@
 
 <meta name="description" content="Object.observe当前MVC模式在Angular.JS等冲击下已经变成了View视图和Model模型两个， 控制器由事件驱动机制替代，见 ：MVI是一种Reactive MVC。
 那么为什么JS不能自然支持事件通知机制呢？ES7引入了Object.observe：
-123var person = &amp;#123;&amp;#125;;var changesHandler = changes =&amp;gt">
+123var person = &amp;#123;&amp;#125;;jvar changesHandler = changes =&amp;g">
 <meta property="og:type" content="article">
 <meta property="og:title" content="关于Object.observe的知识">
 <meta property="og:url" content="https://tomoat.github.io/2017/02/19/Object.observe/index.html">
 <meta property="og:site_name" content="tomoat的笔记">
 <meta property="og:description" content="Object.observe当前MVC模式在Angular.JS等冲击下已经变成了View视图和Model模型两个， 控制器由事件驱动机制替代，见 ：MVI是一种Reactive MVC。
 那么为什么JS不能自然支持事件通知机制呢？ES7引入了Object.observe：
-123var person = &amp;#123;&amp;#125;;var changesHandler = changes =&amp;gt">
+123var person = &amp;#123;&amp;#125;;jvar changesHandler = changes =&amp;g">
 <meta property="og:image" content="http://karat.cc/img/93256ccb-d34f-4419-bd82-5cbb8c1cde88.png">
-<meta property="og:updated_time" content="2017-03-06T14:54:05.000Z">
+<meta property="og:updated_time" content="2017-03-06T15:53:30.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="关于Object.observe的知识">
 <meta name="twitter:description" content="Object.observe当前MVC模式在Angular.JS等冲击下已经变成了View视图和Model模型两个， 控制器由事件驱动机制替代，见 ：MVI是一种Reactive MVC。
 那么为什么JS不能自然支持事件通知机制呢？ES7引入了Object.observe：
-123var person = &amp;#123;&amp;#125;;var changesHandler = changes =&amp;gt">
+123var person = &amp;#123;&amp;#125;;jvar changesHandler = changes =&amp;g">
 <meta name="twitter:image" content="http://karat.cc/img/93256ccb-d34f-4419-bd82-5cbb8c1cde88.png">
 
 
@@ -331,20 +331,20 @@
       
         <h2 id="Object-observe"><a href="#Object-observe" class="headerlink" title="Object.observe"></a>Object.observe</h2><p>当前MVC模式在Angular.JS等冲击下已经变成了View视图和Model模型两个， 控制器由事件驱动机制替代，见 ：<a href="http://www.jdon.com/46833" target="_blank" rel="external">MVI是一种Reactive MVC</a>。</p>
 <p>那么为什么JS不能自然支持事件通知机制呢？ES7引入了Object.observe：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">var person = &#123;&#125;;</div><div class="line">var changesHandler = changes =&gt; console.log(changes);</div><div class="line">Object.observe(person, changesHandler);</div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;&#125;;j</div><div class="line"><span class="keyword">var</span> changesHandler = changes =&gt; <span class="built_in">console</span>.log(changes);</div><div class="line"><span class="built_in">Object</span>.observe(person, changesHandler);</div></pre></td></tr></table></figure>
 <p>这样，当person的内容有更改，将自动触发changes函数，如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">person = &#123;</div><div class="line">　　name: &quot; jdon&quot;</div><div class="line">&#125;</div><div class="line">　　如果person的名称从jdon改为jdon.com:</div><div class="line">person = &#123;</div><div class="line">　　name: &quot; jdon.com&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">person = &#123;</div><div class="line">　　name: <span class="string">" jdon"</span></div><div class="line">&#125;</div><div class="line">　　如果person的名称从jdon改为jdon.com:</div><div class="line">person = &#123;</div><div class="line">　　name: <span class="string">" jdon.com"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>这种name内容变化，将触发函数changes输出：</p>
 <hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[</div><div class="line">    &#123;</div><div class="line">        &quot;type&quot;:&quot;update&quot;,</div><div class="line">        &quot;name&quot;:&quot;name&quot;,</div><div class="line">        &quot;oldValue: &quot;jdon&quot;</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[</div><div class="line">    &#123;</div><div class="line">        "type":"update",</div><div class="line">        "name":"name",</div><div class="line">        "oldValue: "jdon"</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
 <p>如果person增加内容：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">person = &#123;</div><div class="line">　　name: &quot; jdon.com&quot;</div><div class="line">　　employer: &quot;banq&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">person = &#123;</div><div class="line">　　name: <span class="string">" jdon.com"</span></div><div class="line">　　employer: <span class="string">"banq"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>激活函数输出：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[</div><div class="line">    &#123;</div><div class="line">        &quot;type&quot;:&quot;new&quot;,</div><div class="line">        &quot;name&quot;:&quot;employer&quot;,</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[</div><div class="line">    &#123;</div><div class="line">        <span class="string">"type"</span>:<span class="string">"new"</span>,</div><div class="line">        <span class="string">"name"</span>:<span class="string">"employer"</span>,</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
 <p>如果person删除内容employer，那么输出是：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[</div><div class="line">    &#123;</div><div class="line">        &quot;type&quot;:&quot;delete&quot;,</div><div class="line">        &quot;name&quot;:&quot;employer&quot;,</div><div class="line">        &quot;oldValue: &quot;banq&quot;</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[</div><div class="line">    &#123;</div><div class="line">        "type":"delete",</div><div class="line">        "name":"employer",</div><div class="line">        "oldValue: "banq"</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
 <p>解除观察是：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Object.unobserve(person, changesHandler);</div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">Object</span>.unobserve(person, changesHandler);</div></pre></td></tr></table></figure>
 <p>为了防止事件风暴，ES7使用了 Event Loop Queue + Microtasks，当事件处理器EventHandler发出改变事件给ChangeHandler以后，ChangeHandler不会排队在队列后面，而是替换当前EventHandler位置，这样在浏览器渲染页面之前完成所有事件通知：</p>
 <p><img src="http://karat.cc/img/93256ccb-d34f-4419-bd82-5cbb8c1cde88.png" alt="js7.png"></p>
 
