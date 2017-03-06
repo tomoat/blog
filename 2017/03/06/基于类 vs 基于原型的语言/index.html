@@ -84,12 +84,32 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="JTom3">
-<meta property="og:url" content="https://tomoat.github.io/index.html">
+<meta name="description" content="基于类 vs 基于原型的语言JavaScript 是一种基于原型的面向对象语言，而不是基于类的。正是由于这一根本的区别，其如何创建对象的层级结构以及对象的属性与属性值是如何继承的并不是那么清晰。本节试着阐明。
+基于类的面向对象语言，比如 Java 和 C++，是构建在两个不同实体的概念之上的：即类和实例。
+
+类（class）：定义了所有用于具有某一组特征对象的属性（可以将 Java 中的方法和变量">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于类vs基于原型的语言">
+<meta property="og:url" content="https://tomoat.github.io/2017/03/06/基于类 vs 基于原型的语言/index.html">
 <meta property="og:site_name" content="JTom3">
+<meta property="og:description" content="基于类 vs 基于原型的语言JavaScript 是一种基于原型的面向对象语言，而不是基于类的。正是由于这一根本的区别，其如何创建对象的层级结构以及对象的属性与属性值是如何继承的并不是那么清晰。本节试着阐明。
+基于类的面向对象语言，比如 Java 和 C++，是构建在两个不同实体的概念之上的：即类和实例。
+
+类（class）：定义了所有用于具有某一组特征对象的属性（可以将 Java 中的方法和变量">
+<meta property="og:image" content="https://developer.mozilla.org/@api/deki/files/4452/=figure8.1.png">
+<meta property="og:image" content="https://developer.mozilla.org/@api/deki/files/4390/=figure8.2.png">
+<meta property="og:image" content="https://developer.mozilla.org/@api/deki/files/4403/=figure8.3.png">
+<meta property="og:image" content="https://developer.mozilla.org/@api/deki/files/4422/=figure8.4.png">
+<meta property="og:image" content="https://developer.mozilla.org/@api/deki/files/4423/=figure8.5.png">
+<meta property="og:image" content="https://developer.mozilla.org/@api/deki/files/4430/=figure8.6.png">
+<meta property="og:updated_time" content="2017-03-06T14:51:46.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="JTom3">
+<meta name="twitter:title" content="基于类vs基于原型的语言">
+<meta name="twitter:description" content="基于类 vs 基于原型的语言JavaScript 是一种基于原型的面向对象语言，而不是基于类的。正是由于这一根本的区别，其如何创建对象的层级结构以及对象的属性与属性值是如何继承的并不是那么清晰。本节试着阐明。
+基于类的面向对象语言，比如 Java 和 C++，是构建在两个不同实体的概念之上的：即类和实例。
+
+类（class）：定义了所有用于具有某一组特征对象的属性（可以将 Java 中的方法和变量">
+<meta name="twitter:image" content="https://developer.mozilla.org/@api/deki/files/4452/=figure8.1.png">
 
 
 
@@ -110,9 +130,9 @@
 
 
 
-  <link rel="canonical" href="https://tomoat.github.io/"/>
+  <link rel="canonical" href="https://tomoat.github.io/2017/03/06/基于类 vs 基于原型的语言/"/>
 
-  <title> JTom3 </title>
+  <title> 基于类vs基于原型的语言 | JTom3 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -133,9 +153,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left 
-   page-home 
- ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -212,9 +230,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
   
@@ -234,10 +252,7 @@
             
             
               
-                
-                <a class="post-title-link" href="/blog/2017/03/06/基于类 vs 基于原型的语言/" itemprop="url">
-                  基于类vs基于原型的语言
-                </a>
+                基于类vs基于原型的语言
               
             
           </h1>
@@ -277,9 +292,7 @@
       
 
       
-        
-          
-            <h2 id="基于类-vs-基于原型的语言"><a href="#基于类-vs-基于原型的语言" class="headerlink" title="基于类 vs 基于原型的语言"></a>基于类 vs 基于原型的语言</h2><p>JavaScript 是一种基于原型的面向对象语言，而不是基于类的。正是由于这一根本的区别，其如何创建对象的层级结构以及对象的属性与属性值是如何继承的并不是那么清晰。本节试着阐明。</p>
+        <h2 id="基于类-vs-基于原型的语言"><a href="#基于类-vs-基于原型的语言" class="headerlink" title="基于类 vs 基于原型的语言"></a>基于类 vs 基于原型的语言</h2><p>JavaScript 是一种基于原型的面向对象语言，而不是基于类的。正是由于这一根本的区别，其如何创建对象的层级结构以及对象的属性与属性值是如何继承的并不是那么清晰。本节试着阐明。</p>
 <p>基于类的面向对象语言，比如 Java 和 C++，是构建在两个不同实体的概念之上的：即类和实例。</p>
 <ul>
 <li><strong>类</strong>（<em>class</em>）：定义了所有用于具有某一组特征对象的属性（可以将 Java 中的方法和变量以及 C++ 中的成员都视作属性）。类是抽象的事物，而不是其所描述的全部对象中的任何特定的个体。例如 <code>Employee</code> 类可以用来表示所有雇员的集合。</li>
@@ -543,16 +556,20 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Hobbyist.prototype.equipment = [&quot;mask&quot;, &quot;fins&quot;, &quot;regulator&quot;, &quot;bcd&quot;]</div></pre></td></tr></table></figure>
 <p><code>dennis</code> 对象不会继承这个新属性。</p>
 
-          
+      
+    </div>
+
+    <div>
+      
         
+
       
     </div>
 
     <div>
       
-    </div>
+        
 
-    <div>
       
     </div>
 
@@ -560,616 +577,32 @@
       
 
       
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
             
+              <a href="/blog/2017/02/19/Object.observe/" rel="next" title="关于Object.observe的知识">
+                <i class="fa fa-chevron-left"></i> 关于Object.observe的知识
+              </a>
             
-              
-                
-                <a class="post-title-link" href="/blog/2017/02/19/Object.observe/" itemprop="url">
-                  关于Object.observe的知识
-                </a>
-              
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
             
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-02-19T19:16:21+08:00" content="2017-02-19">
-              2017-02-19
-            </time>
-          </span>
-
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
+          </div>
         </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          
-            <h2 id="Object-observe"><a href="#Object-observe" class="headerlink" title="Object.observe"></a>Object.observe</h2><p>当前MVC模式在Angular.JS等冲击下已经变成了View视图和Model模型两个， 控制器由事件驱动机制替代，见 ：<a href="http://www.jdon.com/46833" target="_blank" rel="external">MVI是一种Reactive MVC</a>。</p>
-<p>那么为什么JS不能自然支持事件通知机制呢？ES7引入了Object.observe：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">var person = &#123;&#125;;</div><div class="line">var changesHandler = changes =&gt; console.log(changes);</div><div class="line">Object.observe(person, changesHandler);</div></pre></td></tr></table></figure>
-<p>这样，当person的内容有更改，将自动触发changes函数，如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">person = &#123;</div><div class="line">　　name: &quot; jdon&quot;</div><div class="line">&#125;</div><div class="line">　　如果person的名称从jdon改为jdon.com:</div><div class="line">person = &#123;</div><div class="line">　　name: &quot; jdon.com&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这种name内容变化，将触发函数changes输出：</p>
-<hr>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[</div><div class="line">    &#123;</div><div class="line">        &quot;type&quot;:&quot;update&quot;,</div><div class="line">        &quot;name&quot;:&quot;name&quot;,</div><div class="line">        &quot;oldValue: &quot;jdon&quot;</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
-<p>如果person增加内容：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">person = &#123;</div><div class="line">　　name: &quot; jdon.com&quot;</div><div class="line">　　employer: &quot;banq&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>激活函数输出：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[</div><div class="line">    &#123;</div><div class="line">        &quot;type&quot;:&quot;new&quot;,</div><div class="line">        &quot;name&quot;:&quot;employer&quot;,</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
-<p>如果person删除内容employer，那么输出是：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[</div><div class="line">    &#123;</div><div class="line">        &quot;type&quot;:&quot;delete&quot;,</div><div class="line">        &quot;name&quot;:&quot;employer&quot;,</div><div class="line">        &quot;oldValue: &quot;banq&quot;</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
-<p>解除观察是：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Object.unobserve(person, changesHandler);</div></pre></td></tr></table></figure>
-<p>为了防止事件风暴，ES7使用了 Event Loop Queue + Microtasks，当事件处理器EventHandler发出改变事件给ChangeHandler以后，ChangeHandler不会排队在队列后面，而是替换当前EventHandler位置，这样在浏览器渲染页面之前完成所有事件通知：</p>
-<p><img src="http://karat.cc/img/93256ccb-d34f-4419-bd82-5cbb8c1cde88.png" alt="js7.png"></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </article>
 
 
-    
-      
 
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/blog/2017/01/08/FetchAPI/" itemprop="url">
-                  三种Ajax方式
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-01-08T23:02:40+08:00" content="2017-01-08">
-              2017-01-08
-            </time>
-          </span>
-
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="一、原生-JS-实现-AJAX"><a href="#一、原生-JS-实现-AJAX" class="headerlink" title="一、原生 JS 实现 AJAX"></a>一、原生 JS 实现 AJAX</h2><p>JS 实现 AJAX 主要基于浏览器提供的 XMLHttpRequest（XHR）类，所有现代浏览器（IE7+、Firefox、Chrome、Safari 以及 Opera）均内建 XMLHttpRequest 对象。</p>
-<h4 id="1-获取XMLHttpRequest对象"><a href="#1-获取XMLHttpRequest对象" class="headerlink" title="1. 获取XMLHttpRequest对象"></a>1. 获取XMLHttpRequest对象</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">// 获取XMLHttpRequest对象</div><div class="line">var xhr = new XMLHttpRequest();</div></pre></td></tr></table></figure>
-<h4 id="2-发送一个-HTTP-请求"><a href="#2-发送一个-HTTP-请求" class="headerlink" title="2. 发送一个 HTTP 请求"></a>2. 发送一个 HTTP 请求</h4><p>接下来，我们需要打开一个URL，然后发送这个请求。分别要用到 XMLHttpRequest 的 open() 方法和 send() 方法。</p>
-<h2 id="二、-jQuery-实现-AJAX"><a href="#二、-jQuery-实现-AJAX" class="headerlink" title="二、 jQuery 实现 AJAX"></a>二、 jQuery 实现 AJAX</h2><p>jQuery 作为一个使用人数最多的库，其 AJAX 很好的封装了原生 AJAX 的代码，在兼容性和易用性方面都做了很大的提高，让 AJAX 的调用变得非常简单。下面便是一段简单的 jQuery 的 AJAX 代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">$.ajax(&#123;</div><div class="line">  method: &apos;POST&apos;,</div><div class="line">  url: &apos;/api&apos;,</div><div class="line">  data: &#123; username: &apos;admin&apos;, password: &apos;root&apos; &#125;</div><div class="line">&#125;)</div><div class="line">  .done(function(msg) &#123;</div><div class="line">    alert( &apos;Data Saved: &apos; + msg );</div><div class="line">  &#125;);</div></pre></td></tr></table></figure>
-<p>对比原生 AJAX 的实现，使用 jQuery 就异常简单了。当然我们平时用的最多的，是下面两种更简单的方式：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">// GET</div><div class="line">$.get(&apos;/api&apos;, function(res) &#123;</div><div class="line">  // do something</div><div class="line">&#125;);</div><div class="line"></div><div class="line">// POST</div><div class="line">var data = &#123;</div><div class="line">  username: &apos;admin&apos;,</div><div class="line">  password: &apos;root&apos;</div><div class="line">&#125;;</div><div class="line">$.post(&apos;/api&apos;, data, function(res) &#123;</div><div class="line">  // do something</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
-<h2 id="三、Fetch-API"><a href="#三、Fetch-API" class="headerlink" title="三、Fetch API"></a>三、Fetch API</h2><p>使用 jQuery 虽然可以大大简化 XMLHttpRequest 的使用，但 XMLHttpRequest 本质上但并不是一个设计优良的 API： + 不符合关注分离（Separation of Concerns）的原则 + 配置和调用方式非常混乱 + 使用事件机制来跟踪状态变化 + 基于事件的异步模型没有现代的 Promise，generator/yield，async/await 友好</p>
-<p>Fetch API 旨在修正上述缺陷，它提供了与 HTTP 语义相同的 JS 语法，简单来说，它引入了 fetch() 这个实用的方法来获取网络资源。</p>
-<p>原生支持率并不高，幸运的是，引入下面这些 polyfill 后可以完美支持 IE8+：</p>
-<ul>
-<li>由于 IE8 是 ES3，需要引入 ES5 的 polyfill: <a href="https://link.zhihu.com/?target=https%3A//github.com/es-shims/es5-shim" target="_blank" rel="external">es5-shim, es5-sham**</a></li>
-<li>引入 Promise 的 polyfill: <a href="https://link.zhihu.com/?target=https%3A//github.com/stefanpenner/es6-promise" target="_blank" rel="external">es6-promise**</a></li>
-<li>引入 fetch 探测库：<a href="https://link.zhihu.com/?target=https%3A//github.com/camsong/fetch-detector" target="_blank" rel="external">fetch-detector**</a></li>
-<li>引入 fetch 的 polyfill: <a href="https://link.zhihu.com/?target=https%3A//github.com/camsong/fetch-ie8" target="_blank" rel="external">fetch-ie8**</a></li>
-<li>可选：如果你还使用了 jsonp，引入 <a href="https://link.zhihu.com/?target=https%3A//github.com/camsong/fetch-jsonp" target="_blank" rel="external">fetch-jsonp**</a></li>
-<li>可选：开启 Babel 的 runtime 模式，现在就使用 async/await</li>
-</ul>
-<h4 id="1-一个使用-Fetch-的例子"><a href="#1-一个使用-Fetch-的例子" class="headerlink" title="1. 一个使用 Fetch 的例子"></a>1. 一个使用 Fetch 的例子</h4><p>先看一个简单的 Fetch API 的例子 🌰 ：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">fetch(<span class="string">'/api'</span>).then(<span class="function"><span class="keyword">function</span>(<span class="params">response</span>) </span>&#123;</div><div class="line">  <span class="keyword">return</span> response.json();</div><div class="line">&#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(data);</div><div class="line">&#125;).catch(<span class="function"><span class="keyword">function</span>(<span class="params">error</span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'Oops, error: '</span>, error);</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
-<p>使用 ES6 的箭头函数后：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">fetch(&apos;/api&apos;).then(response =&gt; response.json())</div><div class="line">  .then(data =&gt; console.log(data))</div><div class="line">  .catch(error =&gt; console.log(&apos;Oops, error: &apos;, error))</div></pre></td></tr></table></figure>
-<p>可以看出使用Fetch后我们的代码更加简洁和语义化，链式调用的方式也使其更加流畅和清晰。但这种基于 Promise 的写法还是有 Callback 的影子，我们还可以用 async/await 来做最终优化：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">async function() &#123;</div><div class="line">  try &#123;</div><div class="line">    let response = await fetch(url);</div><div class="line">    let data = response.json();</div><div class="line">    console.log(data);</div><div class="line">  &#125; catch (error) &#123;</div><div class="line">    console.log(&apos;Oops, error: &apos;, error);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>使用 await 后，写代码就更跟同步代码一样。await 后面可以跟 Promise 对象，表示等待 Promise resolve() 才会继续向下执行，如果 Promise 被 reject() 或抛出异常则会被外面的 try…catch 捕获。</p>
-<p>Promise，generator/yield，await/async 都是现在和未来 JS 解决异步的标准做法，可以完美搭配使用。这也是使用标准 Promise 一大好处。</p>
-<h4 id="2-使用-Fetch-的注意事项"><a href="#2-使用-Fetch-的注意事项" class="headerlink" title="2. 使用 Fetch 的注意事项"></a>2. 使用 Fetch 的注意事项</h4><ul>
-<li>Fetch 请求默认是不带 cookie，需要设置 fetch(url, {credentials: ‘include’})`</li>
-<li>服务器返回 400，500 错误码时并不会 reject，只有网络错误这些导致请求不能完成时，fetch 才会被 reject</li>
-</ul>
-<p>接下来将上面基于 XMLHttpRequest 的 AJAX 用 Fetch 改写：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> options = &#123;</div><div class="line">    method: <span class="string">'POST'</span>,</div><div class="line">    headers: &#123;</div><div class="line">      <span class="string">'Accept'</span>: <span class="string">'application/json'</span>,</div><div class="line">      <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span></div><div class="line">    &#125;,</div><div class="line">    body: <span class="built_in">JSON</span>.stringify(&#123; username: <span class="string">'admin'</span>, password: <span class="string">'root'</span> &#125;),</div><div class="line">    credentials: <span class="string">'include'</span></div><div class="line">  &#125;;</div><div class="line"></div><div class="line">fetch(<span class="string">'/api'</span>, options).then(response =&gt; response.json())</div><div class="line">  .then(data =&gt; <span class="built_in">console</span>.log(data))</div><div class="line">  .catch(error =&gt; <span class="built_in">console</span>.log(<span class="string">'Oops, error: '</span>, error))</div></pre></td></tr></table></figure>
-<p>Github Issue: <a href="https://link.zhihu.com/?target=https%3A//github.com/nodejh/nodejh.github.io/issues/15" target="_blank" rel="external">分别使用 XHR、jQuery 和 Fetch 实现 AJAX · Issue #15 · nodejh/nodejh.github.io</a></p>
-
-          
-        
+    <div class="post-spread">
       
     </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/blog/2017/01/08/十张GIFs让你弄懂递归等概念/" itemprop="url">
-                  未命名
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-01-08T17:35:23+08:00" content="2017-01-08">
-              2017-01-08
-            </time>
-          </span>
-
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><img src="http://codingpy.com/static/thumbnails/couple-love-bedroom-kissing.jpg" alt="十张GIFs让你弄懂递归等概念"></p>
-<p><strong>更多Python电子书及视频教程，请关注微信公众号编程派（codingpy）</strong></p>
-<p>图像（包括动图）是传递信息的一种高效方式，往往能增强表象、记忆与思维等方面的反应强度。所谓一图胜千言，说的就是这个道理。</p>
-<p>今天为大家整理了十张动图GIFS，有助于认识循环、递归、二分检索等概念的具体运行情况。代码实例以Python语言编写。</p>
-<h2 id="一、循环"><a href="#一、循环" class="headerlink" title="一、循环"></a>一、循环</h2><p>GIF 1：最简单的 while 循环</p>
-<p>​<img src="http://ww2.sinaimg.cn/mw690/006faQNTgw1f5wnm06h3ug30ci08cake.gif" alt="GIF 1：最简单的 while 循环"></p>
-<p>GIF 2：带 if/else 的循环</p>
-<p><img src="http://ww2.sinaimg.cn/mw690/006faQNTgw1f5wnm0mcxrg30ci07o47l.gif" alt="GIF 2：带 if/else 的循环"></p>
-<h2 id="二、递归"><a href="#二、递归" class="headerlink" title="二、递归"></a>二、递归</h2><p>GIF 3：递归概念的直接演示</p>
-<p><img src="http://ww3.sinaimg.cn/mw690/006faQNTgw1f5wnlzswxcg30b408cduy.gif" alt="GIF 3：递归概念的直接演示"></p>
-<p>GIF 4：递归的代码示例</p>
-<p><img src="http://ww2.sinaimg.cn/mw690/006faQNTgw1f5wnly6j5pg30aa0faqrn.gif" alt="GIF 4：递归的代码示例"></p>
-<p>GIF 5：递归求斐波那契数列</p>
-<p><img src="http://ww2.sinaimg.cn/mw690/006faQNTgw1f5wnlwhw70g30by0byu0x.gif" alt="GIF 5：递归求斐波那契数列"></p>
-<p>GIF 6：递归求阶乘（图里缩进有点问题，请忽略吧）</p>
-<p><img src="http://ww2.sinaimg.cn/mw690/006faQNTgw1f5wnlzf8rbg30by06ykas.gif" alt="GIF 6：递归求阶乘"></p>
-<h2 id="三、按值传递和按引用传递"><a href="#三、按值传递和按引用传递" class="headerlink" title="三、按值传递和按引用传递"></a>三、按值传递和按引用传递</h2><p>GIF 7：按值传递和按引用传递的区别</p>
-<p><img src="http://ww2.sinaimg.cn/mw690/006faQNTgw1f5wnlxqkyfg30dw07iad0.gif" alt="GIF 7：按值传递和按引用传递的区别"></p>
-<h2 id="四、线性检索和二分检索"><a href="#四、线性检索和二分检索" class="headerlink" title="四、线性检索和二分检索"></a>四、线性检索和二分检索</h2><p>GIF 8：线性检索和二分检索求 23 的位置</p>
-<p><img src="http://ww4.sinaimg.cn/mw690/006faQNTgw1f5wnlwwt0mg30dw099abp.gif" alt="GIF 8：线性检索和二分检索求 23 的位置"></p>
-<p>GIF 9：线性检索和二分检索求 1 的位置</p>
-<p><img src="http://ww2.sinaimg.cn/mw690/006faQNTgw1f5wnlxbperg30dw099q4z.gif" alt="GIF 9：线性检索和二分检索求 1 的位置"></p>
-<p>GIF 10：二分检索树</p>
-<p><img src="http://ww3.sinaimg.cn/mw690/006faQNTgw1f5wnluctrag30ci0aitbs.gif" alt="GIF 10：二分检索树"></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/blog/2016/12/24/持续集成交付部署/" itemprop="url">
-                  持续集成交付部署
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-12-24T21:08:29+08:00" content="2016-12-24">
-              2016-12-24
-            </time>
-          </span>
-
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="持续集成"><a href="#持续集成" class="headerlink" title="持续集成"></a>持续集成</h3><p><img src="http://cdn02.mindtheproduct.com/wp-content/uploads/2015/12/409-images-for-snap-blog-postedit_image1.png" alt="Continuous Integration"></p>
-<p>持续集成强调开发人员提交了新代码之后，立刻进行构建、（单元）测试、打包等步骤。根据反馈的测试结果，我们可以知道新代码和原有代码能否正确地集成在一起。</p>
-<h3 id="持续交付"><a href="#持续交付" class="headerlink" title="持续交付"></a>持续交付</h3><p><img src="http://cdn02.mindtheproduct.com/wp-content/uploads/2015/12/409-images-for-snap-blog-postedit_image4-manual.png" alt="Continuous Delivery"></p>
-<p>持续交付在持续集成的基础上，将集成后的代码部署到更贴近真实运行环境的「类生产环境（ <em>production-like environments</em> ）」中。比如，我们完成单元测试后，可以把代码部署到连接数据库的 Staging 环境中进行更多的测试。如果代码没有问题，接下来就可以继续<strong>手动部署</strong>到生产环境中。</p>
-<h3 id="持续部署"><a href="#持续部署" class="headerlink" title="持续部署"></a>持续部署</h3><p><img src="http://cdn02.mindtheproduct.com/wp-content/uploads/2015/12/409-images-for-snap-blog-postedit_image3-auto.png" alt="Continuous Deployment"></p>
-<p>持续部署则是在持续交付的基础上，把部署到生产环境的过程自动化。</p>
-<p>我个人觉得持续集成、持续交付、持续部署非常值得推广。开发过程中最怕集成时遇到问题导致返工，而持续集成、持续交付、持续部署恰恰可以做到问题早发现早解决，从而可以避免这样的麻烦。另外，持续集成、持续交付、持续部署的流程高度依赖自动化工具，所以这种开发方法也可以大大提高开发人员的工作效率。</p>
-<h1 id="21副GIF动图让你了解各种数学概念"><a href="#21副GIF动图让你了解各种数学概念" class="headerlink" title="21副GIF动图让你了解各种数学概念"></a>21副GIF动图让你了解各种数学概念</h1><blockquote>
-<p><em>“让我们面对它;总的来说数学是不容易的，但当你征服了问题，并达到新的理解高度，这就是它给你的回报。”</em></p>
-<p><em>——Danica McKellar</em></p>
-</blockquote>
-<p>数学是很难的科学，但因为它是科学家用数学来解释宇宙的语言，我们无可避免的要学习它。看看下面的这些GIF动图，它们提供了视觉的方式来帮助你理解各种数学技巧。</p>
-<h2 id="1、椭圆的画法"><a href="#1、椭圆的画法" class="headerlink" title="1、椭圆的画法"></a>1、椭圆的画法</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/QjI3a5N.gif" alt="img"></p>
-<h2 id="2、杨辉三角问题-Pascal-triangles-解法"><a href="#2、杨辉三角问题-Pascal-triangles-解法" class="headerlink" title="2、杨辉三角问题(Pascal triangles)解法"></a>2、杨辉三角问题(Pascal triangles)解法</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/UM4iYce.gif" alt="img"></p>
-<h2 id="3、使用“FOIL”轻松的解决二项式乘法"><a href="#3、使用“FOIL”轻松的解决二项式乘法" class="headerlink" title="3、使用“FOIL”轻松的解决二项式乘法"></a>3、使用“FOIL”轻松的解决二项式乘法</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/ptJ6Ph6.gif" alt="img"></p>
-<h2 id="4、对数解法技巧"><a href="#4、对数解法技巧" class="headerlink" title="4、对数解法技巧"></a>4、对数解法技巧</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/sYgj4HS.gif" alt="img"></p>
-<h2 id="5、矩阵转置的技巧"><a href="#5、矩阵转置的技巧" class="headerlink" title="5、矩阵转置的技巧"></a>5、矩阵转置的技巧</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/16Afrj1.gif" alt="img"></p>
-<h2 id="6、勾股定理"><a href="#6、勾股定理" class="headerlink" title="6、勾股定理"></a>6、勾股定理</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/O9W3KCz.gif" alt="img"></p>
-<h2 id="7、多边形的外角之和总是等于360度"><a href="#7、多边形的外角之和总是等于360度" class="headerlink" title="7、多边形的外角之和总是等于360度"></a>7、多边形的外角之和总是等于360度</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/bZDfWVr.gif" alt="img"></p>
-<h2 id="8、圆周率π"><a href="#8、圆周率π" class="headerlink" title="8、圆周率π"></a>8、圆周率π</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/vVcc2OP.gif" alt="img"></p>
-<h2 id="9、一弧度就是长度刚好等于半径的一段圆弧所对的圆心角"><a href="#9、一弧度就是长度刚好等于半径的一段圆弧所对的圆心角" class="headerlink" title="9、一弧度就是长度刚好等于半径的一段圆弧所对的圆心角"></a>9、一弧度就是长度刚好等于半径的一段圆弧所对的圆心角</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/AQUrYb1.gif" alt="img"></p>
-<h2 id="10、在Y轴上使用正弦-红色-，在X轴上使用余弦-蓝色-，则在XY轴平面上画出的环形如下图-黑色"><a href="#10、在Y轴上使用正弦-红色-，在X轴上使用余弦-蓝色-，则在XY轴平面上画出的环形如下图-黑色" class="headerlink" title="10、在Y轴上使用正弦(红色)，在X轴上使用余弦(蓝色)，则在XY轴平面上画出的环形如下图(黑色)"></a>10、在Y轴上使用正弦(红色)，在X轴上使用余弦(蓝色)，则在XY轴平面上画出的环形如下图(黑色)</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/WheKCzG.gif" alt="img"></p>
-<h2 id="11、同前一原理，但更简单"><a href="#11、同前一原理，但更简单" class="headerlink" title="11、同前一原理，但更简单"></a>11、同前一原理，但更简单</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/cBzeLOo.gif" alt="img"></p>
-<h2 id="12、这是将sin和cos运用到三角形上"><a href="#12、这是将sin和cos运用到三角形上" class="headerlink" title="12、这是将sin和cos运用到三角形上"></a>12、这是将sin和cos运用到三角形上</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/ZJ7H3Zw.gif" alt="img"></p>
-<h2 id="13、余弦是正弦的衍生物"><a href="#13、余弦是正弦的衍生物" class="headerlink" title="13、余弦是正弦的衍生物"></a>13、余弦是正弦的衍生物</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/7sNvJ9c.gif" alt="img"></p>
-<h2 id="14、正切线"><a href="#14、正切线" class="headerlink" title="14、正切线"></a>14、正切线</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/SEDLpsd.gif" alt="img"></p>
-<h2 id="15、同上，但翻个面看，更容易理解"><a href="#15、同上，但翻个面看，更容易理解" class="headerlink" title="15、同上，但翻个面看，更容易理解"></a>15、同上，但翻个面看，更容易理解</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/wEbNVxU.gif" alt="img"></p>
-<h2 id="16、将一个公式从笛卡尔坐标转换成轴坐标"><a href="#16、将一个公式从笛卡尔坐标转换成轴坐标" class="headerlink" title="16、将一个公式从笛卡尔坐标转换成轴坐标"></a>16、将一个公式从笛卡尔坐标转换成轴坐标</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/WrdyKdG.gif" alt="img"></p>
-<h2 id="17、画抛物线"><a href="#17、画抛物线" class="headerlink" title="17、画抛物线"></a>17、画抛物线</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/YCnwxZJ.gif" alt="img"></p>
-<h2 id="18、黎曼和-Riemann-sum-约等于其曲线下的面积"><a href="#18、黎曼和-Riemann-sum-约等于其曲线下的面积" class="headerlink" title="18、黎曼和(Riemann sum)约等于其曲线下的面积"></a>18、黎曼和(Riemann sum)约等于其曲线下的面积</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/S7FJlZi.gif" alt="img"></p>
-<h2 id="19、双曲线"><a href="#19、双曲线" class="headerlink" title="19、双曲线"></a>19、双曲线</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/kmh3hR5.gif" alt="img"></p>
-<h2 id="20、将双曲线表现成3D形式，也许你不相信，它完全是用直线画成的"><a href="#20、将双曲线表现成3D形式，也许你不相信，它完全是用直线画成的" class="headerlink" title="20、将双曲线表现成3D形式，也许你不相信，它完全是用直线画成的"></a>20、将双曲线表现成3D形式，也许你不相信，它完全是用直线画成的</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/bsIyErA.gif" alt="img"></p>
-<p>你甚至可以做成这样的效果：</p>
-<p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/Dc1OkwU.gif" alt="img"></p>
-<h1 id="趣图三幅：负载均衡算法需要改进"><a href="#趣图三幅：负载均衡算法需要改进" class="headerlink" title="趣图三幅：负载均衡算法需要改进"></a>趣图三幅：负载均衡算法需要改进</h1><h3 id="图一：负载均衡算法需要改进"><a href="#图一：负载均衡算法需要改进" class="headerlink" title="图一：负载均衡算法需要改进"></a>图一：负载均衡算法需要改进</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/08/load-balance1.jpg" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/08/load-balance1-560x420.jpg" alt="负载均衡算法"></a></p>
-<h3 id="图二：开发人员-vs-测试人员，一张很诡异的图片"><a href="#图二：开发人员-vs-测试人员，一张很诡异的图片" class="headerlink" title="图二：开发人员 vs 测试人员，一张很诡异的图片"></a>图二：开发人员 vs 测试人员，一张很诡异的图片</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/08/developer-vs-tester.png" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/08/developer-vs-tester.png" alt="开发人员 vs 测试人员"></a></p>
-<h1 id="爱喝啤酒的程序员是如何学习数据结构的"><a href="#爱喝啤酒的程序员是如何学习数据结构的" class="headerlink" title="爱喝啤酒的程序员是如何学习数据结构的"></a>爱喝啤酒的程序员是如何学习数据结构的</h1><p>如果在相亲时你说你是程序员，对方——一般是女的——会投来异样的眼光。程序员在其他人的眼中的形象一般是思维逻辑有问题，或木纳，或有点儿轴，或是书呆子。但凡事都在变化，程序员也在变化，英语中的Programmer这个词在国外现在流行写出<a href="http://www.aqee.net/brogrammers-challenge-coders-nerdy-image/" target="_blank" rel="external">Brogrammer</a>。Brogrammer和Programmer的区别是，前者很时髦、很酷。Brogrammer有很多典型特征，比如说编程时戴墨镜，听摇滚乐，喜欢参加派对，喜欢啤酒等，如果你想知道你自己是否符合Brogrammer标准，你可以<a href="http://www.aqee.net/docs/Quiz-Are-You-a-Brogrammer/" target="_blank" rel="external">到这里测试一下自己</a>。</p>
-<p>一般来说，程序员喝酒是大忌，因为编程需要用脑子，要逻辑清晰。但就像之前说的，凡事都在进化，一方面，编程环境、编程工具越来越发达完善，对程序员的要求越来越低，另一方面，有些人喝完酒后更兴奋，脑子更活。下面这几幅图描绘的是一个爱喝啤酒的程序员是如何学习数据结构的，你可以看出，他酒喝了，数据结构也掌握了。</p>
-<h3 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/binary-tree.jpg" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/binary-tree-620x370.jpg" alt="二叉树"></a></p>
-<h3 id="不平衡树"><a href="#不平衡树" class="headerlink" title="不平衡树"></a>不平衡树</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/unbalanced-tree.jpg" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/unbalanced-tree-620x370.jpg" alt="不平衡树"></a></p>
-<h3 id="重新平衡树"><a href="#重新平衡树" class="headerlink" title="重新平衡树"></a>重新平衡树</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/rebalanced-tree.jpg" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/rebalanced-tree-620x370.jpg" alt="重新平衡树"></a></p>
-<h3 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/array.jpg" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/array-620x370.jpg" alt="数组"></a></p>
-<h3 id="矩阵"><a href="#矩阵" class="headerlink" title="矩阵"></a>矩阵</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/matrix.jpg" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/matrix-560x335.jpg" alt="矩阵"></a></p>
-<h3 id="链接表"><a href="#链接表" class="headerlink" title="链接表"></a>链接表</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/linked-list.jpg" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/linked-list-620x370.jpg" alt="链接表"></a></p>
-<h3 id="稀疏矩阵"><a href="#稀疏矩阵" class="headerlink" title="稀疏矩阵"></a>稀疏矩阵</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/sparse-matrix.jpg" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/sparse-matrix-620x370.jpg" alt="稀疏矩阵"></a></p>
-<h3 id="堆"><a href="#堆" class="headerlink" title="堆"></a>堆</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/heap.jpg" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/heap-620x370.jpg" alt="堆"></a></p>
-<h3 id="栈"><a href="#栈" class="headerlink" title="栈"></a>栈</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/stack.jpg" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/stack-620x370.jpg" alt="栈"></a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/blog/2016/08/25/Hello/" itemprop="url">
-                  使用Hexo搭建个人的GitHub Blog
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-08-25T15:15:14+08:00" content="2016-08-25">
-              2016-08-25
-            </time>
-          </span>
-
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-<h3 id="Blog-Example"><a href="#Blog-Example" class="headerlink" title="Blog Example"></a>Blog Example</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">---</div><div class="line"></div><div class="line">title: 使用hexo来写博客</div><div class="line">tags: []</div><div class="line">categories: []</div><div class="line">date: 2016-08-25 15:41:00</div><div class="line"></div><div class="line">---</div><div class="line">## post title</div></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-  </section>
-
-  
+  </div>
 
 
           </div>
@@ -1177,6 +610,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
         
@@ -1196,8 +633,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel  sidebar-panel-active ">
+      <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/blog/images/avatar.gif"
@@ -1240,6 +686,17 @@
 
       </section>
 
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基于类-vs-基于原型的语言"><span class="nav-number">1.</span> <span class="nav-text">基于类 vs 基于原型的语言</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定义类"><span class="nav-number">1.1.</span> <span class="nav-text">定义类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#子类和继承"><span class="nav-number">1.2.</span> <span class="nav-text">子类和继承</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加和移除属性"><span class="nav-number">1.3.</span> <span class="nav-text">添加和移除属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#区别摘要"><span class="nav-number">1.4.</span> <span class="nav-text">区别摘要</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Employee-示例"><span class="nav-number">2.</span> <span class="nav-text">Employee 示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建层级结构"><span class="nav-number">3.</span> <span class="nav-text">创建层级结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对象的属性"><span class="nav-number">4.</span> <span class="nav-text">对象的属性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#继承属性"><span class="nav-number">4.1.</span> <span class="nav-text">继承属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加属性"><span class="nav-number">4.2.</span> <span class="nav-text">添加属性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更灵活的构造器"><span class="nav-number">5.</span> <span class="nav-text">更灵活的构造器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#再谈属性的继承"><span class="nav-number">6.</span> <span class="nav-text">再谈属性的继承</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#本地值和继承值"><span class="nav-number">6.1.</span> <span class="nav-text">本地值和继承值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#判断实例的关系"><span class="nav-number">6.2.</span> <span class="nav-text">判断实例的关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构造器中的全局信息"><span class="nav-number">6.3.</span> <span class="nav-text">构造器中的全局信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#没有多继承"><span class="nav-number">6.4.</span> <span class="nav-text">没有多继承</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
       
 
     </div>
@@ -1343,6 +800,10 @@
 
 
   
+  <script type="text/javascript" src="/blog/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/blog/js/src/post-details.js?v=5.0.1"></script>
+
+
 
   
 
