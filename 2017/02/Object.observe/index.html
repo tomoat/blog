@@ -87,35 +87,24 @@
 
 
 
-<meta name="description" content="权限管理是每个系统中用户管理必需的管理组件，通常需要通过判断用户所具有的权限来控制用户对系统的操作内容，并把资源调配给用户，限制用户的增删改查等操作。
-通常权限管理的访问控制模型有以下两种方式：
-ACL：Access Control List，访问控制列表（节点控制），是比较流行的设计方式。通过把用户和权限挂钩来实现。
- RBAC：Role Based Access Control，基于的角色访问">
+<meta name="description" content="Object.observe当前MVC模式在Angular.JS等冲击下已经变成了View视图和Model模型两个， 控制器由事件驱动机制替代，见 ：MVI是一种Reactive MVC。
+那么为什么JS不能自然支持事件通知机制呢？ES7引入了Object.observe：
+123var person = &amp;#123;&amp;#125;;jvar changesHandler = changes =&amp;g">
 <meta property="og:type" content="article">
-<meta property="og:title" content="项目中用到的用户权限管理系统">
-<meta property="og:url" content="https://tomoat.github.io/2017/03/项目中用到的用户权限管理系统">
+<meta property="og:title" content="关于Object.observe的知识">
+<meta property="og:url" content="https://tomoat.github.io/2017/02/Object.observe/index.html">
 <meta property="og:site_name" content="tomoat的笔记">
-<meta property="og:description" content="权限管理是每个系统中用户管理必需的管理组件，通常需要通过判断用户所具有的权限来控制用户对系统的操作内容，并把资源调配给用户，限制用户的增删改查等操作。
-通常权限管理的访问控制模型有以下两种方式：
-ACL：Access Control List，访问控制列表（节点控制），是比较流行的设计方式。通过把用户和权限挂钩来实现。
- RBAC：Role Based Access Control，基于的角色访问">
-<meta property="og:image" content="http://dl.iteye.com/upload/attachment/425543/d2573c4d-dca7-380f-b2fc-6cda19d6eaf5.jpg">
-<meta property="og:image" content="http://dl.iteye.com/upload/attachment/425558/90bf9805-c29d-3199-a905-c6ddc7fd4e81.jpg">
-<meta property="og:image" content="http://dl.iteye.com/upload/attachment/425567/53bc63c4-52e6-3c6f-91d8-7e23a9aefe4a.jpg">
-<meta property="og:image" content="http://dl.iteye.com/upload/attachment/425569/c07d99bc-e19d-302d-8dea-dc98309bf919.jpg">
-<meta property="og:image" content="http://img.blog.csdn.net/20140118135544281?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGNoOTE4/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center">
-<meta property="og:image" content="http://img.blog.csdn.net/20140118135551234?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGNoOTE4/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center">
-<meta property="og:image" content="http://img.blog.csdn.net/20140118135834234?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGNoOTE4/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center">
-<meta property="og:image" content="http://img.blog.csdn.net/20140118135348656?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGNoOTE4/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center">
-<meta property="og:image" content="http://img.blog.csdn.net/20140118135356750?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGNoOTE4/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center">
-<meta property="og:updated_time" content="2017-03-11T03:14:55.000Z">
+<meta property="og:description" content="Object.observe当前MVC模式在Angular.JS等冲击下已经变成了View视图和Model模型两个， 控制器由事件驱动机制替代，见 ：MVI是一种Reactive MVC。
+那么为什么JS不能自然支持事件通知机制呢？ES7引入了Object.observe：
+123var person = &amp;#123;&amp;#125;;jvar changesHandler = changes =&amp;g">
+<meta property="og:image" content="http://karat.cc/img/93256ccb-d34f-4419-bd82-5cbb8c1cde88.png">
+<meta property="og:updated_time" content="2017-03-06T15:53:30.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="项目中用到的用户权限管理系统">
-<meta name="twitter:description" content="权限管理是每个系统中用户管理必需的管理组件，通常需要通过判断用户所具有的权限来控制用户对系统的操作内容，并把资源调配给用户，限制用户的增删改查等操作。
-通常权限管理的访问控制模型有以下两种方式：
-ACL：Access Control List，访问控制列表（节点控制），是比较流行的设计方式。通过把用户和权限挂钩来实现。
- RBAC：Role Based Access Control，基于的角色访问">
-<meta name="twitter:image" content="http://dl.iteye.com/upload/attachment/425543/d2573c4d-dca7-380f-b2fc-6cda19d6eaf5.jpg">
+<meta name="twitter:title" content="关于Object.observe的知识">
+<meta name="twitter:description" content="Object.observe当前MVC模式在Angular.JS等冲击下已经变成了View视图和Model模型两个， 控制器由事件驱动机制替代，见 ：MVI是一种Reactive MVC。
+那么为什么JS不能自然支持事件通知机制呢？ES7引入了Object.observe：
+123var person = &amp;#123;&amp;#125;;jvar changesHandler = changes =&amp;g">
+<meta name="twitter:image" content="http://karat.cc/img/93256ccb-d34f-4419-bd82-5cbb8c1cde88.png">
 
 
 
@@ -143,13 +132,13 @@ ACL：Access Control List，访问控制列表（节点控制），是比较流�
 
 
 
-  <link rel="canonical" href="https://tomoat.github.io/2017/03/项目中用到的用户权限管理系统"/>
+  <link rel="canonical" href="https://tomoat.github.io/2017/02/Object.observe/"/>
 
 
 
 
 
-  <title> 项目中用到的用户权限管理系统 | tomoat的笔记 </title>
+  <title> 关于Object.observe的知识 | tomoat的笔记 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -268,7 +257,7 @@ ACL：Access Control List，访问控制列表（节点控制），是比较流�
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/项目中用到的用户权限管理系统">
+    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/02/Object.observe/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="tomoat">
@@ -289,7 +278,7 @@ ACL：Access Control List，访问控制列表（节点控制），是比较流�
             
             
               
-                项目中用到的用户权限管理系统
+                关于Object.observe的知识
               
             
           </h1>
@@ -304,8 +293,8 @@ ACL：Access Control List，访问控制列表（节点控制），是比较流�
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-11T10:41:27+08:00">
-                2017-03-11
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-19T19:16:21+08:00">
+                2017-02-19
               </time>
             
 
@@ -340,25 +329,24 @@ ACL：Access Control List，访问控制列表（节点控制），是比较流�
       
 
       
-        <p>权限管理是每个系统中用户管理必需的管理组件，通常需要通过判断用户所具有的权限来控制用户对系统的操作内容，并把资源调配给用户，限制用户的增删改查等操作。</p>
-<p>通常权限管理的访问控制模型有以下两种方式：</p>
-<p><a href="https://en.wikipedia.org/wiki/Access_control_list" target="_blank" rel="external">ACL</a>：Access Control List，访问控制列表（节点控制），是比较流行的设计方式。通过把用户和权限挂钩来实现。</p>
-<p> <a href="https://en.wikipedia.org/wiki/Role-based_access_control" target="_blank" rel="external">RBAC</a>：Role Based Access Control，基于的角色访问控制系统，是另一个实现思路。、就是把用户和角色关联，角色来对应权限，用户和权限没有直接关联，对复杂的系统来说，更加容易管理。</p>
-<h3 id="RBAC物理模型"><a href="#RBAC物理模型" class="headerlink" title="RBAC物理模型"></a>RBAC物理模型</h3><p><a href="http://dl.iteye.com/upload/attachment/425543/d2573c4d-dca7-380f-b2fc-6cda19d6eaf5.jpg" target="_blank" rel="external"><img src="http://dl.iteye.com/upload/attachment/425543/d2573c4d-dca7-380f-b2fc-6cda19d6eaf5.jpg" alt="img"></a></p>
-<p>当用户的数量非常大时，要给系统每个用户逐一授权（授角色），是件非常烦琐的事情。这时，就需要给用户分组，每个用户组内有多个用户。除了可给用户授权外，还可以给用户组授权。这样一来，用户拥有的所有权限，就是用户个人拥有的权限与该用户所在用户组拥有的权限之和。（下图为用户组、用户与角色三者的关联关系）</p>
-<p><img src="http://dl.iteye.com/upload/attachment/425558/90bf9805-c29d-3199-a905-c6ddc7fd4e81.jpg" alt="img"></p>
-<p>​                                    “用户-角色-权限-资源” 授权模型</p>
-<p><img src="http://dl.iteye.com/upload/attachment/425567/53bc63c4-52e6-3c6f-91d8-7e23a9aefe4a.jpg" alt="img"></p>
-<p><img src="http://dl.iteye.com/upload/attachment/425569/c07d99bc-e19d-302d-8dea-dc98309bf919.jpg" alt="点击查看原始大小图片"></p>
-<p><img src="http://img.blog.csdn.net/20140118135544281?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGNoOTE4/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt="img"></p>
-<p><img src="http://img.blog.csdn.net/20140118135551234?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGNoOTE4/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt="img"></p>
-<p><img src="http://img.blog.csdn.net/20140118135834234?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGNoOTE4/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt="img"></p>
-<h3 id="ACL实体模型"><a href="#ACL实体模型" class="headerlink" title="ACL实体模型"></a>ACL实体模型</h3><p><img src="http://img.blog.csdn.net/20140118135348656?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGNoOTE4/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt="img"></p>
-<p>通过ACL（访问控制列表）把Role、User、Module、Permission、status（允许/禁止）关联起来。用于记录用户或者角色对资源拥有的权限</p>
-<p><img src="http://img.blog.csdn.net/20140118135356750?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGNoOTE4/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt="img"></p>
-<blockquote>
-<p><em>内容来源网络整理而成</em> </p>
-</blockquote>
+        <h2 id="Object-observe"><a href="#Object-observe" class="headerlink" title="Object.observe"></a>Object.observe</h2><p>当前MVC模式在Angular.JS等冲击下已经变成了View视图和Model模型两个， 控制器由事件驱动机制替代，见 ：<a href="http://www.jdon.com/46833" target="_blank" rel="external">MVI是一种Reactive MVC</a>。</p>
+<p>那么为什么JS不能自然支持事件通知机制呢？ES7引入了Object.observe：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;&#125;;j</div><div class="line"><span class="keyword">var</span> changesHandler = changes =&gt; <span class="built_in">console</span>.log(changes);</div><div class="line"><span class="built_in">Object</span>.observe(person, changesHandler);</div></pre></td></tr></table></figure>
+<p>这样，当person的内容有更改，将自动触发changes函数，如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">person = &#123;</div><div class="line">　　name: <span class="string">" jdon"</span></div><div class="line">&#125;</div><div class="line">　　如果person的名称从jdon改为jdon.com:</div><div class="line">person = &#123;</div><div class="line">　　name: <span class="string">" jdon.com"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这种name内容变化，将触发函数changes输出：</p>
+<hr>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[</div><div class="line">    &#123;</div><div class="line">        "type":"update",</div><div class="line">        "name":"name",</div><div class="line">        "oldValue: "jdon"</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
+<p>如果person增加内容：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">person = &#123;</div><div class="line">　　name: <span class="string">" jdon.com"</span></div><div class="line">　　employer: <span class="string">"banq"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>激活函数输出：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[</div><div class="line">    &#123;</div><div class="line">        <span class="string">"type"</span>:<span class="string">"new"</span>,</div><div class="line">        <span class="string">"name"</span>:<span class="string">"employer"</span>,</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
+<p>如果person删除内容employer，那么输出是：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[</div><div class="line">    &#123;</div><div class="line">        "type":"delete",</div><div class="line">        "name":"employer",</div><div class="line">        "oldValue: "banq"</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
+<p>解除观察是：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">Object</span>.unobserve(person, changesHandler);</div></pre></td></tr></table></figure>
+<p>为了防止事件风暴，ES7使用了 Event Loop Queue + Microtasks，当事件处理器EventHandler发出改变事件给ChangeHandler以后，ChangeHandler不会排队在队列后面，而是替换当前EventHandler位置，这样在浏览器渲染页面之前完成所有事件通知：</p>
+<p><img src="http://karat.cc/img/93256ccb-d34f-4419-bd82-5cbb8c1cde88.png" alt="js7.png"></p>
 
       
     </div>
@@ -389,8 +377,8 @@ ACL：Access Control List，访问控制列表（节点控制），是比较流�
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/blog/2017/03/JavaScript中的内存释放" rel="next" title="JavaScript中的内存释放">
-                <i class="fa fa-chevron-left"></i> JavaScript中的内存释放
+              <a href="/blog/2017/01/FetchAPI/" rel="next" title="三种Ajax方式">
+                <i class="fa fa-chevron-left"></i> 三种Ajax方式
               </a>
             
           </div>
@@ -399,8 +387,8 @@ ACL：Access Control List，访问控制列表（节点控制），是比较流�
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/blog/2017/03/Node.js权限控制管理模块" rel="prev" title="Node.js权限控制管理模块">
-                Node.js权限控制管理模块 <i class="fa fa-chevron-right"></i>
+              <a href="/blog/2017/03/基于类 vs 基于原型的语言/" rel="prev" title="基于类vs基于原型的语言">
+                基于类vs基于原型的语言 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -521,7 +509,7 @@ ACL：Access Control List，访问控制列表（节点控制），是比较流�
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#RBAC物理模型"><span class="nav-number">1.</span> <span class="nav-text">RBAC物理模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ACL实体模型"><span class="nav-number">2.</span> <span class="nav-text">ACL实体模型</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Object-observe"><span class="nav-number">1.</span> <span class="nav-text">Object.observe</span></a></li></ol></div>
             
 
           </div>
