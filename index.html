@@ -247,7 +247,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/11/JavaScript模块系统对决(PK)：CommonJS-vs-AMD-vs-ES2015/">
+    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/JavaScript内存管理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="tomoat">
@@ -269,7 +269,158 @@
             
               
                 
-                <a class="post-title-link" href="/blog/2017/03/11/JavaScript模块系统对决(PK)：CommonJS-vs-AMD-vs-ES2015/" itemprop="url">
+                <a class="post-title-link" href="/blog/2017/03/JavaScript内存管理/" itemprop="url">
+                  JavaScript内存管理
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-14T10:33:23+08:00">
+                2017-03-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>诸如 C 语言这般的低级语言一般都有低级的内存管理接口，比如 <code>malloc() 和</code> <code>free()</code>。而另外一些高级语言，比如 JavaScript， 其在变量（对象，字符串等等）创建时分配内存，然后在它们不再使用时“自动”释放。后者被称为<strong>垃圾回收</strong>。“自动”是容易让人混淆，迷惑的，并给 JavaScript（和其他高级语言）开发者一个印象：他们可以不用关心内存管理。然而这是错误的。</p>
+<h2 id="内存生命周期"><a href="#内存生命周期" class="headerlink" title="内存生命周期"></a>内存生命周期</h2><p>不管什么程序语言，内存生命周期基本是一致的：   </p>
+<ol>
+<li>分配你所需要的内存</li>
+<li>使用分配到的内存（读、写）</li>
+<li>不需要时将其释放\归还</li>
+</ol>
+<p>在所有语言中第一和第二部分都很清晰。最后一步在低级语言中很清晰，但是在像JavaScript 等高级语言中，这一步是隐藏的、透明的。</p>
+<h3 id="JavaScript-的内存分配"><a href="#JavaScript-的内存分配" class="headerlink" title="JavaScript 的内存分配"></a>JavaScript 的内存分配</h3><h4 id="值的初始化"><a href="#值的初始化" class="headerlink" title="值的初始化"></a>值的初始化</h4><p>为了不让程序员费心分配内存，JavaScript 在定义变量时就完成了内存分配。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">var n = 123; // 给数值变量分配内存</div><div class="line">var s = &quot;azerty&quot;; // 给字符串分配内存</div><div class="line"></div><div class="line">var o = &#123;</div><div class="line">  a: 1,</div><div class="line">  b: null</div><div class="line">&#125;; // 给对象及其包含的值分配内存</div><div class="line"></div><div class="line">// 给数组及其包含的值分配内存（就像对象一样）</div><div class="line">var a = [1, null, &quot;abra&quot;]; </div><div class="line"></div><div class="line">function f(a)&#123;</div><div class="line">  return a + 2;</div><div class="line">&#125; // 给函数（可调用的对象）分配内存</div><div class="line"></div><div class="line">// 函数表达式也能分配一个对象</div><div class="line">someElement.addEventListener(&apos;click&apos;, function()&#123;</div><div class="line">  someElement.style.backgroundColor = &apos;blue&apos;;</div><div class="line">&#125;, false);</div></pre></td></tr></table></figure>
+<h4 id="通过函数调用的内存分配"><a href="#通过函数调用的内存分配" class="headerlink" title="通过函数调用的内存分配"></a>通过函数调用的内存分配</h4><p>有些函数调用结果是分配对象内存：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">var d = new Date(); // 分配一个 Date 对象</div><div class="line"></div><div class="line">var e = document.createElement(&apos;div&apos;); // 分配一个 DOM 元素</div></pre></td></tr></table></figure>
+<p>有些方法分配新变量或者新对象：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">var s = &quot;azerty&quot;;</div><div class="line">var s2 = s.substr(0, 3); // s2 是一个新的字符串</div><div class="line">// 因为字符串是不变量，</div><div class="line">// JavaScript 可能决定不分配内存，</div><div class="line">// 只是存储了 [0-3] 的范围。</div><div class="line"></div><div class="line">var a = [&quot;ouais ouais&quot;, &quot;nan nan&quot;];</div><div class="line">var a2 = [&quot;generation&quot;, &quot;nan nan&quot;];</div><div class="line">var a3 = a.concat(a2); </div><div class="line">// 新数组有四个元素，是 a 连接 a2 的结果</div></pre></td></tr></table></figure>
+<h3 id="值的使用"><a href="#值的使用" class="headerlink" title="值的使用"></a>值的使用</h3><p>使用值的过程实际上是对分配内存进行读取与写入的操作。读取与写入可能是写入一个变量或者一个对象的属性值，甚至传递函数的参数。</p>
+<h3 id="当内存不再需要使用时释放"><a href="#当内存不再需要使用时释放" class="headerlink" title="当内存不再需要使用时释放"></a>当内存不再需要使用时释放</h3><p>大多数内存管理的问题都在这个阶段。在这里最艰难的任务是找到“所分配的内存确实已经不再需要了”。它往往要求开发人员来确定在程序中哪一块内存不再需要并且释放它。</p>
+<p>高级语言解释器嵌入了“垃圾回收器”，它的主要工作是跟踪内存的分配和使用，以便当分配的内存不再使用时，自动释放它。这只能是一个近似的过程，因为要知道是否仍然需要某块内存是<a href="http://en.wikipedia.org/wiki/Decidability_%28logic%29" target="_blank" rel="external">无法判定的</a> (无法通过某种算法解决).</p>
+<h2 id="垃圾回收"><a href="#垃圾回收" class="headerlink" title="垃圾回收"></a>垃圾回收</h2><p>如上文所述自动寻找是否一些内存“不再需要”的问题是无法判定的。因此，垃圾回收实现只能有限制的解决一般问题。本节将解释必要的概念，了解主要的垃圾回收算法和它们的局限性。</p>
+<h3 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h3><p>垃圾回收算法主要依赖于<strong>引用</strong>（<em>reference</em>）的概念。在内存管理的环境中，一个对象如果有访问另一个对象的权限（隐式或者显式），叫做一个对象引用另一个对象。例如，一个Javascript对象具有对它<a href="https://developer.mozilla.org/en/JavaScript/Guide/Inheritance_and_the_prototype_chain" target="_blank" rel="external">原型</a>的引用（隐式引用）和对它属性的引用（显式引用）。</p>
+<p>在这里，“对象”的概念不仅特指 JavaScript 对象，还包括函数作用域（或者全局词法作用域）。</p>
+<h3 id="引用计数垃圾收集"><a href="#引用计数垃圾收集" class="headerlink" title="引用计数垃圾收集"></a>引用计数垃圾收集</h3><p>这是最简单的垃圾收集算法。此算法把“对象是否不再需要”简化定义为“对象有没有其他对象引用到它”。如果没有引用指向该对象（零引用），对象将被垃圾回收机制回收。</p>
+<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">var o = &#123; </div><div class="line">  a: &#123;</div><div class="line">    b:2</div><div class="line">  &#125;</div><div class="line">&#125;; </div><div class="line">// 两个对象被创建，一个作为另一个的属性被引用，另一个被分配给变量o</div><div class="line">// 很显然，没有一个可以被垃圾收集</div><div class="line"></div><div class="line"></div><div class="line">var o2 = o; // o2变量是第二个对“这个对象”的引用</div><div class="line"></div><div class="line">o = 1;      // 现在，“这个对象”的原始引用o被o2替换了</div><div class="line"></div><div class="line">var oa = o2.a; // 引用“这个对象”的a属性</div><div class="line">// 现在，“这个对象”有两个引用了，一个是o2，一个是oa</div><div class="line"></div><div class="line">o2 = &quot;yo&quot;; // 最初的对象现在已经是零引用了</div><div class="line">           // 他可以被垃圾回收了</div><div class="line">           // 然而它的属性a的对象还在被oa引用，所以还不能回收</div><div class="line"></div><div class="line">oa = null; // a属性的那个对象现在也是零引用了</div><div class="line">           // 它可以被垃圾回收了</div></pre></td></tr></table></figure>
+<h4 id="限制：循环引用"><a href="#限制：循环引用" class="headerlink" title="限制：循环引用"></a>限制：循环引用</h4><p>该算法有个限制：无法处理循环引用。在下面的例子中，两个对象被创建，并互相引用，形成了一个循环。它们被调用之后不会离开函数作用域，所以它们已经没有用了，可以被回收了。然而，引用计数算法考虑到它们互相都有至少一次引用，所以它们不会被回收</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">function f()&#123;</div><div class="line">  var o = &#123;&#125;;</div><div class="line">  var o2 = &#123;&#125;;</div><div class="line">  o.a = o2; // o 引用 o2</div><div class="line">  o2.a = o; // o2 引用 o</div><div class="line"></div><div class="line">  return &quot;azerty&quot;;</div><div class="line">&#125;</div><div class="line"></div><div class="line">f();</div></pre></td></tr></table></figure>
+<h4 id="实际例子"><a href="#实际例子" class="headerlink" title="实际例子"></a>实际例子</h4><p>IE 6, 7 使用引用计数方式对 DOM 对象进行垃圾回收。该方式常常造成对象被循环引用时内存发生泄露：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">var div;</div><div class="line">window.onload = function()&#123;</div><div class="line">  div = document.getElementById(&quot;myDivElement&quot;);</div><div class="line">  div.circularReference = div;</div><div class="line">  div.lotsOfData = new Array(10000).join(&quot;*&quot;);</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>在上面的例子里，<code>myDivElement</code> 这个 DOM 元素里的 <code>circularReference 属性</code>引用了 <code>myDivElement</code>，造成了循环引用。如果该属性没有显示移除或者设为 null，引用计数式垃圾收集器将总是且至少有一个引用，并将一直保持在内存里的 DOM 元素，即使其从DOM 树中删去了。如果这个 DOM 元素拥有大量的数据 (如上的 <code>lotsOfData</code> 属性)，而这个数据占用的内存将永远不会被释放。</p>
+<h3 id="标记-清除算法"><a href="#标记-清除算法" class="headerlink" title="标记-清除算法"></a>标记-清除算法</h3><p>这个算法把“对象是否不再需要”简化定义为“对象是否可以获得”。</p>
+<p>这个算法假定设置一个叫做<strong>根</strong>（root）的对象（在Javascript里，根是全局对象）。定期的，垃圾回收器将从根开始，找所有从根开始引用的对象，然后找这些对象引用的对象……从根开始，垃圾回收器将找到所有可以获得的对象和所有不能获得的对象。</p>
+<p>这个算法比前一个要好，因为“有零引用的对象”总是不可获得的，但是相反却不一定，参考“循环引用”。</p>
+<p>从2012年起，所有现代浏览器都使用了标记-清除垃圾回收算法。所有对JavaScript垃圾回收算法的改进都是基于标记-清除算法的改进，并没有改进标记-清除算法本身和它对“对象是否不再需要”的简化定义。</p>
+<h4 id="循环引用不再是问题了"><a href="#循环引用不再是问题了" class="headerlink" title="循环引用不再是问题了"></a>循环引用不再是问题了</h4><p>在上面的示例中，函数调用返回之后，两个对象从全局对象出发无法获取。因此，他们将会被垃圾回收器回收。</p>
+<p>第二个示例同样，一旦 div 和其事件处理无法从根获取到，他们将会被垃圾回收器回收<br>。</p>
+<h4 id="限制-那些无法从根对象查询到的对象都将被清除"><a href="#限制-那些无法从根对象查询到的对象都将被清除" class="headerlink" title="限制: 那些无法从根对象查询到的对象都将被清除"></a>限制: 那些无法从根对象查询到的对象都将被清除</h4><p>尽管这是一个限制，但实践中我们很少会碰到类似的情况，所以开发者不太会去关心垃圾回收机制。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/JavaScript模块系统对决(PK)：CommonJS-vs-AMD-vs-ES2015/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="tomoat">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="tomoat的笔记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/blog/2017/03/JavaScript模块系统对决(PK)：CommonJS-vs-AMD-vs-ES2015/" itemprop="url">
                   JavaScript模块系统对决(PK)：CommonJS vs AMD vs ES2015
                 </a>
               
@@ -481,7 +632,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/11/Javascript中4种类型的内存泄漏和如何摆脱它们/">
+    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/Javascript中4种类型的内存泄漏和如何摆脱它们/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="tomoat">
@@ -503,7 +654,7 @@
             
               
                 
-                <a class="post-title-link" href="/blog/2017/03/11/Javascript中4种类型的内存泄漏和如何摆脱它们/" itemprop="url">
+                <a class="post-title-link" href="/blog/2017/03/Javascript中4种类型的内存泄漏和如何摆脱它们/" itemprop="url">
                   Javascript中4种类型的内存泄漏和如何摆脱它们
                 </a>
               
@@ -711,7 +862,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/11/Node.js权限控制管理模块/">
+    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/Node.js权限控制管理模块/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="tomoat">
@@ -733,7 +884,7 @@
             
               
                 
-                <a class="post-title-link" href="/blog/2017/03/11/Node.js权限控制管理模块/" itemprop="url">
+                <a class="post-title-link" href="/blog/2017/03/Node.js权限控制管理模块/" itemprop="url">
                   Node.js权限控制管理模块
                 </a>
               
@@ -846,7 +997,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/11/项目中用到的用户权限管理系统/">
+    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/项目中用到的用户权限管理系统/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="tomoat">
@@ -868,7 +1019,7 @@
             
               
                 
-                <a class="post-title-link" href="/blog/2017/03/11/项目中用到的用户权限管理系统/" itemprop="url">
+                <a class="post-title-link" href="/blog/2017/03/项目中用到的用户权限管理系统/" itemprop="url">
                   项目中用到的用户权限管理系统
                 </a>
               
@@ -982,7 +1133,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/10/JavaScript中的内存释放/">
+    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/JavaScript中的内存释放/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="tomoat">
@@ -1004,7 +1155,7 @@
             
               
                 
-                <a class="post-title-link" href="/blog/2017/03/10/JavaScript中的内存释放/" itemprop="url">
+                <a class="post-title-link" href="/blog/2017/03/JavaScript中的内存释放/" itemprop="url">
                   JavaScript中的内存释放
                 </a>
               
@@ -1142,7 +1293,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/09/75道程序员面试逻辑思维题/">
+    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/75道程序员面试逻辑思维题/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="tomoat">
@@ -1164,7 +1315,7 @@
             
               
                 
-                <a class="post-title-link" href="/blog/2017/03/09/75道程序员面试逻辑思维题/" itemprop="url">
+                <a class="post-title-link" href="/blog/2017/03/75道程序员面试逻辑思维题/" itemprop="url">
                   75道程序员面试逻辑思维题
                 </a>
               
@@ -1718,7 +1869,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/08/关于JS的继承/">
+    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/关于JS的继承/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="tomoat">
@@ -1740,7 +1891,7 @@
             
               
                 
-                <a class="post-title-link" href="/blog/2017/03/08/关于JS的继承/" itemprop="url">
+                <a class="post-title-link" href="/blog/2017/03/关于JS的继承/" itemprop="url">
                   关于JS的继承
                 </a>
               
@@ -1869,7 +2020,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/06/基于类 vs 基于原型的语言/">
+    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/基于类 vs 基于原型的语言/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="tomoat">
@@ -1891,7 +2042,7 @@
             
               
                 
-                <a class="post-title-link" href="/blog/2017/03/06/基于类 vs 基于原型的语言/" itemprop="url">
+                <a class="post-title-link" href="/blog/2017/03/基于类 vs 基于原型的语言/" itemprop="url">
                   基于类vs基于原型的语言
                 </a>
               
@@ -2249,7 +2400,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/02/19/Object.observe/">
+    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/02/Object.observe/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="tomoat">
@@ -2271,7 +2422,7 @@
             
               
                 
-                <a class="post-title-link" href="/blog/2017/02/19/Object.observe/" itemprop="url">
+                <a class="post-title-link" href="/blog/2017/02/Object.observe/" itemprop="url">
                   关于Object.observe的知识
                 </a>
               
@@ -2375,156 +2526,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/01/08/FetchAPI/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="tomoat">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="tomoat的笔记">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/blog/2017/01/08/FetchAPI/" itemprop="url">
-                  三种Ajax方式
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-08T23:02:40+08:00">
-                2017-01-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="一、原生-JS-实现-AJAX"><a href="#一、原生-JS-实现-AJAX" class="headerlink" title="一、原生 JS 实现 AJAX"></a>一、原生 JS 实现 AJAX</h2><p>JS 实现 AJAX 主要基于浏览器提供的 XMLHttpRequest（XHR）类，所有现代浏览器（IE7+、Firefox、Chrome、Safari 以及 Opera）均内建 XMLHttpRequest 对象。</p>
-<h4 id="1-获取XMLHttpRequest对象"><a href="#1-获取XMLHttpRequest对象" class="headerlink" title="1. 获取XMLHttpRequest对象"></a>1. 获取XMLHttpRequest对象</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 获取XMLHttpRequest对象</span></div><div class="line"><span class="keyword">var</span> xhr = <span class="keyword">new</span> XMLHttpRequest();</div></pre></td></tr></table></figure>
-<h4 id="2-发送一个-HTTP-请求"><a href="#2-发送一个-HTTP-请求" class="headerlink" title="2. 发送一个 HTTP 请求"></a>2. 发送一个 HTTP 请求</h4><p>接下来，我们需要打开一个URL，然后发送这个请求。分别要用到 XMLHttpRequest 的 open() 方法和 send() 方法。</p>
-<h2 id="二、-jQuery-实现-AJAX"><a href="#二、-jQuery-实现-AJAX" class="headerlink" title="二、 jQuery 实现 AJAX"></a>二、 jQuery 实现 AJAX</h2><p>jQuery 作为一个使用人数最多的库，其 AJAX 很好的封装了原生 AJAX 的代码，在兼容性和易用性方面都做了很大的提高，让 AJAX 的调用变得非常简单。下面便是一段简单的 jQuery 的 AJAX 代码：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">$.ajax(&#123;</div><div class="line">  method: <span class="string">'POST'</span>,</div><div class="line">  url: <span class="string">'/api'</span>,</div><div class="line">  data: &#123; username: <span class="string">'admin'</span>, password: <span class="string">'root'</span> &#125;</div><div class="line">&#125;)</div><div class="line">  .done(<span class="function"><span class="keyword">function</span>(<span class="params">msg</span>) </span>&#123;</div><div class="line">    alert( <span class="string">'Data Saved: '</span> + msg );</div><div class="line">  &#125;);</div></pre></td></tr></table></figure>
-<p>对比原生 AJAX 的实现，使用 jQuery 就异常简单了。当然我们平时用的最多的，是下面两种更简单的方式：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// GET</span></div><div class="line">$.get(<span class="string">'/api'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">res</span>) </span>&#123;</div><div class="line">  <span class="comment">// do something</span></div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="comment">// POST</span></div><div class="line"><span class="keyword">var</span> data = &#123;</div><div class="line">  username: <span class="string">'admin'</span>,</div><div class="line">  password: <span class="string">'root'</span></div><div class="line">&#125;;</div><div class="line">$.post(<span class="string">'/api'</span>, data, <span class="function"><span class="keyword">function</span>(<span class="params">res</span>) </span>&#123;</div><div class="line">  <span class="comment">// do something</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
-<h2 id="三、Fetch-API"><a href="#三、Fetch-API" class="headerlink" title="三、Fetch API"></a>三、Fetch API</h2><p>使用 jQuery 虽然可以大大简化 XMLHttpRequest 的使用，但 XMLHttpRequest 本质上但并不是一个设计优良的 API： + 不符合关注分离（Separation of Concerns）的原则 + 配置和调用方式非常混乱 + 使用事件机制来跟踪状态变化 + 基于事件的异步模型没有现代的 Promise，generator/yield，async/await 友好</p>
-<p>Fetch API 旨在修正上述缺陷，它提供了与 HTTP 语义相同的 JS 语法，简单来说，它引入了 fetch() 这个实用的方法来获取网络资源。</p>
-<p>原生支持率并不高，幸运的是，引入下面这些 polyfill 后可以完美支持 IE8+：</p>
-<ul>
-<li>由于 IE8 是 ES3，需要引入 ES5 的 polyfill: <a href="https://link.zhihu.com/?target=https%3A//github.com/es-shims/es5-shim" target="_blank" rel="external">es5-shim, es5-sham**</a></li>
-<li>引入 Promise 的 polyfill: <a href="https://link.zhihu.com/?target=https%3A//github.com/stefanpenner/es6-promise" target="_blank" rel="external">es6-promise**</a></li>
-<li>引入 fetch 探测库：<a href="https://link.zhihu.com/?target=https%3A//github.com/camsong/fetch-detector" target="_blank" rel="external">fetch-detector**</a></li>
-<li>引入 fetch 的 polyfill: <a href="https://link.zhihu.com/?target=https%3A//github.com/camsong/fetch-ie8" target="_blank" rel="external">fetch-ie8**</a></li>
-<li>可选：如果你还使用了 jsonp，引入 <a href="https://link.zhihu.com/?target=https%3A//github.com/camsong/fetch-jsonp" target="_blank" rel="external">fetch-jsonp**</a></li>
-<li>可选：开启 Babel 的 runtime 模式，现在就使用 async/await</li>
-</ul>
-<h4 id="1-一个使用-Fetch-的例子"><a href="#1-一个使用-Fetch-的例子" class="headerlink" title="1. 一个使用 Fetch 的例子"></a>1. 一个使用 Fetch 的例子</h4><p>先看一个简单的 Fetch API 的例子 🌰 ：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">fetch(<span class="string">'/api'</span>).then(<span class="function"><span class="keyword">function</span>(<span class="params">response</span>) </span>&#123;</div><div class="line">  <span class="keyword">return</span> response.json();</div><div class="line">&#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(data);</div><div class="line">&#125;).catch(<span class="function"><span class="keyword">function</span>(<span class="params">error</span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'Oops, error: '</span>, error);</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
-<p>使用 ES6 的箭头函数后：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">fetch(<span class="string">'/api'</span>).then(response =&gt; response.json())</div><div class="line">  .then(data =&gt; <span class="built_in">console</span>.log(data))</div><div class="line">  .catch(error =&gt; <span class="built_in">console</span>.log(<span class="string">'Oops, error: '</span>, error))</div></pre></td></tr></table></figure>
-<p>可以看出使用Fetch后我们的代码更加简洁和语义化，链式调用的方式也使其更加流畅和清晰。但这种基于 Promise 的写法还是有 Callback 的影子，我们还可以用 async/await 来做最终优化：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="keyword">try</span> &#123;</div><div class="line">    <span class="keyword">let</span> response = <span class="keyword">await</span> fetch(url);</div><div class="line">    <span class="keyword">let</span> data = response.json();</div><div class="line">    <span class="built_in">console</span>.log(data);</div><div class="line">  &#125; <span class="keyword">catch</span> (error) &#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'Oops, error: '</span>, error);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>使用 await 后，写代码就更跟同步代码一样。await 后面可以跟 Promise 对象，表示等待 Promise resolve() 才会继续向下执行，如果 Promise 被 reject() 或抛出异常则会被外面的 try…catch 捕获。</p>
-<p>Promise，generator/yield，await/async 都是现在和未来 JS 解决异步的标准做法，可以完美搭配使用。这也是使用标准 Promise 一大好处。</p>
-<h4 id="2-使用-Fetch-的注意事项"><a href="#2-使用-Fetch-的注意事项" class="headerlink" title="2. 使用 Fetch 的注意事项"></a>2. 使用 Fetch 的注意事项</h4><ul>
-<li>Fetch 请求默认是不带 cookie，需要设置 fetch(url, {credentials: ‘include’})`</li>
-<li>服务器返回 400，500 错误码时并不会 reject，只有网络错误这些导致请求不能完成时，fetch 才会被 reject</li>
-</ul>
-<p>接下来将上面基于 XMLHttpRequest 的 AJAX 用 Fetch 改写：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> options = &#123;</div><div class="line">    method: <span class="string">'POST'</span>,</div><div class="line">    headers: &#123;</div><div class="line">      <span class="string">'Accept'</span>: <span class="string">'application/json'</span>,</div><div class="line">      <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span></div><div class="line">    &#125;,</div><div class="line">    body: <span class="built_in">JSON</span>.stringify(&#123; username: <span class="string">'admin'</span>, password: <span class="string">'root'</span> &#125;),</div><div class="line">    credentials: <span class="string">'include'</span></div><div class="line">  &#125;;</div><div class="line"></div><div class="line">fetch(<span class="string">'/api'</span>, options).then(response =&gt; response.json())</div><div class="line">  .then(data =&gt; <span class="built_in">console</span>.log(data))</div><div class="line">  .catch(error =&gt; <span class="built_in">console</span>.log(<span class="string">'Oops, error: '</span>, error))</div></pre></td></tr></table></figure>
-<p>Github Issue: <a href="https://link.zhihu.com/?target=https%3A//github.com/nodejh/nodejh.github.io/issues/15" target="_blank" rel="external">分别使用 XHR、jQuery 和 Fetch 实现 AJAX · Issue #15 · nodejh/nodejh.github.io</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2574,7 +2575,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/blog/archives">
-                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-count">15</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

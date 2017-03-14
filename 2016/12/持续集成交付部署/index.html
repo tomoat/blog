@@ -1,0 +1,747 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/blog/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/blog/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/blog/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/blog/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="持续集成
+持续集成强调开发人员提交了新代码之后，立刻进行构建、（单元）测试、打包等步骤。根据反馈的测试结果，我们可以知道新代码和原有代码能否正确地集成在一起。
+持续交付
+持续交付在持续集成的基础上，将集成后的代码部署到更贴近真实运行环境的「类生产环境（ production-like environments ）」中。比如，我们完成单元测试后，可以把代码部署到连接数据库的 Staging 环境中进">
+<meta property="og:type" content="article">
+<meta property="og:title" content="持续集成交付部署">
+<meta property="og:url" content="https://tomoat.github.io/2016/12/持续集成交付部署/index.html">
+<meta property="og:site_name" content="tomoat的笔记">
+<meta property="og:description" content="持续集成
+持续集成强调开发人员提交了新代码之后，立刻进行构建、（单元）测试、打包等步骤。根据反馈的测试结果，我们可以知道新代码和原有代码能否正确地集成在一起。
+持续交付
+持续交付在持续集成的基础上，将集成后的代码部署到更贴近真实运行环境的「类生产环境（ production-like environments ）」中。比如，我们完成单元测试后，可以把代码部署到连接数据库的 Staging 环境中进">
+<meta property="og:image" content="http://cdn02.mindtheproduct.com/wp-content/uploads/2015/12/409-images-for-snap-blog-postedit_image1.png">
+<meta property="og:image" content="http://cdn02.mindtheproduct.com/wp-content/uploads/2015/12/409-images-for-snap-blog-postedit_image4-manual.png">
+<meta property="og:image" content="http://cdn02.mindtheproduct.com/wp-content/uploads/2015/12/409-images-for-snap-blog-postedit_image3-auto.png">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/QjI3a5N.gif">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/UM4iYce.gif">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/ptJ6Ph6.gif">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/sYgj4HS.gif">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/16Afrj1.gif">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/O9W3KCz.gif">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/bZDfWVr.gif">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/vVcc2OP.gif">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/AQUrYb1.gif">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/WheKCzG.gif">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/cBzeLOo.gif">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/ZJ7H3Zw.gif">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/7sNvJ9c.gif">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/SEDLpsd.gif">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/wEbNVxU.gif">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/WrdyKdG.gif">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/YCnwxZJ.gif">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/S7FJlZi.gif">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/kmh3hR5.gif">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/bsIyErA.gif">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/Dc1OkwU.gif">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2012/08/load-balance1-560x420.jpg">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2012/08/developer-vs-tester.png">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/binary-tree-620x370.jpg">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/unbalanced-tree-620x370.jpg">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/rebalanced-tree-620x370.jpg">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/array-620x370.jpg">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/matrix-560x335.jpg">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/linked-list-620x370.jpg">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/sparse-matrix-620x370.jpg">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/heap-620x370.jpg">
+<meta property="og:image" content="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/stack-620x370.jpg">
+<meta property="og:updated_time" content="2017-03-06T14:50:53.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="持续集成交付部署">
+<meta name="twitter:description" content="持续集成
+持续集成强调开发人员提交了新代码之后，立刻进行构建、（单元）测试、打包等步骤。根据反馈的测试结果，我们可以知道新代码和原有代码能否正确地集成在一起。
+持续交付
+持续交付在持续集成的基础上，将集成后的代码部署到更贴近真实运行环境的「类生产环境（ production-like environments ）」中。比如，我们完成单元测试后，可以把代码部署到连接数据库的 Staging 环境中进">
+<meta name="twitter:image" content="http://cdn02.mindtheproduct.com/wp-content/uploads/2015/12/409-images-for-snap-blog-postedit_image1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/blog/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://tomoat.github.io/2016/12/持续集成交付部署/"/>
+
+
+
+
+
+  <title> 持续集成交付部署 | tomoat的笔记 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/blog/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">tomoat的笔记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/blog/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/blog/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/blog/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2016/12/持续集成交付部署/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="tomoat">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="tomoat的笔记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                持续集成交付部署
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-12-24T21:08:29+08:00">
+                2016-12-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="持续集成"><a href="#持续集成" class="headerlink" title="持续集成"></a>持续集成</h3><p><img src="http://cdn02.mindtheproduct.com/wp-content/uploads/2015/12/409-images-for-snap-blog-postedit_image1.png" alt="Continuous Integration"></p>
+<p>持续集成强调开发人员提交了新代码之后，立刻进行构建、（单元）测试、打包等步骤。根据反馈的测试结果，我们可以知道新代码和原有代码能否正确地集成在一起。</p>
+<h3 id="持续交付"><a href="#持续交付" class="headerlink" title="持续交付"></a>持续交付</h3><p><img src="http://cdn02.mindtheproduct.com/wp-content/uploads/2015/12/409-images-for-snap-blog-postedit_image4-manual.png" alt="Continuous Delivery"></p>
+<p>持续交付在持续集成的基础上，将集成后的代码部署到更贴近真实运行环境的「类生产环境（ <em>production-like environments</em> ）」中。比如，我们完成单元测试后，可以把代码部署到连接数据库的 Staging 环境中进行更多的测试。如果代码没有问题，接下来就可以继续<strong>手动部署</strong>到生产环境中。</p>
+<h3 id="持续部署"><a href="#持续部署" class="headerlink" title="持续部署"></a>持续部署</h3><p><img src="http://cdn02.mindtheproduct.com/wp-content/uploads/2015/12/409-images-for-snap-blog-postedit_image3-auto.png" alt="Continuous Deployment"></p>
+<p>持续部署则是在持续交付的基础上，把部署到生产环境的过程自动化。</p>
+<p>我个人觉得持续集成、持续交付、持续部署非常值得推广。开发过程中最怕集成时遇到问题导致返工，而持续集成、持续交付、持续部署恰恰可以做到问题早发现早解决，从而可以避免这样的麻烦。另外，持续集成、持续交付、持续部署的流程高度依赖自动化工具，所以这种开发方法也可以大大提高开发人员的工作效率。</p>
+<h1 id="21副GIF动图让你了解各种数学概念"><a href="#21副GIF动图让你了解各种数学概念" class="headerlink" title="21副GIF动图让你了解各种数学概念"></a>21副GIF动图让你了解各种数学概念</h1><blockquote>
+<p><em>“让我们面对它;总的来说数学是不容易的，但当你征服了问题，并达到新的理解高度，这就是它给你的回报。”</em></p>
+<p><em>——Danica McKellar</em></p>
+</blockquote>
+<p>数学是很难的科学，但因为它是科学家用数学来解释宇宙的语言，我们无可避免的要学习它。看看下面的这些GIF动图，它们提供了视觉的方式来帮助你理解各种数学技巧。</p>
+<h2 id="1、椭圆的画法"><a href="#1、椭圆的画法" class="headerlink" title="1、椭圆的画法"></a>1、椭圆的画法</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/QjI3a5N.gif" alt="img"></p>
+<h2 id="2、杨辉三角问题-Pascal-triangles-解法"><a href="#2、杨辉三角问题-Pascal-triangles-解法" class="headerlink" title="2、杨辉三角问题(Pascal triangles)解法"></a>2、杨辉三角问题(Pascal triangles)解法</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/UM4iYce.gif" alt="img"></p>
+<h2 id="3、使用“FOIL”轻松的解决二项式乘法"><a href="#3、使用“FOIL”轻松的解决二项式乘法" class="headerlink" title="3、使用“FOIL”轻松的解决二项式乘法"></a>3、使用“FOIL”轻松的解决二项式乘法</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/ptJ6Ph6.gif" alt="img"></p>
+<h2 id="4、对数解法技巧"><a href="#4、对数解法技巧" class="headerlink" title="4、对数解法技巧"></a>4、对数解法技巧</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/sYgj4HS.gif" alt="img"></p>
+<h2 id="5、矩阵转置的技巧"><a href="#5、矩阵转置的技巧" class="headerlink" title="5、矩阵转置的技巧"></a>5、矩阵转置的技巧</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/16Afrj1.gif" alt="img"></p>
+<h2 id="6、勾股定理"><a href="#6、勾股定理" class="headerlink" title="6、勾股定理"></a>6、勾股定理</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/O9W3KCz.gif" alt="img"></p>
+<h2 id="7、多边形的外角之和总是等于360度"><a href="#7、多边形的外角之和总是等于360度" class="headerlink" title="7、多边形的外角之和总是等于360度"></a>7、多边形的外角之和总是等于360度</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/bZDfWVr.gif" alt="img"></p>
+<h2 id="8、圆周率π"><a href="#8、圆周率π" class="headerlink" title="8、圆周率π"></a>8、圆周率π</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/vVcc2OP.gif" alt="img"></p>
+<h2 id="9、一弧度就是长度刚好等于半径的一段圆弧所对的圆心角"><a href="#9、一弧度就是长度刚好等于半径的一段圆弧所对的圆心角" class="headerlink" title="9、一弧度就是长度刚好等于半径的一段圆弧所对的圆心角"></a>9、一弧度就是长度刚好等于半径的一段圆弧所对的圆心角</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/AQUrYb1.gif" alt="img"></p>
+<h2 id="10、在Y轴上使用正弦-红色-，在X轴上使用余弦-蓝色-，则在XY轴平面上画出的环形如下图-黑色"><a href="#10、在Y轴上使用正弦-红色-，在X轴上使用余弦-蓝色-，则在XY轴平面上画出的环形如下图-黑色" class="headerlink" title="10、在Y轴上使用正弦(红色)，在X轴上使用余弦(蓝色)，则在XY轴平面上画出的环形如下图(黑色)"></a>10、在Y轴上使用正弦(红色)，在X轴上使用余弦(蓝色)，则在XY轴平面上画出的环形如下图(黑色)</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/WheKCzG.gif" alt="img"></p>
+<h2 id="11、同前一原理，但更简单"><a href="#11、同前一原理，但更简单" class="headerlink" title="11、同前一原理，但更简单"></a>11、同前一原理，但更简单</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/cBzeLOo.gif" alt="img"></p>
+<h2 id="12、这是将sin和cos运用到三角形上"><a href="#12、这是将sin和cos运用到三角形上" class="headerlink" title="12、这是将sin和cos运用到三角形上"></a>12、这是将sin和cos运用到三角形上</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/ZJ7H3Zw.gif" alt="img"></p>
+<h2 id="13、余弦是正弦的衍生物"><a href="#13、余弦是正弦的衍生物" class="headerlink" title="13、余弦是正弦的衍生物"></a>13、余弦是正弦的衍生物</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/7sNvJ9c.gif" alt="img"></p>
+<h2 id="14、正切线"><a href="#14、正切线" class="headerlink" title="14、正切线"></a>14、正切线</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/SEDLpsd.gif" alt="img"></p>
+<h2 id="15、同上，但翻个面看，更容易理解"><a href="#15、同上，但翻个面看，更容易理解" class="headerlink" title="15、同上，但翻个面看，更容易理解"></a>15、同上，但翻个面看，更容易理解</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/wEbNVxU.gif" alt="img"></p>
+<h2 id="16、将一个公式从笛卡尔坐标转换成轴坐标"><a href="#16、将一个公式从笛卡尔坐标转换成轴坐标" class="headerlink" title="16、将一个公式从笛卡尔坐标转换成轴坐标"></a>16、将一个公式从笛卡尔坐标转换成轴坐标</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/WrdyKdG.gif" alt="img"></p>
+<h2 id="17、画抛物线"><a href="#17、画抛物线" class="headerlink" title="17、画抛物线"></a>17、画抛物线</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/YCnwxZJ.gif" alt="img"></p>
+<h2 id="18、黎曼和-Riemann-sum-约等于其曲线下的面积"><a href="#18、黎曼和-Riemann-sum-约等于其曲线下的面积" class="headerlink" title="18、黎曼和(Riemann sum)约等于其曲线下的面积"></a>18、黎曼和(Riemann sum)约等于其曲线下的面积</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/S7FJlZi.gif" alt="img"></p>
+<h2 id="19、双曲线"><a href="#19、双曲线" class="headerlink" title="19、双曲线"></a>19、双曲线</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/kmh3hR5.gif" alt="img"></p>
+<h2 id="20、将双曲线表现成3D形式，也许你不相信，它完全是用直线画成的"><a href="#20、将双曲线表现成3D形式，也许你不相信，它完全是用直线画成的" class="headerlink" title="20、将双曲线表现成3D形式，也许你不相信，它完全是用直线画成的"></a>20、将双曲线表现成3D形式，也许你不相信，它完全是用直线画成的</h2><p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/bsIyErA.gif" alt="img"></p>
+<p>你甚至可以做成这样的效果：</p>
+<p><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2014/math-gifs/Dc1OkwU.gif" alt="img"></p>
+<h1 id="趣图三幅：负载均衡算法需要改进"><a href="#趣图三幅：负载均衡算法需要改进" class="headerlink" title="趣图三幅：负载均衡算法需要改进"></a>趣图三幅：负载均衡算法需要改进</h1><h3 id="图一：负载均衡算法需要改进"><a href="#图一：负载均衡算法需要改进" class="headerlink" title="图一：负载均衡算法需要改进"></a>图一：负载均衡算法需要改进</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/08/load-balance1.jpg" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/08/load-balance1-560x420.jpg" alt="负载均衡算法"></a></p>
+<h3 id="图二：开发人员-vs-测试人员，一张很诡异的图片"><a href="#图二：开发人员-vs-测试人员，一张很诡异的图片" class="headerlink" title="图二：开发人员 vs 测试人员，一张很诡异的图片"></a>图二：开发人员 vs 测试人员，一张很诡异的图片</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/08/developer-vs-tester.png" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/08/developer-vs-tester.png" alt="开发人员 vs 测试人员"></a></p>
+<h1 id="爱喝啤酒的程序员是如何学习数据结构的"><a href="#爱喝啤酒的程序员是如何学习数据结构的" class="headerlink" title="爱喝啤酒的程序员是如何学习数据结构的"></a>爱喝啤酒的程序员是如何学习数据结构的</h1><p>如果在相亲时你说你是程序员，对方——一般是女的——会投来异样的眼光。程序员在其他人的眼中的形象一般是思维逻辑有问题，或木纳，或有点儿轴，或是书呆子。但凡事都在变化，程序员也在变化，英语中的Programmer这个词在国外现在流行写出<a href="http://www.aqee.net/brogrammers-challenge-coders-nerdy-image/" target="_blank" rel="external">Brogrammer</a>。Brogrammer和Programmer的区别是，前者很时髦、很酷。Brogrammer有很多典型特征，比如说编程时戴墨镜，听摇滚乐，喜欢参加派对，喜欢啤酒等，如果你想知道你自己是否符合Brogrammer标准，你可以<a href="http://www.aqee.net/docs/Quiz-Are-You-a-Brogrammer/" target="_blank" rel="external">到这里测试一下自己</a>。</p>
+<p>一般来说，程序员喝酒是大忌，因为编程需要用脑子，要逻辑清晰。但就像之前说的，凡事都在进化，一方面，编程环境、编程工具越来越发达完善，对程序员的要求越来越低，另一方面，有些人喝完酒后更兴奋，脑子更活。下面这几幅图描绘的是一个爱喝啤酒的程序员是如何学习数据结构的，你可以看出，他酒喝了，数据结构也掌握了。</p>
+<h3 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/binary-tree.jpg" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/binary-tree-620x370.jpg" alt="二叉树"></a></p>
+<h3 id="不平衡树"><a href="#不平衡树" class="headerlink" title="不平衡树"></a>不平衡树</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/unbalanced-tree.jpg" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/unbalanced-tree-620x370.jpg" alt="不平衡树"></a></p>
+<h3 id="重新平衡树"><a href="#重新平衡树" class="headerlink" title="重新平衡树"></a>重新平衡树</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/rebalanced-tree.jpg" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/rebalanced-tree-620x370.jpg" alt="重新平衡树"></a></p>
+<h3 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/array.jpg" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/array-620x370.jpg" alt="数组"></a></p>
+<h3 id="矩阵"><a href="#矩阵" class="headerlink" title="矩阵"></a>矩阵</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/matrix.jpg" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/matrix-560x335.jpg" alt="矩阵"></a></p>
+<h3 id="链接表"><a href="#链接表" class="headerlink" title="链接表"></a>链接表</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/linked-list.jpg" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/linked-list-620x370.jpg" alt="链接表"></a></p>
+<h3 id="稀疏矩阵"><a href="#稀疏矩阵" class="headerlink" title="稀疏矩阵"></a>稀疏矩阵</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/sparse-matrix.jpg" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/sparse-matrix-620x370.jpg" alt="稀疏矩阵"></a></p>
+<h3 id="堆"><a href="#堆" class="headerlink" title="堆"></a>堆</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/heap.jpg" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/heap-620x370.jpg" alt="堆"></a></p>
+<h3 id="栈"><a href="#栈" class="headerlink" title="栈"></a>栈</h3><p><a href="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/stack.jpg" target="_blank" rel="external"><img src="http://www.vaikan.com/wordpress/wp-content/uploads/2012/11/stack-620x370.jpg" alt="栈"></a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2015/03/Immutable.js和函数式编程概念介绍/" rel="next" title="Immutable.js和函数式编程概念介绍">
+                <i class="fa fa-chevron-left"></i> Immutable.js和函数式编程概念介绍
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2017/01/十张GIFs让你弄懂递归等概念/" rel="prev" title="十张GIF弄懂递归等概念">
+                十张GIF弄懂递归等概念 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/blog/images/avatar.gif"
+               alt="tomoat" />
+          <p class="site-author-name" itemprop="name">tomoat</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/blog/archives">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#持续集成"><span class="nav-number">1.</span> <span class="nav-text">持续集成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#持续交付"><span class="nav-number">2.</span> <span class="nav-text">持续交付</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#持续部署"><span class="nav-number">3.</span> <span class="nav-text">持续部署</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#21副GIF动图让你了解各种数学概念"><span class="nav-number"></span> <span class="nav-text">21副GIF动图让你了解各种数学概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1、椭圆的画法"><span class="nav-number"></span> <span class="nav-text">1、椭圆的画法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2、杨辉三角问题-Pascal-triangles-解法"><span class="nav-number"></span> <span class="nav-text">2、杨辉三角问题(Pascal triangles)解法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3、使用“FOIL”轻松的解决二项式乘法"><span class="nav-number"></span> <span class="nav-text">3、使用“FOIL”轻松的解决二项式乘法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4、对数解法技巧"><span class="nav-number"></span> <span class="nav-text">4、对数解法技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5、矩阵转置的技巧"><span class="nav-number"></span> <span class="nav-text">5、矩阵转置的技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6、勾股定理"><span class="nav-number"></span> <span class="nav-text">6、勾股定理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7、多边形的外角之和总是等于360度"><span class="nav-number"></span> <span class="nav-text">7、多边形的外角之和总是等于360度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8、圆周率π"><span class="nav-number"></span> <span class="nav-text">8、圆周率π</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9、一弧度就是长度刚好等于半径的一段圆弧所对的圆心角"><span class="nav-number"></span> <span class="nav-text">9、一弧度就是长度刚好等于半径的一段圆弧所对的圆心角</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10、在Y轴上使用正弦-红色-，在X轴上使用余弦-蓝色-，则在XY轴平面上画出的环形如下图-黑色"><span class="nav-number"></span> <span class="nav-text">10、在Y轴上使用正弦(红色)，在X轴上使用余弦(蓝色)，则在XY轴平面上画出的环形如下图(黑色)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11、同前一原理，但更简单"><span class="nav-number"></span> <span class="nav-text">11、同前一原理，但更简单</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#12、这是将sin和cos运用到三角形上"><span class="nav-number"></span> <span class="nav-text">12、这是将sin和cos运用到三角形上</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#13、余弦是正弦的衍生物"><span class="nav-number"></span> <span class="nav-text">13、余弦是正弦的衍生物</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#14、正切线"><span class="nav-number"></span> <span class="nav-text">14、正切线</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#15、同上，但翻个面看，更容易理解"><span class="nav-number"></span> <span class="nav-text">15、同上，但翻个面看，更容易理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#16、将一个公式从笛卡尔坐标转换成轴坐标"><span class="nav-number"></span> <span class="nav-text">16、将一个公式从笛卡尔坐标转换成轴坐标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#17、画抛物线"><span class="nav-number"></span> <span class="nav-text">17、画抛物线</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#18、黎曼和-Riemann-sum-约等于其曲线下的面积"><span class="nav-number"></span> <span class="nav-text">18、黎曼和(Riemann sum)约等于其曲线下的面积</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#19、双曲线"><span class="nav-number"></span> <span class="nav-text">19、双曲线</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#20、将双曲线表现成3D形式，也许你不相信，它完全是用直线画成的"><span class="nav-number"></span> <span class="nav-text">20、将双曲线表现成3D形式，也许你不相信，它完全是用直线画成的</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#趣图三幅：负载均衡算法需要改进"><span class="nav-number"></span> <span class="nav-text">趣图三幅：负载均衡算法需要改进</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#图一：负载均衡算法需要改进"><span class="nav-number">1.</span> <span class="nav-text">图一：负载均衡算法需要改进</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#图二：开发人员-vs-测试人员，一张很诡异的图片"><span class="nav-number">2.</span> <span class="nav-text">图二：开发人员 vs 测试人员，一张很诡异的图片</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#爱喝啤酒的程序员是如何学习数据结构的"><span class="nav-number"></span> <span class="nav-text">爱喝啤酒的程序员是如何学习数据结构的</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#二叉树"><span class="nav-number">1.</span> <span class="nav-text">二叉树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不平衡树"><span class="nav-number">2.</span> <span class="nav-text">不平衡树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重新平衡树"><span class="nav-number">3.</span> <span class="nav-text">重新平衡树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数组"><span class="nav-number">4.</span> <span class="nav-text">数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#矩阵"><span class="nav-number">5.</span> <span class="nav-text">矩阵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#链接表"><span class="nav-number">6.</span> <span class="nav-text">链接表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#稀疏矩阵"><span class="nav-number">7.</span> <span class="nav-text">稀疏矩阵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#堆"><span class="nav-number">8.</span> <span class="nav-text">堆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#栈"><span class="nav-number">9.</span> <span class="nav-text">栈</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">tomoat</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/blog/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/blog/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/blog/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/blog/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+</body>
+</html>

@@ -1,0 +1,688 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/blog/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/blog/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/blog/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/blog/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="简介诸如 C 语言这般的低级语言一般都有低级的内存管理接口，比如 malloc() 和 free()。而另外一些高级语言，比如 JavaScript， 其在变量（对象，字符串等等）创建时分配内存，然后在它们不再使用时“自动”释放。后者被称为垃圾回收。“自动”是容易让人混淆，迷惑的，并给 JavaScript（和其他高级语言）开发者一个印象：他们可以不用关心内存管理。然而这是错误的。
+内存生命周期不">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript内存管理">
+<meta property="og:url" content="https://tomoat.github.io/2017/03/JavaScript内存管理/index.html">
+<meta property="og:site_name" content="tomoat的笔记">
+<meta property="og:description" content="简介诸如 C 语言这般的低级语言一般都有低级的内存管理接口，比如 malloc() 和 free()。而另外一些高级语言，比如 JavaScript， 其在变量（对象，字符串等等）创建时分配内存，然后在它们不再使用时“自动”释放。后者被称为垃圾回收。“自动”是容易让人混淆，迷惑的，并给 JavaScript（和其他高级语言）开发者一个印象：他们可以不用关心内存管理。然而这是错误的。
+内存生命周期不">
+<meta property="og:updated_time" content="2017-03-14T03:07:47.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JavaScript内存管理">
+<meta name="twitter:description" content="简介诸如 C 语言这般的低级语言一般都有低级的内存管理接口，比如 malloc() 和 free()。而另外一些高级语言，比如 JavaScript， 其在变量（对象，字符串等等）创建时分配内存，然后在它们不再使用时“自动”释放。后者被称为垃圾回收。“自动”是容易让人混淆，迷惑的，并给 JavaScript（和其他高级语言）开发者一个印象：他们可以不用关心内存管理。然而这是错误的。
+内存生命周期不">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/blog/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://tomoat.github.io/2017/03/JavaScript内存管理/"/>
+
+
+
+
+
+  <title> JavaScript内存管理 | tomoat的笔记 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/blog/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">tomoat的笔记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/blog/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/blog/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/blog/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/JavaScript内存管理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="tomoat">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="tomoat的笔记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                JavaScript内存管理
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-14T10:33:23+08:00">
+                2017-03-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>诸如 C 语言这般的低级语言一般都有低级的内存管理接口，比如 <code>malloc() 和</code> <code>free()</code>。而另外一些高级语言，比如 JavaScript， 其在变量（对象，字符串等等）创建时分配内存，然后在它们不再使用时“自动”释放。后者被称为<strong>垃圾回收</strong>。“自动”是容易让人混淆，迷惑的，并给 JavaScript（和其他高级语言）开发者一个印象：他们可以不用关心内存管理。然而这是错误的。</p>
+<h2 id="内存生命周期"><a href="#内存生命周期" class="headerlink" title="内存生命周期"></a>内存生命周期</h2><p>不管什么程序语言，内存生命周期基本是一致的：   </p>
+<ol>
+<li>分配你所需要的内存</li>
+<li>使用分配到的内存（读、写）</li>
+<li>不需要时将其释放\归还</li>
+</ol>
+<p>在所有语言中第一和第二部分都很清晰。最后一步在低级语言中很清晰，但是在像JavaScript 等高级语言中，这一步是隐藏的、透明的。</p>
+<h3 id="JavaScript-的内存分配"><a href="#JavaScript-的内存分配" class="headerlink" title="JavaScript 的内存分配"></a>JavaScript 的内存分配</h3><h4 id="值的初始化"><a href="#值的初始化" class="headerlink" title="值的初始化"></a>值的初始化</h4><p>为了不让程序员费心分配内存，JavaScript 在定义变量时就完成了内存分配。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">var n = 123; // 给数值变量分配内存</div><div class="line">var s = &quot;azerty&quot;; // 给字符串分配内存</div><div class="line"></div><div class="line">var o = &#123;</div><div class="line">  a: 1,</div><div class="line">  b: null</div><div class="line">&#125;; // 给对象及其包含的值分配内存</div><div class="line"></div><div class="line">// 给数组及其包含的值分配内存（就像对象一样）</div><div class="line">var a = [1, null, &quot;abra&quot;]; </div><div class="line"></div><div class="line">function f(a)&#123;</div><div class="line">  return a + 2;</div><div class="line">&#125; // 给函数（可调用的对象）分配内存</div><div class="line"></div><div class="line">// 函数表达式也能分配一个对象</div><div class="line">someElement.addEventListener(&apos;click&apos;, function()&#123;</div><div class="line">  someElement.style.backgroundColor = &apos;blue&apos;;</div><div class="line">&#125;, false);</div></pre></td></tr></table></figure>
+<h4 id="通过函数调用的内存分配"><a href="#通过函数调用的内存分配" class="headerlink" title="通过函数调用的内存分配"></a>通过函数调用的内存分配</h4><p>有些函数调用结果是分配对象内存：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">var d = new Date(); // 分配一个 Date 对象</div><div class="line"></div><div class="line">var e = document.createElement(&apos;div&apos;); // 分配一个 DOM 元素</div></pre></td></tr></table></figure>
+<p>有些方法分配新变量或者新对象：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">var s = &quot;azerty&quot;;</div><div class="line">var s2 = s.substr(0, 3); // s2 是一个新的字符串</div><div class="line">// 因为字符串是不变量，</div><div class="line">// JavaScript 可能决定不分配内存，</div><div class="line">// 只是存储了 [0-3] 的范围。</div><div class="line"></div><div class="line">var a = [&quot;ouais ouais&quot;, &quot;nan nan&quot;];</div><div class="line">var a2 = [&quot;generation&quot;, &quot;nan nan&quot;];</div><div class="line">var a3 = a.concat(a2); </div><div class="line">// 新数组有四个元素，是 a 连接 a2 的结果</div></pre></td></tr></table></figure>
+<h3 id="值的使用"><a href="#值的使用" class="headerlink" title="值的使用"></a>值的使用</h3><p>使用值的过程实际上是对分配内存进行读取与写入的操作。读取与写入可能是写入一个变量或者一个对象的属性值，甚至传递函数的参数。</p>
+<h3 id="当内存不再需要使用时释放"><a href="#当内存不再需要使用时释放" class="headerlink" title="当内存不再需要使用时释放"></a>当内存不再需要使用时释放</h3><p>大多数内存管理的问题都在这个阶段。在这里最艰难的任务是找到“所分配的内存确实已经不再需要了”。它往往要求开发人员来确定在程序中哪一块内存不再需要并且释放它。</p>
+<p>高级语言解释器嵌入了“垃圾回收器”，它的主要工作是跟踪内存的分配和使用，以便当分配的内存不再使用时，自动释放它。这只能是一个近似的过程，因为要知道是否仍然需要某块内存是<a href="http://en.wikipedia.org/wiki/Decidability_%28logic%29" target="_blank" rel="external">无法判定的</a> (无法通过某种算法解决).</p>
+<h2 id="垃圾回收"><a href="#垃圾回收" class="headerlink" title="垃圾回收"></a>垃圾回收</h2><p>如上文所述自动寻找是否一些内存“不再需要”的问题是无法判定的。因此，垃圾回收实现只能有限制的解决一般问题。本节将解释必要的概念，了解主要的垃圾回收算法和它们的局限性。</p>
+<h3 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h3><p>垃圾回收算法主要依赖于<strong>引用</strong>（<em>reference</em>）的概念。在内存管理的环境中，一个对象如果有访问另一个对象的权限（隐式或者显式），叫做一个对象引用另一个对象。例如，一个Javascript对象具有对它<a href="https://developer.mozilla.org/en/JavaScript/Guide/Inheritance_and_the_prototype_chain" target="_blank" rel="external">原型</a>的引用（隐式引用）和对它属性的引用（显式引用）。</p>
+<p>在这里，“对象”的概念不仅特指 JavaScript 对象，还包括函数作用域（或者全局词法作用域）。</p>
+<h3 id="引用计数垃圾收集"><a href="#引用计数垃圾收集" class="headerlink" title="引用计数垃圾收集"></a>引用计数垃圾收集</h3><p>这是最简单的垃圾收集算法。此算法把“对象是否不再需要”简化定义为“对象有没有其他对象引用到它”。如果没有引用指向该对象（零引用），对象将被垃圾回收机制回收。</p>
+<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">var o = &#123; </div><div class="line">  a: &#123;</div><div class="line">    b:2</div><div class="line">  &#125;</div><div class="line">&#125;; </div><div class="line">// 两个对象被创建，一个作为另一个的属性被引用，另一个被分配给变量o</div><div class="line">// 很显然，没有一个可以被垃圾收集</div><div class="line"></div><div class="line"></div><div class="line">var o2 = o; // o2变量是第二个对“这个对象”的引用</div><div class="line"></div><div class="line">o = 1;      // 现在，“这个对象”的原始引用o被o2替换了</div><div class="line"></div><div class="line">var oa = o2.a; // 引用“这个对象”的a属性</div><div class="line">// 现在，“这个对象”有两个引用了，一个是o2，一个是oa</div><div class="line"></div><div class="line">o2 = &quot;yo&quot;; // 最初的对象现在已经是零引用了</div><div class="line">           // 他可以被垃圾回收了</div><div class="line">           // 然而它的属性a的对象还在被oa引用，所以还不能回收</div><div class="line"></div><div class="line">oa = null; // a属性的那个对象现在也是零引用了</div><div class="line">           // 它可以被垃圾回收了</div></pre></td></tr></table></figure>
+<h4 id="限制：循环引用"><a href="#限制：循环引用" class="headerlink" title="限制：循环引用"></a>限制：循环引用</h4><p>该算法有个限制：无法处理循环引用。在下面的例子中，两个对象被创建，并互相引用，形成了一个循环。它们被调用之后不会离开函数作用域，所以它们已经没有用了，可以被回收了。然而，引用计数算法考虑到它们互相都有至少一次引用，所以它们不会被回收</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">function f()&#123;</div><div class="line">  var o = &#123;&#125;;</div><div class="line">  var o2 = &#123;&#125;;</div><div class="line">  o.a = o2; // o 引用 o2</div><div class="line">  o2.a = o; // o2 引用 o</div><div class="line"></div><div class="line">  return &quot;azerty&quot;;</div><div class="line">&#125;</div><div class="line"></div><div class="line">f();</div></pre></td></tr></table></figure>
+<h4 id="实际例子"><a href="#实际例子" class="headerlink" title="实际例子"></a>实际例子</h4><p>IE 6, 7 使用引用计数方式对 DOM 对象进行垃圾回收。该方式常常造成对象被循环引用时内存发生泄露：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">var div;</div><div class="line">window.onload = function()&#123;</div><div class="line">  div = document.getElementById(&quot;myDivElement&quot;);</div><div class="line">  div.circularReference = div;</div><div class="line">  div.lotsOfData = new Array(10000).join(&quot;*&quot;);</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>在上面的例子里，<code>myDivElement</code> 这个 DOM 元素里的 <code>circularReference 属性</code>引用了 <code>myDivElement</code>，造成了循环引用。如果该属性没有显示移除或者设为 null，引用计数式垃圾收集器将总是且至少有一个引用，并将一直保持在内存里的 DOM 元素，即使其从DOM 树中删去了。如果这个 DOM 元素拥有大量的数据 (如上的 <code>lotsOfData</code> 属性)，而这个数据占用的内存将永远不会被释放。</p>
+<h3 id="标记-清除算法"><a href="#标记-清除算法" class="headerlink" title="标记-清除算法"></a>标记-清除算法</h3><p>这个算法把“对象是否不再需要”简化定义为“对象是否可以获得”。</p>
+<p>这个算法假定设置一个叫做<strong>根</strong>（root）的对象（在Javascript里，根是全局对象）。定期的，垃圾回收器将从根开始，找所有从根开始引用的对象，然后找这些对象引用的对象……从根开始，垃圾回收器将找到所有可以获得的对象和所有不能获得的对象。</p>
+<p>这个算法比前一个要好，因为“有零引用的对象”总是不可获得的，但是相反却不一定，参考“循环引用”。</p>
+<p>从2012年起，所有现代浏览器都使用了标记-清除垃圾回收算法。所有对JavaScript垃圾回收算法的改进都是基于标记-清除算法的改进，并没有改进标记-清除算法本身和它对“对象是否不再需要”的简化定义。</p>
+<h4 id="循环引用不再是问题了"><a href="#循环引用不再是问题了" class="headerlink" title="循环引用不再是问题了"></a>循环引用不再是问题了</h4><p>在上面的示例中，函数调用返回之后，两个对象从全局对象出发无法获取。因此，他们将会被垃圾回收器回收。</p>
+<p>第二个示例同样，一旦 div 和其事件处理无法从根获取到，他们将会被垃圾回收器回收<br>。</p>
+<h4 id="限制-那些无法从根对象查询到的对象都将被清除"><a href="#限制-那些无法从根对象查询到的对象都将被清除" class="headerlink" title="限制: 那些无法从根对象查询到的对象都将被清除"></a>限制: 那些无法从根对象查询到的对象都将被清除</h4><p>尽管这是一个限制，但实践中我们很少会碰到类似的情况，所以开发者不太会去关心垃圾回收机制。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2017/03/JavaScript模块系统对决(PK)：CommonJS-vs-AMD-vs-ES2015/" rel="next" title="JavaScript模块系统对决(PK)：CommonJS vs AMD vs ES2015">
+                <i class="fa fa-chevron-left"></i> JavaScript模块系统对决(PK)：CommonJS vs AMD vs ES2015
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/blog/images/avatar.gif"
+               alt="tomoat" />
+          <p class="site-author-name" itemprop="name">tomoat</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/blog/archives">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内存生命周期"><span class="nav-number">2.</span> <span class="nav-text">内存生命周期</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JavaScript-的内存分配"><span class="nav-number">2.1.</span> <span class="nav-text">JavaScript 的内存分配</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#值的初始化"><span class="nav-number">2.1.1.</span> <span class="nav-text">值的初始化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过函数调用的内存分配"><span class="nav-number">2.1.2.</span> <span class="nav-text">通过函数调用的内存分配</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#值的使用"><span class="nav-number">2.2.</span> <span class="nav-text">值的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#当内存不再需要使用时释放"><span class="nav-number">2.3.</span> <span class="nav-text">当内存不再需要使用时释放</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#垃圾回收"><span class="nav-number">3.</span> <span class="nav-text">垃圾回收</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#引用"><span class="nav-number">3.1.</span> <span class="nav-text">引用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#引用计数垃圾收集"><span class="nav-number">3.2.</span> <span class="nav-text">引用计数垃圾收集</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#示例"><span class="nav-number">3.2.1.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#限制：循环引用"><span class="nav-number">3.2.2.</span> <span class="nav-text">限制：循环引用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#实际例子"><span class="nav-number">3.2.3.</span> <span class="nav-text">实际例子</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#标记-清除算法"><span class="nav-number">3.3.</span> <span class="nav-text">标记-清除算法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#循环引用不再是问题了"><span class="nav-number">3.3.1.</span> <span class="nav-text">循环引用不再是问题了</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#限制-那些无法从根对象查询到的对象都将被清除"><span class="nav-number">3.3.2.</span> <span class="nav-text">限制: 那些无法从根对象查询到的对象都将被清除</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">tomoat</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/blog/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/blog/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/blog/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/blog/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+</body>
+</html>
