@@ -71,7 +71,7 @@
 <link href="/blog/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="build blog," />
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
@@ -87,19 +87,24 @@
 
 
 
-<meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
-Quick">
+<meta name="description" content="Object.observe当前MVC模式在Angular.JS等冲击下已经变成了View视图和Model模型两个， 控制器由事件驱动机制替代，见 ：MVI是一种Reactive MVC。
+那么为什么JS不能自然支持事件通知机制呢？ES7引入了Object.observe：
+123var person = &amp;#123;&amp;#125;;jvar changesHandler = changes =&amp;g">
 <meta property="og:type" content="article">
-<meta property="og:title" content="使用Hexo搭建个人的GitHub Blog">
-<meta property="og:url" content="https://tomoat.github.io/2015/03/Hello/index.html">
+<meta property="og:title" content="关于Object.observe的知识">
+<meta property="og:url" content="https://tomoat.github.io/2017/02/Object.observe">
 <meta property="og:site_name" content="tomoat的笔记">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
-Quick">
-<meta property="og:updated_time" content="2015-03-25T07:15:00.000Z">
+<meta property="og:description" content="Object.observe当前MVC模式在Angular.JS等冲击下已经变成了View视图和Model模型两个， 控制器由事件驱动机制替代，见 ：MVI是一种Reactive MVC。
+那么为什么JS不能自然支持事件通知机制呢？ES7引入了Object.observe：
+123var person = &amp;#123;&amp;#125;;jvar changesHandler = changes =&amp;g">
+<meta property="og:image" content="http://karat.cc/img/93256ccb-d34f-4419-bd82-5cbb8c1cde88.png">
+<meta property="og:updated_time" content="2017-03-06T15:53:30.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="使用Hexo搭建个人的GitHub Blog">
-<meta name="twitter:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
-Quick">
+<meta name="twitter:title" content="关于Object.observe的知识">
+<meta name="twitter:description" content="Object.observe当前MVC模式在Angular.JS等冲击下已经变成了View视图和Model模型两个， 控制器由事件驱动机制替代，见 ：MVI是一种Reactive MVC。
+那么为什么JS不能自然支持事件通知机制呢？ES7引入了Object.observe：
+123var person = &amp;#123;&amp;#125;;jvar changesHandler = changes =&amp;g">
+<meta name="twitter:image" content="http://karat.cc/img/93256ccb-d34f-4419-bd82-5cbb8c1cde88.png">
 
 
 
@@ -127,13 +132,13 @@ Quick">
 
 
 
-  <link rel="canonical" href="https://tomoat.github.io/2015/03/Hello/"/>
+  <link rel="canonical" href="https://tomoat.github.io/2017/02/Object.observe"/>
 
 
 
 
 
-  <title> 使用Hexo搭建个人的GitHub Blog | tomoat的笔记 </title>
+  <title> 关于Object.observe的知识 | tomoat的笔记 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -252,7 +257,7 @@ Quick">
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2015/03/Hello/">
+    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/02/Object.observe">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="tomoat">
@@ -273,7 +278,7 @@ Quick">
             
             
               
-                使用Hexo搭建个人的GitHub Blog
+                关于Object.observe的知识
               
             
           </h1>
@@ -288,8 +293,8 @@ Quick">
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-03-25T15:15:00+08:00">
-                2015-03-25
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-19T19:16:21+08:00">
+                2017-02-19
               </time>
             
 
@@ -324,16 +329,24 @@ Quick">
       
 
       
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-<h3 id="Blog-Example"><a href="#Blog-Example" class="headerlink" title="Blog Example"></a>Blog Example</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">---</div><div class="line"></div><div class="line">title: 使用hexo来写博客</div><div class="line">tags: []</div><div class="line">categories: []</div><div class="line">date: 2016-08-25 15:41:00</div><div class="line"></div><div class="line">---</div><div class="line">## post title</div></pre></td></tr></table></figure>
+        <h2 id="Object-observe"><a href="#Object-observe" class="headerlink" title="Object.observe"></a>Object.observe</h2><p>当前MVC模式在Angular.JS等冲击下已经变成了View视图和Model模型两个， 控制器由事件驱动机制替代，见 ：<a href="http://www.jdon.com/46833" target="_blank" rel="external">MVI是一种Reactive MVC</a>。</p>
+<p>那么为什么JS不能自然支持事件通知机制呢？ES7引入了Object.observe：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;&#125;;j</div><div class="line"><span class="keyword">var</span> changesHandler = changes =&gt; <span class="built_in">console</span>.log(changes);</div><div class="line"><span class="built_in">Object</span>.observe(person, changesHandler);</div></pre></td></tr></table></figure>
+<p>这样，当person的内容有更改，将自动触发changes函数，如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">person = &#123;</div><div class="line">　　name: <span class="string">" jdon"</span></div><div class="line">&#125;</div><div class="line">　　如果person的名称从jdon改为jdon.com:</div><div class="line">person = &#123;</div><div class="line">　　name: <span class="string">" jdon.com"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这种name内容变化，将触发函数changes输出：</p>
+<hr>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[</div><div class="line">    &#123;</div><div class="line">        "type":"update",</div><div class="line">        "name":"name",</div><div class="line">        "oldValue: "jdon"</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
+<p>如果person增加内容：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">person = &#123;</div><div class="line">　　name: <span class="string">" jdon.com"</span></div><div class="line">　　employer: <span class="string">"banq"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>激活函数输出：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[</div><div class="line">    &#123;</div><div class="line">        <span class="string">"type"</span>:<span class="string">"new"</span>,</div><div class="line">        <span class="string">"name"</span>:<span class="string">"employer"</span>,</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
+<p>如果person删除内容employer，那么输出是：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[</div><div class="line">    &#123;</div><div class="line">        "type":"delete",</div><div class="line">        "name":"employer",</div><div class="line">        "oldValue: "banq"</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
+<p>解除观察是：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">Object</span>.unobserve(person, changesHandler);</div></pre></td></tr></table></figure>
+<p>为了防止事件风暴，ES7使用了 Event Loop Queue + Microtasks，当事件处理器EventHandler发出改变事件给ChangeHandler以后，ChangeHandler不会排队在队列后面，而是替换当前EventHandler位置，这样在浏览器渲染页面之前完成所有事件通知：</p>
+<p><img src="http://karat.cc/img/93256ccb-d34f-4419-bd82-5cbb8c1cde88.png" alt="js7.png"></p>
 
       
     </div>
@@ -355,12 +368,6 @@ Quick">
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/blog/tags/build-blog/" rel="tag"># build blog</a>
-          
-        </div>
-      
 
       
         
@@ -370,14 +377,18 @@ Quick">
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/blog/2017/01/FetchAPI" rel="next" title="三种Ajax方式">
+                <i class="fa fa-chevron-left"></i> 三种Ajax方式
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/blog/2015/03/Immutable.js和函数式编程概念介绍/" rel="prev" title="Immutable.js和函数式编程概念介绍">
-                Immutable.js和函数式编程概念介绍 <i class="fa fa-chevron-right"></i>
+              <a href="/blog/2017/03/基于类 vs 基于原型的语言" rel="prev" title="基于类vs基于原型的语言">
+                基于类vs基于原型的语言 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -498,7 +509,7 @@ Quick">
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Quick-Start"><span class="nav-number">1.</span> <span class="nav-text">Quick Start</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Create-a-new-post"><span class="nav-number">1.1.</span> <span class="nav-text">Create a new post</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Run-server"><span class="nav-number">1.2.</span> <span class="nav-text">Run server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Generate-static-files"><span class="nav-number">1.3.</span> <span class="nav-text">Generate static files</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deploy-to-remote-sites"><span class="nav-number">1.4.</span> <span class="nav-text">Deploy to remote sites</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Blog-Example"><span class="nav-number">1.5.</span> <span class="nav-text">Blog Example</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Object-observe"><span class="nav-number">1.</span> <span class="nav-text">Object.observe</span></a></li></ol></div>
             
 
           </div>
