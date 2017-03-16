@@ -1,0 +1,877 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/blog/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/blog/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/blog/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/blog/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="一、typeof12345678910111213console.log(typeof 123456); // numberconsole.log(typeof null); // objectconsole.log(typeof undefined); // undefinedconsole.log(typeof &apos;123456&apos;); // stringconsole.log(typeof &apos;&apos;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JS数据类型判断的方式">
+<meta property="og:url" content="https://tomoat.github.io/2015/04/JS数据类型的判断检测方式/index.html">
+<meta property="og:site_name" content="tomoat的笔记">
+<meta property="og:description" content="一、typeof12345678910111213console.log(typeof 123456); // numberconsole.log(typeof null); // objectconsole.log(typeof undefined); // undefinedconsole.log(typeof &apos;123456&apos;); // stringconsole.log(typeof &apos;&apos;">
+<meta property="og:image" content="https://o5wwk8baw.qnssl.com/1e5b073b33c45488730d8deb12868272/large">
+<meta property="og:image" content="https://o5wwk8baw.qnssl.com/12213d42e388d24fdff3d89d87759869/large">
+<meta property="og:image" content="https://o5wwk8baw.qnssl.com/d25e22b435da24b9fc0e48a756fa8923/large">
+<meta property="og:image" content="https://o5wwk8baw.qnssl.com/a6727d2bb9795b6fca8f5d3e147ee23c/large">
+<meta property="og:image" content="https://o5wwk8baw.qnssl.com/a3bb757e1ffd5347149c8b25c7207429/large">
+<meta property="og:image" content="https://o5wwk8baw.qnssl.com/5c65895b8b9a263ff9ffdb1d08b2e1cd/large">
+<meta property="og:image" content="https://o5wwk8baw.qnssl.com/fd491ebf9ae42d5c35354ab09cc5b846/large">
+<meta property="og:image" content="https://o5wwk8baw.qnssl.com/449e37cc16e3d33edf2322a7fa3df0f0/large">
+<meta property="og:image" content="https://o5wwk8baw.qnssl.com/5c0e5637a1c0dbc8a287910b1c93ff16/large">
+<meta property="og:image" content="https://o5wwk8baw.qnssl.com/7b2f7d6431e299a69846a98d0e3e8dbe/large">
+<meta property="og:image" content="https://o5wwk8baw.qnssl.com/db7a90daea89620a5e689d180c68730a/large">
+<meta property="og:image" content="https://o5wwk8baw.qnssl.com/1a8feab14763519f95add483816e3af5/large">
+<meta property="og:updated_time" content="2015-04-10T07:15:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JS数据类型判断的方式">
+<meta name="twitter:description" content="一、typeof12345678910111213console.log(typeof 123456); // numberconsole.log(typeof null); // objectconsole.log(typeof undefined); // undefinedconsole.log(typeof &apos;123456&apos;); // stringconsole.log(typeof &apos;&apos;">
+<meta name="twitter:image" content="https://o5wwk8baw.qnssl.com/1e5b073b33c45488730d8deb12868272/large">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/blog/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://tomoat.github.io/2015/04/JS数据类型的判断检测方式/"/>
+
+
+
+
+
+  <title> JS数据类型判断的方式 | tomoat的笔记 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/blog/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">tomoat的笔记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/blog/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/blog/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/blog/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2015/04/JS数据类型的判断检测方式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="tomoat">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="tomoat的笔记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                JS数据类型判断的方式
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-04-10T15:15:00+08:00">
+                2015-04-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="一、typeof"><a href="#一、typeof" class="headerlink" title="一、typeof"></a>一、typeof</h1><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> <span class="number">123456</span>); <span class="comment">// number</span></div><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> <span class="literal">null</span>); <span class="comment">// object</span></div><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> <span class="literal">undefined</span>); <span class="comment">// undefined</span></div><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> <span class="string">'123456'</span>); <span class="comment">// string</span></div><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> <span class="string">''</span>); <span class="comment">// string</span></div><div class="line"><span class="built_in">console</span>.log(type <span class="keyword">new</span> <span class="built_in">String</span>); <span class="comment">// object</span></div><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> <span class="keyword">new</span> <span class="built_in">Object</span>); <span class="comment">// object</span></div><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> &#123;&#125;); <span class="comment">// object</span></div><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;&#125;); <span class="comment">// function</span></div><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> []); <span class="comment">// object</span></div><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> <span class="literal">true</span>); <span class="comment">// boolean</span></div><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> <span class="literal">NaN</span>); <span class="comment">// number</span></div><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> /^[-+]?\d+$/); <span class="comment">// object</span></div></pre></td></tr></table></figure>
+<p>使用typeof检测数据类型，首先返回的都是一个字符串，其次字符串中包含了对应的数据类型，例如：”number”、”string”、”boolean”、”undefined”、”function”、”object”</p>
+<ul>
+<li><p>typeof (引用类型) 除了函数, 都是 ‘object’,比如 typeof /123/</p>
+</li>
+<li><p>typeof null 为’object’</p>
+</li>
+<li><p>typeof undefined 为 ‘undefined’,通常, 如果使用两等号, null == undefined 为真.</p>
+</li>
+<li><p>转换为数字的常见用法 “10”-0或+”10”, 如果没有转换成功,返回NaN,由于NaN 的一个特性: NaN != NaN,故判断转换成功与否的常见做法: (这也是我参见 jQuery的源码发现的,jQuery源码读100遍都不为过)</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">(<span class="string">"10x"</span> - <span class="number">0</span>) == (<span class="string">"10x"</span> - <span class="number">0</span>);</div><div class="line"><span class="comment">// 结果为假!</span></div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>面试题：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> <span class="keyword">typeof</span> <span class="keyword">typeof</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;&#125;); <span class="comment">// string</span></div></pre></td></tr></table></figure>
+<p>typeof的局限性：不能具体的细分是数组还是正则，还是对象中其他的值，因为使用typeof检测数据类型，对于对象数据类型中的所有的值，最后返回的结果都是”object”。</p>
+<p><strong>应用一</strong>：添加默认值</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params">num1, num2</span>) </span>&#123;</div><div class="line">    <span class="comment">// 方式一</span></div><div class="line">    <span class="comment">// if (typeof num2 === 'undefined') &#123;</span></div><div class="line">    <span class="comment">//   num2 = 0;</span></div><div class="line">    <span class="comment">// &#125;</span></div><div class="line"></div><div class="line">    <span class="comment">// 方式二：不适用fn(10,false)这种情况</span></div><div class="line">    num2 = num2 || <span class="number">0</span>;</div><div class="line">&#125;</div><div class="line">fn(<span class="number">10</span>);</div></pre></td></tr></table></figure>
+<p><strong>应用二</strong>：回调函数调用</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params">callback</span>) </span>&#123;</div><div class="line">    <span class="comment">//typeof callback === 'function' ? callback() : null;</span></div><div class="line">    callback &amp;&amp; callback();</div><div class="line">&#125;</div><div class="line">fn(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line"></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<h1 id="二、instanceof"><a href="#二、instanceof" class="headerlink" title="二、instanceof"></a>二、instanceof</h1><p>用于判断一个变量是否某个对象的实例,或用于判断一个变量是否某个对象的实例；</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> ary = [];</div><div class="line"><span class="built_in">console</span>.log(ary <span class="keyword">instanceof</span> <span class="built_in">Array</span>); <span class="comment">// true</span></div><div class="line"><span class="built_in">console</span>.log(ary <span class="keyword">instanceof</span> <span class="built_in">Object</span>); <span class="comment">// true</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params"></span>) </span>&#123;&#125;</div><div class="line"><span class="built_in">console</span>.log(fn <span class="keyword">instanceof</span> <span class="built_in">Function</span>); <span class="comment">// true</span></div><div class="line"><span class="built_in">console</span>.log(fn <span class="keyword">instanceof</span> <span class="built_in">Object</span>); <span class="comment">// true</span></div></pre></td></tr></table></figure>
+<p>只要在当前实例的原型链上，用instanceof检测出来的结果都是true，所以在类的原型继承中，最后检测出来的结果未必是正确的，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Fn</span>(<span class="params"></span>) </span>&#123;</div><div class="line">&#125;</div><div class="line">Fn.prototype = <span class="keyword">new</span> <span class="built_in">Array</span>; <span class="comment">// 原型继承：让子类的原型等于父类的一个实例</span></div><div class="line"><span class="keyword">var</span> f = <span class="keyword">new</span> Fn;</div><div class="line"><span class="built_in">console</span>.log(f <span class="keyword">instanceof</span> <span class="built_in">Array</span>); <span class="comment">// true</span></div></pre></td></tr></table></figure>
+<h1 id="三、constructor"><a href="#三、constructor" class="headerlink" title="三、constructor"></a>三、constructor</h1><p>用于判断一个变量的原型，constructor 属性返回对创建此对象的数组函数的引用</p>
+<p>Javascript中对象的prototype属性的解释是:返回对象类型原型的引用</p>
+<p>constructor即构造函数，作用和instanceof非常的相似。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> obj = [];</div><div class="line"><span class="built_in">console</span>.log(obj.constructor === <span class="built_in">Array</span>); <span class="comment">// true</span></div><div class="line"><span class="built_in">console</span>.log(obj.constructor === <span class="built_in">RegExp</span>); <span class="comment">// false</span></div></pre></td></tr></table></figure>
+<p>constructor可以处理基本数据类型的检测</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> num = <span class="number">1</span>;</div><div class="line"><span class="built_in">console</span>.log(num.constructor === <span class="built_in">Number</span>); <span class="comment">// true</span></div></pre></td></tr></table></figure>
+<p>constructor检测Object和instanceof不一样，一般情况下是检测不了的</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> reg = <span class="regexp">/^$/</span>;</div><div class="line"><span class="built_in">console</span>.log(reg.constructor === <span class="built_in">RegExp</span>); <span class="comment">// true</span></div><div class="line"><span class="built_in">console</span>.log(reg.constructor === <span class="built_in">Object</span>); <span class="comment">// false</span></div></pre></td></tr></table></figure>
+<p>constructor的局限性：我们可以把类的原型进行重写，在重写的过程中，很有可能把之前的constructor给覆盖了，这样检测出来的结果就是不准确的。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Fn</span>(<span class="params"></span>) </span>&#123;</div><div class="line">&#125;</div><div class="line">Fn.prototype = <span class="keyword">new</span> <span class="built_in">Array</span>;</div><div class="line"><span class="keyword">var</span> f = <span class="keyword">new</span> Fn;</div><div class="line"><span class="built_in">console</span>.log(f.constructor); <span class="comment">// Array</span></div></pre></td></tr></table></figure>
+<p>对于特殊的数据类型null和undefined，它们的所属类型是Null和Undefined，但是浏览器把这两个类保护起来了，不允许在外面访问使用。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(<span class="string">"----------------Number---------------"</span>);</div><div class="line"><span class="keyword">var</span> A = <span class="number">123</span>;</div><div class="line"><span class="built_in">console</span>.log(A <span class="keyword">instanceof</span> <span class="built_in">Number</span>); <span class="comment">//false</span></div><div class="line"><span class="built_in">console</span>.log(A.constructor == <span class="built_in">Number</span>); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(A.constructor);</div><div class="line"><span class="built_in">console</span>.log(<span class="string">"----------------String---------------"</span>);</div><div class="line"><span class="keyword">var</span> B = <span class="string">"javascript"</span>;</div><div class="line"><span class="built_in">console</span>.log(B <span class="keyword">instanceof</span> <span class="built_in">String</span>); <span class="comment">//false</span></div><div class="line"><span class="built_in">console</span>.log(B.constructor == <span class="built_in">String</span>); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(B.constructor);</div><div class="line"><span class="built_in">console</span>.log(<span class="string">"----------------Boolean---------------"</span>);</div><div class="line"><span class="keyword">var</span> C = <span class="literal">true</span>;</div><div class="line"><span class="built_in">console</span>.log(C <span class="keyword">instanceof</span> <span class="built_in">Boolean</span>); <span class="comment">//false</span></div><div class="line"><span class="built_in">console</span>.log(C.constructor == <span class="built_in">Boolean</span>); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(C.constructor);</div><div class="line"><span class="built_in">console</span>.log(<span class="string">"----------------null---------------"</span>);</div><div class="line"><span class="keyword">var</span> D = <span class="literal">null</span>;</div><div class="line"><span class="built_in">console</span>.log(D <span class="keyword">instanceof</span> <span class="built_in">Object</span>); <span class="comment">//false</span></div><div class="line"><span class="comment">//console.log(D.constructor == null); //报错</span></div><div class="line"><span class="comment">//console.log(D.constructor); //报错</span></div><div class="line"><span class="built_in">console</span>.log(<span class="string">"----------------undefined---------------"</span>);</div><div class="line"><span class="keyword">var</span> E = <span class="literal">undefined</span>;</div><div class="line"><span class="comment">//console.log(E instanceof undefined); // //报错</span></div><div class="line"><span class="comment">//console.log(E.constructor == undefined); //报错</span></div><div class="line"><span class="comment">//console.log(E.constructor); //报错</span></div><div class="line"><span class="built_in">console</span>.log(<span class="string">"----------------function---------------"</span>);</div><div class="line"><span class="keyword">var</span> F = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;&#125;;</div><div class="line"><span class="built_in">console</span>.log(F <span class="keyword">instanceof</span> <span class="built_in">Function</span>);</div><div class="line"><span class="built_in">console</span>.log(F.constructor == <span class="built_in">Function</span>);</div><div class="line"><span class="built_in">console</span>.log(F.constructor);</div><div class="line"><span class="built_in">console</span>.log(<span class="string">"----------------new function---------------"</span>);</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">SB</span>(<span class="params"></span>) </span>&#123;&#125;;</div><div class="line"><span class="keyword">var</span> G = <span class="keyword">new</span> SB();</div><div class="line"><span class="built_in">console</span>.log(G <span class="keyword">instanceof</span> SB);</div><div class="line"><span class="built_in">console</span>.log(G.constructor == SB);</div><div class="line"><span class="built_in">console</span>.log(G.constructor);</div><div class="line"><span class="built_in">console</span>.log(<span class="string">"----------------new Object---------------"</span>);</div><div class="line"><span class="keyword">var</span> H = <span class="keyword">new</span> <span class="built_in">Object</span>;</div><div class="line"><span class="built_in">console</span>.log(H <span class="keyword">instanceof</span> <span class="built_in">Object</span>);</div><div class="line"><span class="built_in">console</span>.log(H.constructor == <span class="built_in">Object</span>);</div><div class="line"><span class="built_in">console</span>.log(H.constructor);</div><div class="line"><span class="built_in">console</span>.log(<span class="string">"-----------------Array--------------"</span>);</div><div class="line"><span class="keyword">var</span> I = [];</div><div class="line"><span class="built_in">console</span>.log(I <span class="keyword">instanceof</span> <span class="built_in">Array</span>);</div><div class="line"><span class="built_in">console</span>.log(I.constructor == <span class="built_in">Array</span>);</div><div class="line"><span class="built_in">console</span>.log(I.constructor);</div><div class="line"><span class="built_in">console</span>.log(<span class="string">"-----------------JSON--------------"</span>);</div><div class="line"><span class="keyword">var</span> J = &#123;</div><div class="line">  <span class="string">"good"</span>: <span class="string">"js"</span>,</div><div class="line">  <span class="string">"node"</span>: <span class="string">"very good"</span></div><div class="line">&#125;;</div><div class="line"><span class="built_in">console</span>.log(J <span class="keyword">instanceof</span> <span class="built_in">Object</span>);</div><div class="line"><span class="built_in">console</span>.log(J.constructor == <span class="built_in">Object</span>);</div><div class="line"><span class="built_in">console</span>.log(J.constructor);</div></pre></td></tr></table></figure>
+<h1 id="四、Object-prototype-toStrong-call"><a href="#四、Object-prototype-toStrong-call" class="headerlink" title="四、Object.prototype.toStrong.call()"></a>四、Object.prototype.toStrong.call()</h1><p>toString的理解：</p>
+<ul>
+<li><p>咋一看应该是转换为字符串，但是某些toString方法不仅仅是转换为字符串。对于Number、String、Boolean、Array、RegExp、Date、Function原型上的toString方法都是把当前的数据类转换为字符串的类型（它们的作用仅仅是用来转换为字符串的）</p>
+</li>
+<li><p>Object.prototype.toString并不是用来转换为字符串的。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">(&#123;name:<span class="string">"iceman"</span>&#125;).toString() <span class="comment">// --&gt; "[object Object]"</span></div><div class="line"><span class="built_in">Math</span>.toString() <span class="comment">// --&gt; "[object Math]"</span></div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>Number.prototype.toString是转换字符串的</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log((<span class="number">1</span>).toString()); <span class="comment">// --&gt; Number.prototype.toString，--&gt; "1"  转换为字符串</span></div><div class="line"><span class="built_in">console</span>.log((<span class="number">1</span>).__proto__.__proto__.toString()); <span class="comment">// Object.prototype.toString --&gt; "[object Object]"</span></div><div class="line"><span class="built_in">console</span>.log((<span class="number">128</span>).toString(<span class="number">2</span>/<span class="number">8</span>/<span class="number">10</span>)); <span class="comment">// 把数字转换为二进制/八进制/十进制</span></div></pre></td></tr></table></figure>
+<p>Object.prototype.toStrong.call()是检测数据类型最准确最常用的方式，起原理为：</p>
+<ul>
+<li>先获取Object原型上的toString方法，让方法执行，并且改变方法中的this关键字的指向；</li>
+<li>Object.prototype.toString 它的作用是返回当前方法的执行主体（方法中this）所属类的详细信息；</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> obj = &#123;name:<span class="string">'iceman'</span>&#125;;</div><div class="line"><span class="comment">// toString中的this是obj，返回的是obj所属类的信息 --&gt; "[object Object]"</span></div><div class="line"><span class="comment">// 第一个object代表当前实例是对象数据类型的（这个是固定死的）</span></div><div class="line"><span class="comment">// 第二个Object，代表的是obj所属的类是Object</span></div><div class="line"><span class="built_in">console</span>.log(obj.toString());</div><div class="line"></div><div class="line"><span class="comment">// toString中的this是Math，那么返回的是Math所属类的信息 --&gt; "[object Math]"</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Math</span>.toString());</div></pre></td></tr></table></figure>
+<p>检测其他类型：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> ary = [];</div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.prototype.toString.call(ary)); <span class="comment">// --&gt; "[object Array]"</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.prototype.toString.call(<span class="regexp">/^$/</span>)); <span class="comment">// --&gt; "[object RegExp]"</span></div><div class="line"><span class="built_in">console</span>.log((&#123;&#125;).toString.call(<span class="number">1</span>)); <span class="comment">// --&gt; "[object Number]"</span></div><div class="line"></div><div class="line"><span class="built_in">console</span>.log((&#123;&#125;).toString.call(<span class="string">'珠峰'</span>)); <span class="comment">// --&gt; "[object String]"</span></div><div class="line"><span class="built_in">console</span>.log((&#123;&#125;).toString.call(<span class="literal">true</span>)); <span class="comment">// --&gt; [object Boolean]</span></div><div class="line"><span class="built_in">console</span>.log((&#123;&#125;).toString.call(<span class="literal">undefined</span>)); <span class="comment">// --&gt;[object Undefined]</span></div><div class="line"><span class="built_in">console</span>.log((&#123;&#125;).toString.call(<span class="literal">null</span>)); <span class="comment">// --&gt;[object Null]</span></div><div class="line"><span class="built_in">console</span>.log((&#123;&#125;).toString.call(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;&#125;)); <span class="comment">// --&gt;[object Function]</span></div></pre></td></tr></table></figure>
+<p>实际使用：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> ary = [];</div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.prototype.toString.call(ary) === <span class="string">'[object Array]'</span>); <span class="comment">// true</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> reg = <span class="regexp">/^\[object Array\]$/</span>;</div><div class="line"><span class="built_in">console</span>.log(reg.test(<span class="built_in">Object</span>.prototype.toString.call(ary))); <span class="comment">// true</span></div></pre></td></tr></table></figure>
+<p>检测原型继承的情况：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Fn</span>(<span class="params"></span>) </span>&#123;</div><div class="line">&#125;</div><div class="line">Fn.prototype = <span class="keyword">new</span> <span class="built_in">Array</span>;</div><div class="line"><span class="keyword">var</span> f = <span class="keyword">new</span> Fn;</div><div class="line"><span class="built_in">console</span>.log(f <span class="keyword">instanceof</span> <span class="built_in">Array</span>); <span class="comment">// true</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.prototype.toString.call(f) === <span class="string">'[object Array]'</span>); <span class="comment">// false</span></div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(&#123;&#125;.toString.call(<span class="number">1</span>)); <span class="comment">// [object Number]</span></div><div class="line"><span class="built_in">console</span>.log(&#123;&#125;.toString.call(<span class="string">"11"</span>)); <span class="comment">// [object String]</span></div><div class="line"><span class="built_in">console</span>.log(&#123;&#125;.toString.call(<span class="regexp">/123/</span>)); <span class="comment">// [object RegExp]</span></div><div class="line"><span class="built_in">console</span>.log(&#123;&#125;.toString.call(&#123;&#125;)); <span class="comment">// [object Object]</span></div><div class="line"><span class="built_in">console</span>.log(&#123;&#125;.toString.call(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;&#125;)); <span class="comment">// [object Function]</span></div><div class="line"><span class="built_in">console</span>.log(&#123;&#125;.toString.call([])); <span class="comment">// [object Array]</span></div><div class="line"><span class="built_in">console</span>.log(&#123;&#125;.toString.call(<span class="literal">true</span>)); <span class="comment">// [object Boolean]</span></div><div class="line"><span class="built_in">console</span>.log(&#123;&#125;.toString.call(<span class="keyword">new</span> <span class="built_in">Date</span>())); <span class="comment">// [object Date]</span></div><div class="line"><span class="built_in">console</span>.log(&#123;&#125;.toString.call(<span class="keyword">new</span> <span class="built_in">Error</span>())); <span class="comment">// [object Error]</span></div><div class="line"><span class="built_in">console</span>.log(&#123;&#125;.toString.call(<span class="literal">null</span>)); <span class="comment">// [obejct Null]</span></div><div class="line"><span class="built_in">console</span>.log(&#123;&#125;.toString.call(<span class="literal">undefined</span>)); <span class="comment">// [object Undefined]</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">String</span>(<span class="literal">null</span>)); <span class="comment">// null</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">String</span>(<span class="literal">undefined</span>)); <span class="comment">// undefind</span></div></pre></td></tr></table></figure>
+<h1 id="使用jQuery中的方法-type"><a href="#使用jQuery中的方法-type" class="headerlink" title="使用jQuery中的方法$.type()"></a><strong>使用jQuery中的方法$.type()</strong></h1><p>现在看看jQuery是怎么做的</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 先申明一个对象,目的是用来做映射</span></div><div class="line"><span class="keyword">var</span> class2type = &#123;&#125;;</div><div class="line"><span class="comment">// 申明一个core_toString() 的方法,得到最原始的toString() 方法,因为在很多对象中,toStrintg() 已经被重写 </span></div><div class="line"><span class="keyword">var</span> core_toString() = class2type.toString;</div><div class="line"><span class="comment">// 这里为 toStrintg() 后的结果和类型名做一个映射,申明一个core_toString() 后的结果,而值就是类型名</span></div><div class="line">jQuery.each(<span class="string">"Boolean Number String Function Array Date RegExp Object Error"</span>.split(<span class="string">" "</span>), <span class="function"><span class="keyword">function</span>(<span class="params">i, name</span>) </span>&#123;</div><div class="line">    class2type[ <span class="string">"[object "</span> + name + <span class="string">"]"</span> ] = name.toLowerCase();</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log($.type(<span class="number">1</span>)); <span class="comment">// number</span></div><div class="line"><span class="built_in">console</span>.log($.type(<span class="string">"11"</span>)); <span class="comment">// string</span></div><div class="line"><span class="built_in">console</span>.log($.type(<span class="regexp">/123/</span>)); <span class="comment">// regexp</span></div><div class="line"><span class="built_in">console</span>.log($.type(&#123;&#125;)); <span class="comment">// object</span></div><div class="line"><span class="built_in">console</span>.log($.type(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;&#125;)); <span class="comment">// function</span></div><div class="line"><span class="built_in">console</span>.log($.type([])); <span class="comment">// array</span></div><div class="line"><span class="built_in">console</span>.log($.type(<span class="literal">true</span>)); <span class="comment">// boolean</span></div><div class="line"><span class="built_in">console</span>.log($.type(<span class="keyword">new</span> <span class="built_in">Date</span>())); <span class="comment">// date</span></div><div class="line"><span class="built_in">console</span>.log($.type(<span class="keyword">new</span> <span class="built_in">Error</span>())); <span class="comment">// error</span></div><div class="line"><span class="built_in">console</span>.log($.type(<span class="literal">null</span>)); <span class="comment">// null</span></div><div class="line"><span class="built_in">console</span>.log($.type(<span class="literal">undefined</span>)); <span class="comment">// undefined</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">String</span>(<span class="literal">null</span>)); <span class="comment">// null</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">String</span>(<span class="literal">undefined</span>)); <span class="comment">// undefined</span></div></pre></td></tr></table></figure>
+<p>上面的打印结果与</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">class2type[ <span class="string">"[object "</span> + name + <span class="string">"]"</span> ] = name.toLowerCase();</div></pre></td></tr></table></figure>
+<p>不谋而合!</p>
+<p>这是jQuery.type 的核心方法</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">type: <span class="function"><span class="keyword">function</span>(<span class="params"> obj </span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span> ( obj == <span class="literal">null</span> ) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="built_in">String</span>( obj );</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// Support: Safari &lt;= 5.1 (functionish RegExp)</span></div><div class="line">    <span class="keyword">return</span> <span class="keyword">typeof</span> obj === <span class="string">"object"</span> || <span class="keyword">typeof</span> obj === <span class="string">"function"</span> ?</div><div class="line">        class2type[ core_toString.call(obj) ] || <span class="string">"object"</span> :</div><div class="line">        <span class="keyword">typeof</span> obj;</div><div class="line">&#125;,</div></pre></td></tr></table></figure>
+<blockquote>
+<p>注意,为什么把 null 或者 undefined 单独讨论呢,因为 在一些版本浏览器中</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt; <span class="built_in">console</span>.log(core_toString.call(<span class="literal">null</span>));</div><div class="line">&gt; <span class="built_in">console</span>.log(core_toString.call(<span class="literal">undefined</span>));</div><div class="line">&gt;</div></pre></td></tr></table></figure>
+</blockquote>
+<p>&gt;</p>
+<blockquote>
+<p>这是会报错的!</p>
+</blockquote>
+<p>​     如果是对象类型,另:由于 在一些低版本的浏览器中,typeof /123/ 会返回的是 “function” 而不是 “object”,所以这里要判断是否是函数,要明白 这里的 <code>typeof obj === function</code> 不是为了函数讨论的,因为函数本身就可以通过typeof 来得到类型.</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">typeof</span> obj === <span class="string">"object"</span> || <span class="keyword">typeof</span> obj === <span class="string">"function"</span> ?</div><div class="line">       class2type[ core_toString.call(obj) ]</div></pre></td></tr></table></figure>
+<p>就直接返回class2type 中键值对的结果,,如果不是,那么一定就是基本类型, 通过 typeof 就可以啦.</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">class2type[ core_toString.call(obj) ] || <span class="string">"object"</span> :</div><div class="line"><span class="comment">// 这是防止一些未知情况的,如果未取到,就返回object</span></div></pre></td></tr></table></figure>
+<h1 id="但是-jQuery-type-有一个很大的缺陷"><a href="#但是-jQuery-type-有一个很大的缺陷" class="headerlink" title="但是 jQuery.type 有一个很大的缺陷"></a><strong>但是 jQuery.type 有一个很大的缺陷</strong></h1><p>这是一个自定义类型</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">this</span>.name = <span class="string">'pawn'</span>;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> p = <span class="keyword">new</span> Person();</div><div class="line"><span class="built_in">console</span>.log($.type(p));</div><div class="line"><span class="built_in">console</span>.log(&#123;&#125;.toString.call(p));</div></pre></td></tr></table></figure>
+<blockquote>
+<p>// 注意,这里会打印 [object Object],通过上面的方法,无法得到精确的自定义类型<br>这也是 它的一个大缺陷了!</p>
+</blockquote>
+<p><img src="https://o5wwk8baw.qnssl.com/1e5b073b33c45488730d8deb12868272/large" alt="img"></p>
+<p>下面,我们通过构造函数的方式来获取精确类型</p>
+<h1 id="通过构造函数来获取类型"><a href="#通过构造函数来获取类型" class="headerlink" title="通过构造函数来获取类型"></a><strong>通过构造函数来获取类型</strong></h1><p>在理解这个方法之前,需要理解两个点</p>
+<p>prorotype 原型属性</p>
+<p><strong>       我们知道,任何对象或者函数都直接或者间接的继承自Object 或者 Function， （其实最终Function 是继承自 Object 的，这属于原型链的知识了，见下图）。那么，任何一个对象都具有原型对象 <strong>proto</strong> (这个对象只在chrome 和 firefox 暴露，但是在其他浏览器中也是存在的)，这个原型对象就是这个对象的构造函数的原型属性(这里可能有点绕,直接上图).</strong></p>
+<p><img src="https://o5wwk8baw.qnssl.com/12213d42e388d24fdff3d89d87759869/large" alt="img"></p>
+<p>由于 任何函数都具有 原型属性prototype,并且这个原型属性具有一个默认属性 constructor,它是这个函数的引用,看下面的代码</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="keyword">this</span>.name = <span class="string">'pawn'</span>;</div><div class="line">&#125;</div><div class="line"><span class="built_in">console</span>.log(Person.prototype.constructor === Person);   <span class="comment">//true</span></div></pre></td></tr></table></figure>
+<p>发现,这两个东西其实一个东西</p>
+<p>但是,在某些情况下,需要这么写</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="keyword">this</span>.name = <span class="string">'pawn'</span>;</div><div class="line">&#125;</div><div class="line">Person.protype = &#123;</div><div class="line">    XX: ... ,</div><div class="line">    xx: ... ,</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这么做,就会覆盖原本的 protype 方法,那么construcor 就不存在了,这是,必须要显示的申明这个对象，</p>
+<h2 id="construction-Person-这句话非常重要，作用是修正this指向"><a href="#construction-Person-这句话非常重要，作用是修正this指向" class="headerlink" title="construction: Person, 这句话非常重要，作用是修正this指向"></a><strong>construction: Person, 这句话非常重要，作用是修正this指向</strong></h2><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Person.protype = &#123;</div><div class="line">    construction: Person,   <span class="comment">//这句话的作用是修正this指向</span></div><div class="line">    XX: ... ,</div><div class="line">    xx: ... ,</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在jQuery的中,就是这么做的,</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">jQuery.fn = jQuery.prototype = &#123;</div><div class="line">  <span class="keyword">constructor</span>: jQuery,</div><div class="line">  init: function( selector, context, rootjQuery ) &#123;</div><div class="line">      <span class="keyword">var</span> match, elem;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>关于 jQuery对象封装的方式 也是非常值得研究</p>
+</blockquote>
+<p><img src="https://o5wwk8baw.qnssl.com/d25e22b435da24b9fc0e48a756fa8923/large" alt="img"></p>
+<p><strong>注意,这里已经不是熟悉 [object Object],而是 已经重写了.</strong></p>
+<p>也就是,如果调用一个函数的toString() 方法.那么就会打印这个函数的函数体.</p>
+<p><img src="https://o5wwk8baw.qnssl.com/a6727d2bb9795b6fca8f5d3e147ee23c/large" alt="img"></p>
+<p>如何通过构造函数来获得变量的类型?</p>
+<p>判断是否是基本类型</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> getType = <span class="function"><span class="keyword">function</span>(<span class="params">obj</span>)</span>&#123;</div><div class="line">    <span class="keyword">if</span>(obj == <span class="literal">null</span>)&#123;</div><div class="line">       <span class="keyword">return</span> <span class="built_in">String</span>(obj);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span>(<span class="keyword">typeof</span> obj === <span class="string">'object'</span> || <span class="keyword">typeof</span> obj === <span class="string">'fucntion'</span>)&#123;</div><div class="line">        ...</div><div class="line">    &#125;<span class="keyword">else</span>&#123;</div><div class="line">        <span class="comment">// 如果不是引用类型,那么就是基本类型</span></div><div class="line">        <span class="keyword">return</span> <span class="keyword">typeof</span> obj</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如果是对象或者函数类型</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="keyword">this</span>.name = <span class="string">'pawn'</span>;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> p = <span class="keyword">new</span> Person();</div><div class="line"><span class="built_in">console</span>.log(p.constructor);   <span class="comment">//返回function Person()&#123;...&#125;</span></div></pre></td></tr></table></figure>
+<p>现在要做的事 : 如何将Person 提取出来呢?<br>毋庸置疑,字符串切割那一套肯定可以办到,但是太 low 啦!<br>这里,我使用正则将Person提取出来</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> regex = <span class="regexp">/function\s(.+?)\(/</span></div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params"></span>)</span>&#123;</div><div class="line"> <span class="keyword">this</span>.name = <span class="string">'pawn'</span>;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> p = <span class="keyword">new</span> Person();</div><div class="line"><span class="keyword">var</span> c = p.constructor</div><div class="line"><span class="keyword">var</span> regex = <span class="regexp">/function\s(.+?)\(/</span>;</div><div class="line"><span class="built_in">console</span>.log(<span class="string">'|'</span> + regex.exec(c)[<span class="number">1</span>] + <span class="string">'|'</span>);</div></pre></td></tr></table></figure>
+<p><img src="https://o5wwk8baw.qnssl.com/a3bb757e1ffd5347149c8b25c7207429/large" alt="img"></p>
+<p>其实,除了上面的正则,<strong>每个函数还有一个name属性<strong><strong><em>**</em></strong></strong></strong>,返回函数名,但是ie8 是不支持的.</p>
+<p>因此上面的代码可以写为:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> getType = <span class="function"><span class="keyword">function</span>(<span class="params">obj</span>)</span>&#123;</div><div class="line">    <span class="keyword">if</span>(obj == <span class="literal">null</span>)&#123;</div><div class="line">        <span class="keyword">return</span> <span class="built_in">String</span>(obj);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span>(<span class="keyword">typeof</span> obj === <span class="string">'object'</span> || <span class="keyword">typeof</span> obj === <span class="string">'function'</span>)&#123; </div><div class="line">        <span class="keyword">var</span> <span class="keyword">constructor</span> = obj.<span class="keyword">constructor</span>;</div><div class="line">        if(<span class="keyword">constructor</span> &amp;&amp; <span class="keyword">constructor</span>.name)&#123;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">constructor</span>.name;</div><div class="line">        &#125;</div><div class="line">        var regex = /function\s(.+?)\(/;</div><div class="line">        return regex.exec(c)[1];</div><div class="line">    &#125;else&#123;</div><div class="line">        <span class="comment">// 如果不是引用类型,那么就是基本;类型</span></div><div class="line">        <span class="keyword">return</span> <span class="keyword">typeof</span> obj;</div><div class="line">    &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>但是上面的代码太丑啦,将其简化</p>
+<p>简化</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> getType = <span class="function"><span class="keyword">function</span>(<span class="params">obj</span>)</span>&#123;</div><div class="line">    <span class="keyword">if</span>(obj == <span class="literal">null</span>)&#123;</div><div class="line">        <span class="keyword">return</span> <span class="built_in">String</span>(obj);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span>(<span class="keyword">typeof</span> obj === <span class="string">'object'</span> || <span class="keyword">typeof</span> obj === <span class="string">'function'</span>)&#123; </div><div class="line">        <span class="keyword">return</span> obj.constructor &amp;&amp; obj.constructor.name.toLowerCase() || </div><div class="line">          <span class="regexp">/function\s(.+?)\(/</span>.exec(obj.constructor)[<span class="number">1</span>].toLowerCase();</div><div class="line">    &#125;<span class="keyword">else</span>&#123;</div><div class="line">        <span class="comment">// 如果不是引用类型,那么就是基本类型</span></div><div class="line">        <span class="keyword">return</span> <span class="keyword">typeof</span> obj;</div><div class="line">    &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>还是比较麻烦,继续简化</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> getType = <span class="function"><span class="keyword">function</span>(<span class="params">obj</span>)</span>&#123;</div><div class="line">    <span class="keyword">if</span>(obj == <span class="literal">null</span>)&#123;</div><div class="line">       <span class="keyword">return</span> <span class="built_in">String</span>(obj);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">typeof</span> obj === <span class="string">'object'</span> || <span class="keyword">typeof</span> obj === <span class="string">'function'</span> ?</div><div class="line">      obj.constructor &amp;&amp; obj.constructor.name &amp;&amp; obj.constructor.name.toLowerCase() ||</div><div class="line">          <span class="regexp">/function\s(.+?)\(/</span>.exec(obj.constructor)[<span class="number">1</span>].toLowerCase():</div><div class="line">      <span class="keyword">typeof</span> obj;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>好了,已经全部弄完了,写个代码测试一下:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="keyword">this</span>.name = <span class="string">'pawn'</span>;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> p = <span class="keyword">new</span> Person();</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(getType(p));</div><div class="line"><span class="built_in">console</span>.log(getType(<span class="number">1</span>));</div><div class="line"><span class="built_in">console</span>.log(getType(<span class="string">"a"</span>));</div><div class="line"><span class="built_in">console</span>.log(getType(<span class="literal">false</span>));</div><div class="line"><span class="built_in">console</span>.log(getType(<span class="regexp">/123/</span>));</div><div class="line"><span class="built_in">console</span>.log(getType(&#123;&#125;));</div><div class="line"><span class="built_in">console</span>.log(getType(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;&#125;));</div><div class="line"><span class="built_in">console</span>.log(getType(<span class="keyword">new</span> <span class="built_in">Date</span>()));</div><div class="line"><span class="built_in">console</span>.log(getType(<span class="keyword">new</span> <span class="built_in">Error</span>()));</div><div class="line"><span class="built_in">console</span>.log(getType( <span class="literal">null</span>));</div><div class="line"><span class="built_in">console</span>.log(getType( <span class="literal">undefined</span>));</div></pre></td></tr></table></figure>
+<p><img src="https://o5wwk8baw.qnssl.com/5c65895b8b9a263ff9ffdb1d08b2e1cd/large" alt="img"></p>
+<p><img src="https://o5wwk8baw.qnssl.com/fd491ebf9ae42d5c35354ab09cc5b846/large" alt="img"></p>
+<p><img src="https://o5wwk8baw.qnssl.com/449e37cc16e3d33edf2322a7fa3df0f0/large" alt="img"></p>
+<p><img src="https://o5wwk8baw.qnssl.com/5c0e5637a1c0dbc8a287910b1c93ff16/large" alt="img"></p>
+<h2 id="1-有时会看到Object-prototype-toString-call"><a href="#1-有时会看到Object-prototype-toString-call" class="headerlink" title="1.有时会看到Object.prototype.toString.call()"></a><strong>1.有时会看到Object.prototype.toString.call()</strong></h2><p><img src="https://o5wwk8baw.qnssl.com/7b2f7d6431e299a69846a98d0e3e8dbe/large" alt="img"></p>
+<h2 id="2-toString-是一个怎样的方法-他定义在哪里？"><a href="#2-toString-是一个怎样的方法-他定义在哪里？" class="headerlink" title="2.toString()是一个怎样的方法,他定义在哪里？"></a><strong>2.toString()是一个怎样的方法,他定义在哪里？</strong></h2><p><img src="https://o5wwk8baw.qnssl.com/db7a90daea89620a5e689d180c68730a/large" alt="img"></p>
+<hr>
+<h2 id="3-call-apply-bind可以吗？"><a href="#3-call-apply-bind可以吗？" class="headerlink" title="3.call.apply.bind可以吗？"></a><strong>3.call.apply.bind可以吗？</strong></h2><p><img src="https://o5wwk8baw.qnssl.com/1a8feab14763519f95add483816e3af5/large" alt="img"></p>
+<hr>
+<h2 id="4-为神马要去call呢？用-Object-prototype-toString-call-obj-而不用-obj-toString-呢？"><a href="#4-为神马要去call呢？用-Object-prototype-toString-call-obj-而不用-obj-toString-呢？" class="headerlink" title="4.为神马要去call呢？用 Object.prototype.toString.call(obj) 而不用 obj.toString() 呢？"></a><strong>4.为神马要去call呢？用 Object.prototype.toString.call(obj) 而不用 obj.toString() 呢？</strong></h2><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">head</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">title</span>&gt;</span><span class="tag">&lt;/<span class="name">title</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="javascript"></span></div><div class="line">            <span class="function"><span class="keyword">function</span> <span class="title">A</span>(<span class="params"></span>)</span>&#123;</div><div class="line">                <span class="keyword">this</span>.say=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">                    <span class="built_in">console</span>.log(<span class="string">"我是1"</span>);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            <span class="function"><span class="keyword">function</span> <span class="title">B</span>(<span class="params"></span>)</span>&#123;</div><div class="line">                <span class="keyword">this</span>.say=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">                    <span class="built_in">console</span>.log(<span class="string">"我是2"</span>);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">var</span> a=<span class="keyword">new</span> A();</div><div class="line">            <span class="keyword">var</span> b=<span class="keyword">new</span> B();</div><div class="line">            a.say.call(b);    <span class="comment">//我是1</span></div><div class="line">        <span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">head</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">body</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></div></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">head</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">title</span>&gt;</span><span class="tag">&lt;/<span class="name">title</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="javascript"></span></div><div class="line">            <span class="function"><span class="keyword">function</span> <span class="title">A</span>(<span class="params"></span>)</span>&#123;</div><div class="line">                <span class="keyword">this</span>.name=<span class="string">'SB'</span>;</div><div class="line">                <span class="keyword">this</span>.say=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">                    <span class="built_in">console</span>.log(<span class="string">"我是1"</span>);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            <span class="function"><span class="keyword">function</span> <span class="title">B</span>(<span class="params"></span>)</span>&#123;</div><div class="line">                A.call(<span class="keyword">this</span>);   <span class="comment">//B继承A，重写say方法</span></div><div class="line">                <span class="keyword">this</span>.say=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">                    <span class="built_in">console</span>.log(<span class="string">"我是2"</span>);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">var</span> a=<span class="keyword">new</span> A();</div><div class="line">            <span class="keyword">var</span> b=<span class="keyword">new</span> B();</div><div class="line">            <span class="built_in">console</span>.log(b.name);  <span class="comment">//SB</span></div><div class="line">            b.say();         <span class="comment">//我是2</span></div><div class="line">            a.say.call(b);    <span class="comment">//我是1</span></div><div class="line">        <span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">head</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">body</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></div></pre></td></tr></table></figure>
+<h2 id="就是怕你重写了toString-所以才要用object-最原始的他toString-所以才去call。"><a href="#就是怕你重写了toString-所以才要用object-最原始的他toString-所以才去call。" class="headerlink" title="就是怕你重写了toString,所以才要用object 最原始的他toString,所以才去call。"></a><strong>就是怕你重写了toString,所以才要用object 最原始的他toString,所以才去call。</strong></h2><h2 id="5-Object-prototype-toString方法的原理是什么？"><a href="#5-Object-prototype-toString方法的原理是什么？" class="headerlink" title="5.Object.prototype.toString方法的原理是什么？"></a><strong>5.Object.prototype.toString方法的原理是什么？</strong></h2><p>参考链接：<strong><a href="http://www.jb51.net/article/79941.htm" target="_blank" rel="external">http://www.jb51.net/article/79941.htm</a></strong></p>
+<p>在JavaScript中,想要判断某个对象值属于哪种内置类型,最靠谱的做法就是通过Object.prototype.toString方法.</p>
+<p>12var arr = [];console.log(Object.prototype.toString.call(arr)) //“[object Array]”</p>
+<p>本文要讲的就是,toString方法是如何做到这一点的,原理是什么.</p>
+<p><strong>ECMAScript 3</strong></p>
+<p>在ES3中,Object.prototype.toString方法的规范如下:</p>
+<p>115.2.4.2 Object.prototype.toString()</p>
+<p>在toString方法被调用时,会执行下面的操作步骤:</p>
+<p>\1. 获取this对象的[[Class]]属性的值.</p>
+<p>\2. 计算出三个字符串”[object “, 第一步的操作结果Result(1), 以及 “]”连接后的新字符串.</p>
+<p>\3. 返回第二步的操作结果Result(2).</p>
+<p>[[Class]]是一个内部属性,所有的对象(原生对象和宿主对象)都拥有该属性.在规范中,[[Class]]是这么定义的</p>
+<p><strong>[[Class]]一个字符串值,表明了该对象的类型.</strong></p>
+<hr>
+<p>然后给了一段解释:</p>
+<p>所有内置对象的[[Class]]属性的值是由本规范定义的.所有宿主对象的[[Class]]属性的值可以是任意值,甚至可以是内置对象使用过的[[Class]]属性的值.[[Class]]属性的值可以用来判断一个原生对象属于哪种内置类型.需要注意的是,除了通过Object.prototype.toString方法之外,本规范没有提供任何其他方式来让程序访问该属性的值(查看 15.2.4.2).</p>
+<p>也就是说,把Object.prototype.toString方法返回的字符串,去掉前面固定的”[object “和后面固定的”]”,就是内部属性[[class]]的值,也就达到了判断对象类型的目的.jQuery中的工具方法$.type(),就是干这个的.</p>
+<p>在ES3中,规范文档并没有总结出[[class]]内部属性一共有几种,不过我们可以自己统计一下,原生对象的[[class]]内部属性的值一共有10种.分别是:”Array”, “Boolean”, “Date”, “Error”, “Function”, “Math”, “Number”, “Object”, “RegExp”, “String”.</p>
+<p><strong>ECMAScript 5</strong></p>
+<p>在ES5.1中,除了规范写的更详细一些以外,Object.prototype.toString方法和[[class]]内部属性的定义上也有一些变化,Object.prototype.toString方法的规范如下:</p>
+<p><strong>15.2.4.2 Object.prototype.toString ( )</strong></p>
+<p>在toString方法被调用时,会执行下面的操作步骤:</p>
+<hr>
+<p><strong>如果this的值为undefined,则返回”[object Undefined]”.</strong></p>
+<p><strong>如果this的值为null,则返回”[object Null]”.</strong></p>
+<p><strong>让O成为调用ToObject(this)的结果.</strong></p>
+<p><strong>让class成为O的内部属性[[Class]]的值.</strong></p>
+<p><strong>返回三个字符串”[object “, class, 以及 “]”连接后的新字符串.</strong></p>
+<hr>
+<p>可以看出,比ES3多了1,2,3步.第1,2步属于新规则,比较特殊,因为”Undefined”和”Null”并不属于[[class]]属性的值,需要注意的是,这里和严格模式无关(大部分函数在严格模式下,this的值才会保持undefined或null,非严格模式下会自动成为全局对象).第3步并不算是新规则,因为在ES3的引擎中,也都会在这一步将三种原始值类型转换成对应的包装对象,只是规范中没写出来.ES5中,[[Class]]属性的解释更加详细:</p>
+<p>所有内置对象的[[Class]]属性的值是由本规范定义的.所有宿主对象的[[Class]]属性的值可以是除了”Arguments”, “Array”, “Boolean”, “Date”, “Error”, “Function”, “JSON”, “Math”, “Number”, “Object”, “RegExp”, “String”之外的的任何字符串.[[Class]]内部属性是引擎内部用来判断一个对象属于哪种类型的值的.需要注意的是,除了通过Object.prototype.toString方法之外,本规范没有提供任何其他方式来让程序访问该属性的值(查看 15.2.4.2).</p>
+<p>和ES3对比一下,第一个差别就是[[class]]内部属性的值多了两种,成了12种,一种是arguments对象的[[class]]成了”Arguments”,而不是以前的”Object”,还有就是多个了全局对象JSON,它的[[class]]值为”JSON”.第二个差别就是,宿主对象的[[class]]内部属性的值,不能和这12种值冲突,不过在支持ES3的浏览器中,貌似也没有发现哪些宿主对象故意使用那10个值.</p>
+<p><strong>ECMAScript 6</strong></p>
+<p>ES6目前还只是工作草案,但能够肯定的是,[[class]]内部属性没有了,取而代之的是另外一个内部属性[[NativeBrand]].[[NativeBrand]]属性是这么定义的:</p>
+<p>内部属性属性值描述<br>[[NativeBrand]]枚举NativeBrand的一个成员.该属性的值对应一个标志值(tag value),可以用来区分原生对象的类型.</p>
+<p><strong>[[NativeBrand]]属性的解释:</strong></p>
+<p>[[NativeBrand]]内部属性用来识别某个原生对象是否为符合本规范的某一种特定类型的对象.[[NativeBrand]]内部属性的值为下面这些枚举类型的值中的一个:NativeFunction, NativeArray, StringWrapper, BooleanWrapper, NumberWrapper, NativeMath, NativeDate, NativeRegExp, NativeError, NativeJSON, NativeArguments, NativePrivateName.[[NativeBrand]]内部属性仅用来区分区分特定类型的ECMAScript原生对象.只有在表10中明确指出的对象类型才有[[NativeBrand]]内部属性.</p>
+<p>表10 — [[NativeBrand]]内部属性的值</p>
+<p>属性值对应类型<br>NativeFunctionFunction objects<br>NativeArrayArray objects<br>StringWrapperString objects<br>BooleanWrapperBoolean objects<br>NumberWrapperNumber objects<br>NativeMathThe Math object<br>NativeDateDate objects<br>NativeRegExpRegExp objects<br>NativeErrorError objects<br>NativeJSONThe JSON object<br>NativeArgumentsArguments objects<br>NativePrivateNamePrivate Name objects</p>
+<p>可见,和[[class]]不同的是,并不是每个对象都拥有[[NativeBrand]].同时,Object.prototype.toString方法的规范也改成了下面这样:</p>
+<p><strong>15.2.4.2 Object.prototype.toString ( )</strong></p>
+<p>在toString方法被调用时,会执行下面的操作步骤:</p>
+<p>如果this的值为undefined,则返回”[object Undefined]”.</p>
+<p>如果this的值为null,则返回”[object Null]”.</p>
+<p>让O成为调用ToObject(this)的结果.</p>
+<p>如果O有[[NativeBrand]]内部属性,让tag成为表29中对应的值.</p>
+<p>否则</p>
+<p>让hasTag成为调用O的[[HasProperty]]内部方法后的结果,参数为@@toStringTag.</p>
+<p>如果hasTag为false,则让tag为”Object”.</p>
+<p>否则,</p>
+<p>让tag成为调用O的[[Get]]内部方法后的结果,参数为@@toStringTag.</p>
+<p>如果tag是一个abrupt completion,则让tag成为NormalCompletion(“???”).</p>
+<p>让tag成为tag.[[value]].</p>
+<p>如果Type(tag)不是字符串,则让tag成为”???”.</p>
+<p>如果tag的值为”Arguments”, “Array”, “Boolean”, “Date”, “Error”, “Function”, “JSON”, “Math”, “Number”, “Object”, “RegExp”,或</p>
+<p>者”String”中的任一个,则让tag成为字符串”~”和tag当前的值连接后的结果.</p>
+<p>返回三个字符串”[object “, tag, and “]”连接后的新字符串.</p>
+<p>表29 — [[NativeBrand]] 标志值</p>
+<p>[[NativeBrand]]值标志值<br>NativeFunction”Function”<br>NativeArray”Array”<br>StringWrapper”String”<br>BooleanWrapper”Boolean”<br>NumberWrapper”Number”<br>NativeMath”Math”<br>NativeDate”Date”<br>NativeRegExp”RegExp”<br>NativeError”Error”<br>NativeJSON”JSON”<br>NativeArguments”Arguments”</p>
+<p>可以看到,在规范上有了很大的变化,不过对于普通用户来说,貌似感觉不到.</p>
+<p>也许你发现了,ES6里的新类型Map,Set等,都没有在表29中.它们在执行toString方法的时候返回的是什么?</p>
+<p>``</p>
+<p><code>console.log(Object.prototype.toString.call(Map())) //&quot;[object Map]&quot;</code></p>
+<p><code>console.log(Object.prototype.toString.call(Set())) //&quot;[object Set]&quot;</code></p>
+<p>其中的字符串”Map”是怎么来的呢:</p>
+<p><strong>15.14.5.13 Map.prototype.@@toStringTag</strong></p>
+<p>@@toStringTag 属性的初始值为字符串”Map”.</p>
+<p>由于ES6的规范还在制定中,各种相关规定都有可能改变,所以如果想了解更多细节.看看下面这两个链接,现在只需要知道的是:[[class]]没了,使用了更复杂的机制.</p>
+<p>以上所述是JavaScript中Object.prototype.toString方法的原理</p>
+<ul>
+<li><a href="http://www.jianshu.com/p/75057391ad51" target="_blank" rel="external">数据类型检测的四种方式 - 简书</a></li>
+<li><a href="https://www.talkingcoder.com/article/6333557442705696719" target="_blank" rel="external">JS类型判断 - TalkingCoder</a></li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2015/03/Immutable.js和函数式编程概念介绍/" rel="next" title="Immutable.js和函数式编程概念介绍">
+                <i class="fa fa-chevron-left"></i> Immutable.js和函数式编程概念介绍
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2016/12/持续集成交付部署/" rel="prev" title="持续集成交付部署">
+                持续集成交付部署 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/blog/images/avatar.gif"
+               alt="tomoat" />
+          <p class="site-author-name" itemprop="name">tomoat</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/blog/archives">
+                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一、typeof"><span class="nav-number">1.</span> <span class="nav-text">一、typeof</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、instanceof"><span class="nav-number">2.</span> <span class="nav-text">二、instanceof</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三、constructor"><span class="nav-number">3.</span> <span class="nav-text">三、constructor</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#四、Object-prototype-toStrong-call"><span class="nav-number">4.</span> <span class="nav-text">四、Object.prototype.toStrong.call()</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用jQuery中的方法-type"><span class="nav-number">5.</span> <span class="nav-text">使用jQuery中的方法$.type()</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#但是-jQuery-type-有一个很大的缺陷"><span class="nav-number">6.</span> <span class="nav-text">但是 jQuery.type 有一个很大的缺陷</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#通过构造函数来获取类型"><span class="nav-number">7.</span> <span class="nav-text">通过构造函数来获取类型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#construction-Person-这句话非常重要，作用是修正this指向"><span class="nav-number">7.1.</span> <span class="nav-text">construction: Person, 这句话非常重要，作用是修正this指向</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-有时会看到Object-prototype-toString-call"><span class="nav-number">7.2.</span> <span class="nav-text">1.有时会看到Object.prototype.toString.call()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-toString-是一个怎样的方法-他定义在哪里？"><span class="nav-number">7.3.</span> <span class="nav-text">2.toString()是一个怎样的方法,他定义在哪里？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-call-apply-bind可以吗？"><span class="nav-number">7.4.</span> <span class="nav-text">3.call.apply.bind可以吗？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-为神马要去call呢？用-Object-prototype-toString-call-obj-而不用-obj-toString-呢？"><span class="nav-number">7.5.</span> <span class="nav-text">4.为神马要去call呢？用 Object.prototype.toString.call(obj) 而不用 obj.toString() 呢？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#就是怕你重写了toString-所以才要用object-最原始的他toString-所以才去call。"><span class="nav-number">7.6.</span> <span class="nav-text">就是怕你重写了toString,所以才要用object 最原始的他toString,所以才去call。</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Object-prototype-toString方法的原理是什么？"><span class="nav-number">7.7.</span> <span class="nav-text">5.Object.prototype.toString方法的原理是什么？</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">tomoat</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/blog/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/blog/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/blog/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/blog/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+</body>
+</html>

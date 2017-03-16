@@ -247,6 +247,546 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/在Node.js中查找JavaScript内存泄漏简略指南/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="tomoat">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="tomoat的笔记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/blog/2017/03/在Node.js中查找JavaScript内存泄漏简略指南/" itemprop="url">
+                  在Node.js中查找JavaScript内存泄漏简略指南
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-16T16:07:25+08:00">
+                2017-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><ul>
+<li><a href="https://www.alexkras.com/simple-guide-to-finding-a-javascript-memory-leak-in-node-js/#intro" target="_blank" rel="external">介绍</a></li>
+<li><a href="https://www.alexkras.com/simple-guide-to-finding-a-javascript-memory-leak-in-node-js/#min-theory" target="_blank" rel="external">最小理论</a></li>
+<li><a href="https://www.alexkras.com/simple-guide-to-finding-a-javascript-memory-leak-in-node-js/#reproduce" target="_blank" rel="external">步骤1.重现并确认问题</a></li>
+<li><a href="https://www.alexkras.com/simple-guide-to-finding-a-javascript-memory-leak-in-node-js/#heapdump" target="_blank" rel="external">第2步。至少取3堆堆</a></li>
+<li><a href="https://www.alexkras.com/simple-guide-to-finding-a-javascript-memory-leak-in-node-js/#find-problem" target="_blank" rel="external">步骤3.查找问题</a></li>
+<li><a href="https://www.alexkras.com/simple-guide-to-finding-a-javascript-memory-leak-in-node-js/#confirm" target="_blank" rel="external">步骤4.确认问题已解决</a></li>
+<li><a href="https://www.alexkras.com/simple-guide-to-finding-a-javascript-memory-leak-in-node-js/#links" target="_blank" rel="external">链接到一些其他资源</a></li>
+<li><a href="https://www.alexkras.com/simple-guide-to-finding-a-javascript-memory-leak-in-node-js/#summary" target="_blank" rel="external">概要</a></li>
+</ul>
+<blockquote>
+<p>你可能想要的书签：简单指南查找JavaScript内存泄漏在Node.js由<a href="https://twitter.com/akras14" target="_blank" rel="external">@ akras14 </a><a href="https://t.co/oRyQboa8Uw" target="_blank" rel="external">https://t.co/oRyQboa8Uw</a></p>
+<p>- Node.js（@nodejs）<a href="https://twitter.com/nodejs/status/684678799896625152" target="_blank" rel="external">2016年1月6日</a></p>
+</blockquote>
+<p>请考虑<a href="https://www.alexkras.com/recommends/kindle-memory-leak" target="_blank" rel="external">在亚马逊上查看本指南</a>，如果你会发现它有所帮助。</p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>几个月前，我不得不调试Node.js中的内存泄漏。我发现了很多文章专门的主题，但即使仔细阅读其中一些，我仍然很困惑，我究竟应该做什么来调试我们的问题。</p>
+<p>我的目的是这个职位是一个简单的指南，在节点中查找内存泄漏。我将概述一个易于遵循的方法，应该（在我看来）成为任何内存泄漏调试在节点的起点。在某些情况下，这种方法可能不够。我将链接到您可能想要考虑的一些其他资源。</p>
+<h2 id="最小理论"><a href="#最小理论" class="headerlink" title="最小理论"></a>最小理论</h2><p>JavaScript是一种垃圾收集语言。因此，Node进程使用的所有内存都由V8 JavaScript引擎自动分配和取消分配。</p>
+<p>V8如何知道何时解除分配内存？V8保留程序中所有变量的图形，从根节点开始。JavaScript中有4种类型的数据类型：Boolean，String，Number和Object。前3个是简单类型，它们只能保留分配给它们的数据（即文本字符串）。对象和JavaScript中的一切都是一个对象（即数组是对象），可以保持引用（指针）到其他对象。</p>
+<p><a href="https://www.alexkras.com/wp-content/uploads/memory-graph.png" target="_blank" rel="external"><img src="https://www.alexkras.com/wp-content/uploads/memory-graph.png" alt="内存图"></a></p>
+<p>周期性地，V8将遍历存储器图，尝试识别从根节点不再能够到达的数据组。如果从根节点无法访问，V8假定数据不再使用并释放内存。这个过程称为<strong>垃圾收集</strong>。</p>
+<h3 id="什么时候发生内存泄漏？"><a href="#什么时候发生内存泄漏？" class="headerlink" title="什么时候发生内存泄漏？"></a>什么时候发生内存泄漏？</h3><p>当一些不再需要的数据仍然可以从根节点到达时，在JavaScript中发生内存泄漏。V8将假设数据仍在使用，并且不会释放内存。<strong>为了调试内存泄漏，我们需要找到错误保存的数据，并确保V8能够清理它。</strong></p>
+<p>还有一点很重要，要注意的是，垃圾回收不会一直运行。通常V8可以在认为合适时触发垃圾收集。例如，它可以定期运行垃圾收集，或者它可以触发垃圾收集，如果它感测到可用内存量越来越低。节点对每个进程可用的内存数量有限，因此V8必须明智地使用它。</p>
+<p><a href="https://www.alexkras.com/wp-content/uploads/node-error.png" target="_blank" rel="external"><img src="https://www.alexkras.com/wp-content/uploads/node-error.png" alt="节点错误"></a></p>
+<p>后来的情况下，<strong>垃圾收集</strong>可能是<strong>性能明显下降的来源</strong>。</p>
+<p>想象一下，你有一个应用程序有很多内存泄漏。很快，Node进程会开始耗尽内存，这将导致V8触发一个无法回收的垃圾收集。但是由于大多数数据仍然可以从根节点到达，非常少的内存将被清理，保持大部分的位置。</p>
+<p>比以后更快，Node进程会再次运行内存，触发另一个垃圾收集。在你知道它之前，你的应用程序进入一个不断的垃圾收集周期，只是为了保持过程的功能。由于V8花费大部分时间来处理垃圾收集，因此只剩下很少的资源来运行实际程序。</p>
+<h2 id="步骤1-重现并确认问题"><a href="#步骤1-重现并确认问题" class="headerlink" title="步骤1.重现并确认问题"></a>步骤1.重现并确认问题</h2><p>正如我前面指出的，V8 JavaScript引擎有一个复杂的逻辑，它用于确定何时运行垃圾收集。记住这一点，即使我们可以看到Node进程的内存继续上升，<strong>我们不能确定我们目睹了内存泄漏，直到我们知道Garbage Collection已经运行</strong>，允许未使用的内存被清除。</p>
+<p>幸运的是，Node允许我们手动触发垃圾收集，这是我们在尝试确认内存泄漏时应该做的第一件事。这可以通过运行带有<code>--expose-gc</code>标志（ie <code>node --expose-gc index.js</code>）的Node来实现。一旦节点在该模式下运行，您可以随时通过<code>global.gc()</code>从您的程序调用来以编程方式触发垃圾收集。</p>
+<p>您还可以通过调用来检查进程使用的内存量<code>process.memoryUsage().heapUsed</code>。</p>
+<p><strong>通过手动触发垃圾收集和检查使用的堆，你可以确定你是否实际上观察你的程序中的内存泄漏。</strong></p>
+<h3 id="示例程序"><a href="#示例程序" class="headerlink" title="示例程序"></a>示例程序</h3><p>我创建了一个简单的内存泄漏程序，你可以在这里看到：<a href="https://github.com/akras14/memory-leak-example" target="_blank" rel="external">https</a> : <a href="https://github.com/akras14/memory-leak-example" target="_blank" rel="external">//github.com/akras14/memory-leak-example</a></p>
+<p>您可以克隆它，运行<code>npm install</code>，然后运行<code>node --expose-gc index.js</code>以查看它的操作。</p>
+<table>
+<thead>
+<tr>
+<th>12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849</th>
+<th>“use strict”;require(‘heapdump’); var leakyData = [];var nonLeakyData = []; class SimpleClass {  constructor(text){    this.text = text;  }} function cleanUpData(dataStore, randomObject){  var objectIndex = dataStore.indexOf(randomObject);  dataStore.splice(objectIndex, 1);} function getAndStoreRandomData(){  var randomData = Math.random().toString();  var randomObject = new SimpleClass(randomData);   leakyData.push(randomObject);  nonLeakyData.push(randomObject);   // cleanUpData(leakyData, randomObject); //&lt;– Forgot to clean up  cleanUpData(nonLeakyData, randomObject);} function generateHeapDumpAndStats(){  //1. Force garbage collection every time this function is called  try {    global.gc();  } catch (e) {    console.log(“You must run program with ‘node –expose-gc index.js’ or ‘npm start’”);    process.exit();  }   //2. Output Heap stats  var heapUsed = process.memoryUsage().heapUsed;  console.log(“Program is using “ + heapUsed + “ bytes of Heap.”)   //3. Get Heap dump  process.kill(process.pid, ‘SIGUSR2’);} //Kick off the programsetInterval(getAndStoreRandomData, 5); //Add random data every 5 millisecondssetInterval(generateHeapDumpAndStats, 2000); //Do garbage collection and heap dump every 2 seconds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>程序将：</p>
+<ol>
+<li>每5毫秒生成一个随机对象并将其存储在2个数组中，一个名为<em>leakyData</em>和另一个<em>nonLeakyData</em>。我们将每5毫秒清除nonLeakyData数组，但是我们会<strong>“忘记”</strong>清理leakyData数组。</li>
+<li>每2秒，程序将输出所使用的内存量（并生成堆转储，但我们将在下一节中讨论更多）。</li>
+</ol>
+<p>如果用<code>node --expose-gc index.js</code>（或<code>npm start</code>）运行程序，它将开始输出内存统计信息。让它运行一两分钟，并杀死它<code>Ctr + c</code>。</p>
+<p>你会看到内存快速增长，即使我们每2秒触发一次垃圾收集，在我们得到统计数据之前：</p>
+<table>
+<thead>
+<tr>
+<th>123456789101112</th>
+<th>//1. Force garbage collection every time this function is calledtry {  global.gc();} catch (e) {  console.log(“You must run program with ‘node –expose-gc index.js’ or ‘npm start’”);  process.exit();} //2. Output Heap statsvar heapUsed = process.memoryUsage().heapUsed;console.log(“Program is using “ + heapUsed + “ bytes of Heap.”)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>使用stats输出看起来像下面：</p>
+<table>
+<thead>
+<tr>
+<th>12345678910111213141516</th>
+<th>Program is using 3783656 bytes of Heap.Program is using 3919520 bytes of Heap.Program is using 3849976 bytes of Heap.Program is using 3881480 bytes of Heap.Program is using 3907608 bytes of Heap.Program is using 3941752 bytes of Heap.Program is using 3968136 bytes of Heap.Program is using 3994504 bytes of Heap.Program is using 4032400 bytes of Heap.Program is using 4058464 bytes of Heap.Program is using 4084656 bytes of Heap.Program is using 4111128 bytes of Heap.Program is using 4137336 bytes of Heap.Program is using 4181240 bytes of Heap.Program is using 4207304 bytes of Heap.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>如果你绘制数据，内存增长变得更加明显。</p>
+<p><a href="https://www.alexkras.com/wp-content/uploads/with-memory-leak.png" target="_blank" rel="external"><img src="https://www.alexkras.com/wp-content/uploads/with-memory-leak.png" alt="带内存泄漏"></a></p>
+<p><em>注意：如果你好奇我如何绘制数据，请继续阅读。如果没有，请跳到下一节。</em></p>
+<p>我将输出的统计信息保存到一个JSON文件中，然后读入它并用几行Python绘制它。我把它保持在单独的早午餐以避免混乱，但你可以在这里查看：<a href="https://github.com/akras14/memory-leak-example/tree/plot" target="_blank" rel="external">https</a>：<a href="https://github.com/akras14/memory-leak-example/tree/plot" target="_blank" rel="external">//github.com/akras14/memory-leak-example/tree/plot</a></p>
+<p>相关部分为：</p>
+<table>
+<thead>
+<tr>
+<th>1234567891011121314151617181920212223</th>
+<th>var fs = require(‘fs’);var stats = []; //— skip — var heapUsed = process.memoryUsage().heapUsed;stats.push(heapUsed); //— skip — //On ctrl+c save the stats and exitprocess.on(‘SIGINT’, function(){  var data = JSON.stringify(stats);  fs.writeFile(“stats.json”, data, function(err) {    if(err) {      console.log(err);    } else {      console.log(“\nSaved stats to stats.json”);    }    process.exit();  });});</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>和</p>
+<table>
+<thead>
+<tr>
+<th>1234567891011121314</th>
+<th>#!/usr/bin/env python import matplotlib.pyplot as pltimport json statsFile = open(‘stats.json’, ‘r’)heapSizes = json.load(statsFile) print(‘Plotting %s’ % ‘, ‘.join(map(str, heapSizes))) plt.plot(heapSizes)plt.ylabel(‘Heap Size’)plt.show()</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>你可以检查出<a href="https://github.com/akras14/memory-leak-example/tree/plot" target="_blank" rel="external">plot</a>分支，并像往常一样运行程序。一旦你完成运行<code>python plot.py</code>生成情节。您需要在您的机器上安装<a href="http://matplotlib.org/" target="_blank" rel="external">Matplotlib</a>库才能正常工作。</p>
+<p>或者可以在Excel中绘制数据。</p>
+<h2 id="第2步。至少取3堆堆"><a href="#第2步。至少取3堆堆" class="headerlink" title="第2步。至少取3堆堆"></a>第2步。至少取3堆堆</h2><p>好了，所以我们重现了问题，现在是什么？现在我们需要弄清楚问题在哪里，并解决它</p>
+<p>您可能已经注意到我的示例程序中的以下行：</p>
+<table>
+<thead>
+<tr>
+<th>12345678</th>
+<th>require(‘heapdump’);// —skip— //3. Get Heap dumpprocess.kill(process.pid, ‘SIGUSR2’); // —skip—</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>我使用一个node-heapdump模块，你可以在这里找到：<a href="https://github.com/bnoordhuis/node-heapdump" target="_blank" rel="external">https</a> : <a href="https://github.com/bnoordhuis/node-heapdump" target="_blank" rel="external">//github.com/bnoordhuis/node-heapdump</a></p>
+<p>为了使用node-heapdump，你只需要：</p>
+<ol>
+<li>安装它。</li>
+<li>要求它在你的程序的顶部</li>
+<li><code>kill -USR2 </code>在Unix上调用像平台</li>
+</ol>
+<p>如果你从来没有看到该<code>kill</code>部分，它是Unix中的一个命令，它允许你（除了别的以外）发送一个自定义信号（aka User Signal）给任何正在运行的进程。Node-heapdump配置为进行进程的堆转储，任何时候它接收<strong>用户信号两个</strong>因此<code>-USR2</code>，后跟进程id。</p>
+<p>在我的示例程序中，我<code>kill -USR2 </code>通过运行自动化命令<code>process.kill(process.pid, &#39;SIGUSR2&#39;);</code>，其中<code>process.kill</code>是一个<code>kill</code>命令的节点包装器，<code>SIGUSR2</code>是Node的说法<code>-USR2</code>，并<code>process.pid</code>获取当前Node进程的ID。我在每个垃圾收集之后运行此命令以获得干净的堆转储。</p>
+<p>我不认为<code>process.kill(process.pid, &#39;SIGUSR2&#39;);</code>会在Windows上工作，但你可以运行<code>heapdump.writeSnapshot()</code>。</p>
+<p>这个例子可能会更容易一些<code>heapdump.writeSnapshot()</code>，但是我想提一提的是，你可以<code>kill -USR2 </code>在Unix上像平台一样触发堆 信号，这样可以派上用场。</p>
+<p>下一节将讨论如何使用生成的堆转储来隔离内存泄漏。</p>
+<h2 id="步骤3-查找问题"><a href="#步骤3-查找问题" class="headerlink" title="步骤3.查找问题"></a>步骤3.查找问题</h2><p>在第2步中，我们生成了一堆堆转储，但<strong>我们至少需要3个</strong>，你很快就会明白为什么。</p>
+<p>一旦你有你的堆转储。转到Google Chrome浏览器，打开Chrome开发工具（Windows上为F12或Mac上为Command + Options + i）。</p>
+<p>一旦进入开发工具导航到“配置文件”选项卡，选择屏幕底部的“加载”按钮，导航到您采取的第一个堆转储，并选择它。堆转储将加载到Chrome视图中，如下所示：</p>
+<p><a href="https://www.alexkras.com/wp-content/uploads/1st-Heap-Dump.png" target="_blank" rel="external"><img src="https://www.alexkras.com/wp-content/uploads/1st-Heap-Dump.png" alt="第一堆"></a></p>
+<p>继续加载2个堆转储到视图中。例如，您可以使用您所采取的最后2个堆转储。最重要的是，堆转储必须按照它们被采用的顺序加载。您的“配置文件”选项卡应类似于以下内容。</p>
+<p><a href="https://www.alexkras.com/wp-content/uploads/3-Heap-Dumps.png" target="_blank" rel="external"><img src="https://www.alexkras.com/wp-content/uploads/3-Heap-Dumps.png" alt="3堆堆"></a></p>
+<p>从上面的图像可以看出，堆随着时间的推移继续增长。</p>
+<h3 id="3堆倾销法"><a href="#3堆倾销法" class="headerlink" title="3堆倾销法"></a>3堆倾销法</h3><p>一旦堆转储被加载，您将在“个人档案”选项卡中看到很多子视图，并且很容易丢失它们。然而，有一种观点，我发现特别有帮助。</p>
+<p>点击你已经采取的最后一个堆转储，它会立即将你进入“摘要”视图。在“摘要”下拉列表的左侧，您应该会看到另一个显示“全部”的下拉菜单。点击它并选择“在heapdump-YOUR-FIRST-HEAP-DUMP和heapdump-YOUR-SECOND-TO-LAST-HEAP-DUMP之间分配的对象”，如下图所示。</p>
+<p><a href="https://www.alexkras.com/wp-content/uploads/3-Heap-Dump-View.png" target="_blank" rel="external"><img src="https://www.alexkras.com/wp-content/uploads/3-Heap-Dump-View.png" alt="3堆堆视图"></a></p>
+<p>它将显示有时在您的第一个堆转储和第二个到最后一个堆转储之间分配的所有对象。这些事情，这些对象仍然挂在你的最后堆转储是引起关注，应该调查，因为他们应该被拾起由垃圾收集。</p>
+<p>相当惊人的东西实际上，但不是很直观，发现和容易忽视。</p>
+<h3 id="忽略括号中的任何内容，例如（字符串），至少在开头"><a href="#忽略括号中的任何内容，例如（字符串），至少在开头" class="headerlink" title="忽略括号中的任何内容，例如（字符串），至少在开头"></a>忽略括号中的任何内容，例如（字符串），至少在开头</h3><p>完成示例应用程序的概述步骤后，我结束了以下视图。</p>
+<p>注意，<strong>浅尺寸</strong>表示对象本身的大小，而<strong>保留尺寸</strong>表示对象的尺寸和它的所有子。</p>
+<p><a href="https://www.alexkras.com/wp-content/uploads/memory-leak.png" target="_blank" rel="external"><img src="https://www.alexkras.com/wp-content/uploads/memory-leak.png" alt="内存泄漏"></a></p>
+<p>似乎有5个条目保留在我上次的快照，应该不存在：（数组），（编译代码），（字符串），（系统）和SimpleClass。</p>
+<p>其中只有<strong>SimpleClass</strong>看起来很熟悉，因为它来自示例应用程序中的以下代码。</p>
+<table>
+<thead>
+<tr>
+<th>12</th>
+<th>var randomObject = new SimpleClass(randomData);</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>可能很有可能先通过（数组）或（字符串）条目开始查找。摘要视图中的所有对象按其构造函数名称分组。在数组或字符串的情况下，这些是JavaScript引擎内部的构造函数。虽然你的程序肯定坚持通过这些构造函数创建的一些数据，你也会在那里得到很多噪音，使得更难找到内存泄漏的来源。</p>
+<p>这就是为什么最好跳过这些，而是看看你是否可以发现任何更明显的嫌疑犯，如示例应用程序中的<strong>SimpleClass</strong>构造函数。</p>
+<p>单击SimpleClass构造函数中的下拉箭头，并从结果列表中选择任何创建的对象，将填充窗口下部的保留路径（参见上图）。从那里，很容易跟踪leakyData数组持有我们的数据。</p>
+<p>如果你在你的应用程序没有幸运，像我在我的示例应用程序，你可能需要看看内部构造函数（如字符串），并试图找出是什么导致内存泄漏。在这种情况下，诀窍是尝试识别在一些内部构造器组中经常出现的值组，并尝试使用它作为指向可疑内存泄漏的提示。</p>
+<p>例如，在示例应用程序案例中，您可能会观察到很多字符串看起来像转换为字符串的随机数。如果您检查其保留路径，Chrome开发工具将指向leakyData数组。</p>
+<h2 id="步骤4-确认问题已解决"><a href="#步骤4-确认问题已解决" class="headerlink" title="步骤4.确认问题已解决"></a>步骤4.确认问题已解决</h2><p>在您确定并修复了可疑的内存泄漏后，您应该会发现堆使用情况有很大的不同。</p>
+<p>如果我们在示例应用中取消注释以下行：</p>
+<table>
+<thead>
+<tr>
+<th>12</th>
+<th>cleanUpData(leakyData, randomObject); //&lt;– Forgot to clean up</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>并按照步骤1中所述重新运行应用程序，请注意以下输出：</p>
+<table>
+<thead>
+<tr>
+<th>12345678910111213141516</th>
+<th>Program is using 3756664 bytes of Heap.Program is using 3862504 bytes of Heap.Program is using 3763208 bytes of Heap.Program is using 3763400 bytes of Heap.Program is using 3763424 bytes of Heap.Program is using 3763448 bytes of Heap.Program is using 3763472 bytes of Heap.Program is using 3763496 bytes of Heap.Program is using 3763784 bytes of Heap.Program is using 3763808 bytes of Heap.Program is using 3763832 bytes of Heap.Program is using 3758368 bytes of Heap.Program is using 3758368 bytes of Heap.Program is using 3758368 bytes of Heap.Program is using 3758368 bytes of Heap.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>如果我们绘制数据，它将看起来如下：</p>
+<p><a href="https://www.alexkras.com/wp-content/uploads/without-memory-leak.png" target="_blank" rel="external"><img src="https://www.alexkras.com/wp-content/uploads/without-memory-leak.png" alt="无内存泄漏"></a></p>
+<p>Hooray，内存泄漏了。</p>
+<p><em>注意，内存使用的初始峰值仍然存在，这是正常的，而你等待程序稳定。注意你的分析中的尖峰，以确保你不会将其解释为内存泄漏。</em></p>
+<h2 id="链接到一些其他资源"><a href="#链接到一些其他资源" class="headerlink" title="链接到一些其他资源"></a>链接到一些其他资源</h2><h3 id="使用Chrome-DevTools进行内存分析"><a href="#使用Chrome-DevTools进行内存分析" class="headerlink" title="使用Chrome DevTools进行内存分析"></a>使用Chrome DevTools进行内存分析</h3><iframe width="560" height="315" src="https://www.youtube.com/embed/L3ugr9BJqIs" frameborder="0" allowfullscreen></iframe>
+
+<p>您在本文中阅读的大部分内容都来自上面的视频。本文存在的唯一原因是，我必须在两个星期内观看这个视频3次，以发现（我相信是）的关键点，我想让发现过程更容易为其他人。</p>
+<p>我强烈建议观看这个视频补充这篇文章。</p>
+<h3 id="另一个有用的工具-memwatch-next"><a href="#另一个有用的工具-memwatch-next" class="headerlink" title="另一个有用的工具 - memwatch-next"></a>另一个有用的工具 - memwatch-next</h3><p>这是另一个很酷的工具，我认为值得一提。你可以<a href="https://hacks.mozilla.org/2012/11/tracking-down-memory-leaks-in-node-js-a-node-js-holiday-season/" target="_blank" rel="external">在这里</a>阅读更多的一些推理（短读，值得你的时间）。</p>
+<p>或者直接去回购：<a href="https://github.com/marcominetti/node-memwatch" target="_blank" rel="external">https</a>：<a href="https://github.com/marcominetti/node-memwatch" target="_blank" rel="external">//github.com/marcominetti/node-memwatch</a></p>
+<p>为了节省您的点击，您可以安装它 <code>npm install memwatch-next</code></p>
+<p>然后使用它与两个事件：</p>
+<table>
+<thead>
+<tr>
+<th>12345678910</th>
+<th>var memwatch = require(‘memwatch-next’);memwatch.on(‘leak’, function(info) { /<em>Log memory leak info, runs when memory leak is detected </em>/ });memwatch.on(‘stats’, function(stats) { /<em>Log memory stats, runs when V8 does Garbage Collection</em>/ }); //It can also do this…var hd = new memwatch.HeapDiff();// Do something that might leak memoryvar diff = hd.end();console.log(diff);</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>最后一个控制台日志将输出如下内容，显示内存中已经生成了什么类型的对象。</p>
+<table>
+<thead>
+<tr>
+<th>12345678910111213141516171819</th>
+<th>{  “before”: { “nodes”: 11625, “size_bytes”: 1869904, “size”: “1.78 mb” },  “after”:  { “nodes”: 21435, “size_bytes”: 2119136, “size”: “2.02 mb” },  “change”: { “size_bytes”: 249232, “size”: “243.39 kb”, “freed_nodes”: 197,    “allocated_nodes”: 10007,    “details”: [      { “what”: “String”,        “size_bytes”: -2120,  “size”: “-2.07 kb”,  “+”: 3,    “-“: 62      },      { “what”: “Array”,        “size_bytes”: 66687,  “size”: “65.13 kb”,  “+”: 4,    “-“: 78      },      { “what”: “LeakingClass”,        “size_bytes”: 239952, “size”: “234.33 kb”, “+”: 9998, “-“: 0      }    ]  }}</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>很酷。</p>
+<h3 id="从developer-chrome-com的JavaScript内存分析"><a href="#从developer-chrome-com的JavaScript内存分析" class="headerlink" title="从developer.chrome.com的JavaScript内存分析"></a>从developer.chrome.com的JavaScript内存分析</h3><p><a href="https://developer.chrome.com/devtools/docs/javascript-memory-profiling" target="_blank" rel="external">https://developer.chrome.com/devtools/docs/javascript-memory-profiling</a></p>
+<p>绝对是必读。它涵盖了我所涉及的所有主题和更多，更多的细节，更准确的🙂</p>
+<p>不要忽略底部的Addy Osmani的演讲，他提到了一堆调试提示和资源。</p>
+<p>你可以幻灯片<a href="https://speakerdeck.com/addyosmani/javascript-memory-management-masterclass" target="_blank" rel="external">在这里</a>：和示例代码<a href="https://github.com/addyosmani/memory-mysteries" target="_blank" rel="external">在这里</a>：</p>
+<h2 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h2><p>请考虑<a href="https://www.alexkras.com/recommends/kindle-memory-leak" target="_blank" rel="external">在Amazon上查看本指南</a>，如果您发现它有帮助。</p>
+<ol>
+<li>尝试重现和识别内存泄漏时手动触发垃圾收集。您可以从程序中运行带有<code>--expose-gc</code>标志和调用的Node <code>global.gc()</code>。</li>
+<li>使用<a href="https://github.com/bnoordhuis/node-heapdump" target="_blank" rel="external">https://github.com/bnoordhuis/node-heapdump</a>采取至少3堆堆转储</li>
+<li>使用3堆转储方法隔离内存泄漏</li>
+<li>确认内存泄漏已消失</li>
+<li>利润</li>
+</ol>
+<ul>
+<li><em>原文：<a href="https://www.alexkras.com/simple-guide-to-finding-a-javascript-memory-leak-in-node-js/" target="_blank" rel="external">Simple Guide to Finding a JavaScript Memory Leak in Node.js</a></em></li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/JavaScript继承与原型链/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="tomoat">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="tomoat的笔记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/blog/2017/03/JavaScript继承与原型链/" itemprop="url">
+                  JavaScript继承与原型链
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-14T11:22:27+08:00">
+                2017-03-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>JavaScript对于有基于类的语言经验的开发人员来说有点令人困惑 (如Java或C ++) ，因为它是动态的，并且本身不提供类实现.。(在ES2015/ES6中引入了class关键字，但是只是语法糖，JavaScript 仍然是基于原型的)。</p>
+<p>当谈到继承时，Javascript 只有一种结构：对象。每个对象都有一个内部链接到另一个对象，称为它的<strong>原型 prototype</strong>。该原型对象有自己的原型，等等，直到达到一个以null为原型的对象。根据定义，null没有原型，并且作为这个<strong>原型链 **</strong>prototype chain**中的最终链接。</p>
+<p>虽然，原型继承经常被视作 JavaScript 的一个弱点，但事实上，原型继承模型比经典的继承模型更强大。举例来说，在原型继承模型的基础之上建立一个经典的继承模型是相当容易的。</p>
+<h2 id="基于原型链的继承"><a href="#基于原型链的继承" class="headerlink" title="基于原型链的继承"></a>基于原型链的继承</h2><h3 id="继承属性"><a href="#继承属性" class="headerlink" title="继承属性"></a>继承属性</h3><p>JavaScript 对象是动态的属性“包”（指其自己的属性）。JavaScript 对象有一个指向一个原型对象的链。当试图访问一个对象的属性时，它不仅仅在该对象上搜寻，还会搜寻该对象的原型，以及该对象的原型的原型，依此层层向上搜索，直到找到一个名字匹配的属性或到达原型链的末尾。</p>
+<p>遵循ECMAScript标准，<code>someObject.[[Prototype]]</code> 符号是用于指派 <code>someObject</code>的原型。这个等同于 JavaScript 的 <code>__proto__</code>  属性。从 ECMAScript 6 开始, <code>[[Prototype]]</code> 可以用<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/getPrototypeOf" target="_blank" rel="external"><code>Object.getPrototypeOf()</code></a>和<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/setPrototypeOf" target="_blank" rel="external"><code>Object.setPrototypeOf()</code></a>访问器来访问。</p>
+<p>这里演示当尝试访问属性时会发生什么：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 让我们假设我们有一个对象 o, 其有自己的属性 a 和 b：</span></div><div class="line"><span class="comment">// &#123;a: 1, b: 2&#125;</span></div><div class="line"><span class="comment">// o 的原型 o.[[Prototype]]有属性 b 和 c：</span></div><div class="line"><span class="comment">// &#123;b: 3, c: 4&#125;</span></div><div class="line"><span class="comment">// 最后, o.[[Prototype]].[[Prototype]] 是 null.</span></div><div class="line"><span class="comment">// 这就是原型链的末尾，即 null，</span></div><div class="line"><span class="comment">// 根据定义，null 没有[[Prototype]].</span></div><div class="line"><span class="comment">// 综上，整个原型链如下: </span></div><div class="line"><span class="comment">// &#123;a:1, b:2&#125; ---&gt; &#123;b:3, c:4&#125; ---&gt; null</span></div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(o.a); <span class="comment">// 1</span></div><div class="line"><span class="comment">// a是o的自身属性吗？是的，该属性的值为1</span></div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(o.b); <span class="comment">// 2</span></div><div class="line"><span class="comment">// b是o的自身属性吗？是的，该属性的值为2</span></div><div class="line"><span class="comment">// o.[[Prototype]]上还有一个'b'属性,但是它不会被访问到.这种情况称为"属性遮蔽 (property shadowing)".</span></div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(o.c); <span class="comment">// 4</span></div><div class="line"><span class="comment">// c是o的自身属性吗？不是，那看看o.[[Prototype]]上有没有.</span></div><div class="line"><span class="comment">// c是o.[[Prototype]]的自身属性吗？是的,该属性的值为4</span></div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(o.d); <span class="comment">// undefined</span></div><div class="line"><span class="comment">// d是o的自身属性吗？不是,那看看o.[[Prototype]]上有没有.</span></div><div class="line"><span class="comment">// d是o.[[Prototype]]的自身属性吗？不是，那看看o.[[Prototype]].[[Prototype]]上有没有.</span></div><div class="line"><span class="comment">// o.[[Prototype]].[[Prototype]]为null，停止搜索，</span></div><div class="line"><span class="comment">// 没有d属性，返回undefined</span></div></pre></td></tr></table></figure>
+<p>创建一个对象它自己的属性的方法就是设置这个对象的属性。唯一例外的获取和设置的行为规则就是当有<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Working_with_Objects#Defining_getters_and_setters" target="_blank" rel="external">一个 getter或者一个setter</a> 被设置成继承的属性的时候。</p>
+<h3 id="继承方法"><a href="#继承方法" class="headerlink" title="继承方法"></a>继承方法</h3><p>JavaScript 并没有其他基于类的语言所定义的“方法”。在 JavaScript 里，任何函数都可以添加到对象上作为对象的属性。函数的继承与其他的属性继承没有差别，包括上面的“属性遮蔽”（这种情况相当于其他语言的方法重写）。</p>
+<p>当继承的函数被调用时，<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/this" target="_blank" rel="external"><code>this</code></a> 指向的是当前继承的对象，而不是继承的函数所在的原型对象。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> o = &#123;</div><div class="line">  a: <span class="number">2</span>,</div><div class="line">  m: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.a + <span class="number">1</span>;</div><div class="line">  &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(o.m()); <span class="comment">// 3</span></div><div class="line"><span class="comment">// 当调用 o.m 时,'this'指向了o.</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> p = <span class="built_in">Object</span>.create(o);</div><div class="line"><span class="comment">// p是一个对象, p.[[Prototype]]是o.</span></div><div class="line"></div><div class="line">p.a = <span class="number">12</span>; <span class="comment">// 创建 p 的自身属性a.</span></div><div class="line"><span class="built_in">console</span>.log(p.m()); <span class="comment">// 13</span></div><div class="line"><span class="comment">// 调用 p.m 时, 'this'指向 p. </span></div><div class="line"><span class="comment">// 又因为 p 继承 o 的 m 函数</span></div><div class="line"><span class="comment">// 此时的'this.a' 即 p.a，即 p 的自身属性 'a'</span></div></pre></td></tr></table></figure>
+<h2 id="使用不同的方法来创建对象和生成原型链"><a href="#使用不同的方法来创建对象和生成原型链" class="headerlink" title="使用不同的方法来创建对象和生成原型链"></a>使用不同的方法来创建对象和生成原型链</h2><h3 id="使用普通语法创建对象"><a href="#使用普通语法创建对象" class="headerlink" title="使用普通语法创建对象"></a>使用普通语法创建对象</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> o = &#123;a: <span class="number">1</span>&#125;;</div><div class="line"></div><div class="line"><span class="comment">// o这个对象继承了Object.prototype上面的所有属性</span></div><div class="line"><span class="comment">// 所以可以这样使用 o.hasOwnProperty('a').</span></div><div class="line"><span class="comment">// hasOwnProperty 是Object.prototype的自身属性。</span></div><div class="line"><span class="comment">// Object.prototype的原型为null。</span></div><div class="line"><span class="comment">// 原型链如下:</span></div><div class="line"><span class="comment">// o ---&gt; Object.prototype ---&gt; null</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> a = [<span class="string">"yo"</span>, <span class="string">"whadup"</span>, <span class="string">"?"</span>];</div><div class="line"></div><div class="line"><span class="comment">// 数组都继承于Array.prototype </span></div><div class="line"><span class="comment">// (indexOf, forEach等方法都是从它继承而来).</span></div><div class="line"><span class="comment">// 原型链如下:</span></div><div class="line"><span class="comment">// a ---&gt; Array.prototype ---&gt; Object.prototype ---&gt; null</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">f</span>(<span class="params"></span>)</span>&#123;</div><div class="line">  <span class="keyword">return</span> <span class="number">2</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 函数都继承于Function.prototype</span></div><div class="line"><span class="comment">// (call, bind等方法都是从它继承而来):</span></div><div class="line"><span class="comment">// f ---&gt; Function.prototype ---&gt; Object.prototype ---&gt; null</span></div></pre></td></tr></table></figure>
+<h3 id="使用构造器创建对象"><a href="#使用构造器创建对象" class="headerlink" title="使用构造器创建对象"></a>使用构造器创建对象</h3><p>在 JavaScript 中，构造器其实就是一个普通的函数。当使用 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/new" target="_blank" rel="external">new 操作符</a> 来作用这个函数时，它就可以被称为构造方法（构造函数）。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Graph</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="keyword">this</span>.vertexes = [];</div><div class="line">  <span class="keyword">this</span>.edges = [];</div><div class="line">&#125;</div><div class="line"></div><div class="line">Graph.prototype = &#123;</div><div class="line">  addVertex: <span class="function"><span class="keyword">function</span>(<span class="params">v</span>)</span>&#123;</div><div class="line">    <span class="keyword">this</span>.vertexes.push(v);</div><div class="line">  &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">var</span> g = <span class="keyword">new</span> Graph();</div><div class="line"><span class="comment">// g是生成的对象,他的自身属性有'vertices'和'edges'.</span></div><div class="line"><span class="comment">// 在g被实例化时,g.[[Prototype]]指向了Graph.prototype.</span></div></pre></td></tr></table></figure>
+<h3 id="使用-Object-create-创建对象"><a href="#使用-Object-create-创建对象" class="headerlink" title="使用 Object.create 创建对象"></a>使用 Object.create 创建对象</h3><p>ECMAScript 5 中引入了一个新方法：<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/create" target="_blank" rel="external"><code>Object.create()</code></a>。可以调用这个方法来创建一个新对象。新对象的原型就是调用 <code>create</code> 方法时传入的第一个参数：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = &#123;a: <span class="number">1</span>&#125;; </div><div class="line"><span class="comment">// a ---&gt; Object.prototype ---&gt; null</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> b = <span class="built_in">Object</span>.create(a);</div><div class="line"><span class="comment">// b ---&gt; a ---&gt; Object.prototype ---&gt; null</span></div><div class="line"><span class="built_in">console</span>.log(b.a); <span class="comment">// 1 (继承而来)</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> c = <span class="built_in">Object</span>.create(b);</div><div class="line"><span class="comment">// c ---&gt; b ---&gt; a ---&gt; Object.prototype ---&gt; null</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> d = <span class="built_in">Object</span>.create(<span class="literal">null</span>);</div><div class="line"><span class="comment">// d ---&gt; null</span></div><div class="line"><span class="built_in">console</span>.log(d.hasOwnProperty); <span class="comment">// undefined, 因为d没有继承Object.prototype</span></div></pre></td></tr></table></figure>
+<h3 id="使用-class-关键字"><a href="#使用-class-关键字" class="headerlink" title="使用 class 关键字"></a>使用 <code>class</code> 关键字</h3><p>ECMAScript6 引入了一套新的关键字用来实现 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Classes" target="_blank" rel="external">class</a>。使用基于类语言的开发人员会对这些结构感到熟悉，但它们是不一样的。 JavaScript 仍然是基于原型的。这些新的关键字包括 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/class" target="_blank" rel="external"><code>class</code></a>, <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Classes/constructor" target="_blank" rel="external"><code>constructor</code></a>, <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Classes/static" target="_blank" rel="external"><code>static</code></a>, <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Classes/extends" target="_blank" rel="external"><code>extends</code></a>, 和 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/super" target="_blank" rel="external"><code>super</code></a>.</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="meta">"use strict"</span>;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Polygon</span> </span>&#123;</div><div class="line">  <span class="keyword">constructor</span>(height, width) &#123;</div><div class="line">    <span class="keyword">this</span>.height = height;</div><div class="line">    <span class="keyword">this</span>.width = width;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Square</span> <span class="keyword">extends</span> <span class="title">Polygon</span> </span>&#123;</div><div class="line">  <span class="keyword">constructor</span>(sideLength) &#123;</div><div class="line">    <span class="keyword">super</span>(sideLength, sideLength);</div><div class="line">  &#125;</div><div class="line">  get area() &#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.height * <span class="keyword">this</span>.width;</div><div class="line">  &#125;</div><div class="line">  set sideLength(newLength) &#123;</div><div class="line">    <span class="keyword">this</span>.height = newLength;</div><div class="line">    <span class="keyword">this</span>.width = newLength;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> square = <span class="keyword">new</span> Square(<span class="number">2</span>);</div></pre></td></tr></table></figure>
+<h3 id="性能"><a href="#性能" class="headerlink" title="性能"></a>性能</h3><p>在原型链上查找属性比较耗时，对性能有副作用，这在性能要求苛刻的情况下很重要。另外，试图访问不存在的属性时会遍历整个原型链。</p>
+<p>遍历对象的属性时，原型链上的<strong>每个</strong>可枚举属性都会被枚举出来。</p>
+<p>检测对象的属性是定义在自身上还是在原型链上，有必要使用 <a href="https://developer.mozilla.org/zh-CN/docs/JavaScript/Reference/Global_Objects/Object/hasOwnProperty" target="_blank" rel="external">hasOwnProperty</a> 方法，所有继承自 <code>Object.proptotype 的对象都包含这个方法</code>。</p>
+<p><a href="https://developer.mozilla.org/zh-CN/docs/JavaScript/Reference/Global_Objects/Object/hasOwnProperty" target="_blank" rel="external">hasOwnProperty</a> 是 JavaScript 中唯一一个只涉及对象自身属性而不会遍历原型链的方法。</p>
+<p>注意：仅仅通过判断值是否为 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/undefined" target="_blank" rel="external">undefined</a> 还<strong>不</strong>足以检测一个属性是否存在，一个属性可能存在而其值恰好为 <code>undefined</code>。</p>
+<h3 id="不好的实践：扩展原生对象的原型"><a href="#不好的实践：扩展原生对象的原型" class="headerlink" title="不好的实践：扩展原生对象的原型"></a>不好的实践：扩展原生对象的原型</h3><p>一个经常被用到的错误实践是去扩展 <code>Object.prototype</code> 或者其他内置对象的原型。</p>
+<p>该技术被称为 monkey patching，它破坏了原型链的密封性。尽管，一些流行的框架（如 Prototype.js）在使用该技术，但是并没有足够好的理由要用其他<em>非标准</em>的方法将内置的类型系统搞乱。</p>
+<p>我们去扩展内置对象原型的<strong>唯一</strong>理由是引入新的 JavaScript 引擎的某些新特性，比如 <code>Array.forEach</code>。</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p><code>B</code> 将继承自 <code>A：</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">A</span>(<span class="params">a</span>)</span>&#123;</div><div class="line">  <span class="keyword">this</span>.varA = a;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 以上函数 A 的定义中，既然 A.prototype.varA 总是会被 this.varA 遮蔽，</span></div><div class="line"><span class="comment">// 那么将 varA 加入到原型（prototype）中的目的是什么？</span></div><div class="line">A.prototype = &#123;</div><div class="line">  varA : <span class="literal">null</span>,  </div><div class="line"><span class="comment">/*</span></div><div class="line">既然它没有任何作用，干嘛不将 varA 从原型（prototype）去掉 ? </div><div class="line">也许作为一种在隐藏类中优化分配空间的考虑 ?</div><div class="line">https://developers.google.com/speed/articles/optimizing-javascript </div><div class="line">如果varA并不是在每个实例中都被初始化，那这样做将是有效果的。</div><div class="line">*/</div><div class="line">  doSomething : <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="comment">// ...</span></div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">B</span>(<span class="params">a, b</span>)</span>&#123;</div><div class="line">  A.call(<span class="keyword">this</span>, a);</div><div class="line">  <span class="keyword">this</span>.varB = b;</div><div class="line">&#125;</div><div class="line">B.prototype = <span class="built_in">Object</span>.create(A.prototype, &#123;</div><div class="line">  varB : &#123;</div><div class="line">    value: <span class="literal">null</span>, </div><div class="line">    enumerable: <span class="literal">true</span>, </div><div class="line">    configurable: <span class="literal">true</span>, </div><div class="line">    writable: <span class="literal">true</span> </div><div class="line">  &#125;,</div><div class="line">  doSomething : &#123; </div><div class="line">    value: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123; <span class="comment">// override</span></div><div class="line">      A.prototype.doSomething.apply(<span class="keyword">this</span>, <span class="built_in">arguments</span>); </div><div class="line">      <span class="comment">// call super</span></div><div class="line">      <span class="comment">// ...</span></div><div class="line">    &#125;,</div><div class="line">    enumerable: <span class="literal">true</span>,</div><div class="line">    configurable: <span class="literal">true</span>, </div><div class="line">    writable: <span class="literal">true</span></div><div class="line">  &#125;</div><div class="line">&#125;);</div><div class="line">B.prototype.constructor = B;</div><div class="line"></div><div class="line"><span class="keyword">var</span> b = <span class="keyword">new</span> B();</div><div class="line">b.doSomething();</div></pre></td></tr></table></figure>
+<p><code>最重要的部分是：</code></p>
+<ul>
+<li><code>类型被定义在 .prototype 中</code></li>
+<li><code>而你用 Object.create() 来继承</code></li>
+</ul>
+<h2 id="prototype-和-Object-getPrototypeOf"><a href="#prototype-和-Object-getPrototypeOf" class="headerlink" title="prototype 和 Object.getPrototypeOf"></a><code>prototype 和 Object.getPrototypeOf</code></h2><p><code>对于从 Java 或 C++ 转过来的开发人员来说 JavaScript 会有点让人困惑，因为它全部都是动态的，都是运行时，而且不存在类（classes）。所有的都是实例（对象）。即使我们模拟出的 “类（classes）”，也只是一个函数对象。</code></p>
+<p><code>你可能已经注意到，我们的函数 A 有一个特殊的属性叫做原型。这个特殊的属性与 JavaScript 的 new 运算符一起工作。对原型对象的引用会复制到新实例内部的 [[Prototype]] 属性。例如，当你这样： var a1 = new A()， JavaScript 就会设置：a1.[[Prototype]] = A.prototype（在内存中创建对象后，并在运行 this 绑定的函数 A()之前）。然后在你访问实例的属性时，JavaScript 首先检查它们是否直接存在于该对象中（即是否是该对象的自身属性），如果不是，它会在 [[Prototype]] 中查找。也就是说，你在原型中定义的元素将被所有实例共享，甚至可以在稍后对原型进行修改，这种变更将影响到所有现存实例。</code></p>
+<p><code>像上面的例子中，如果你执行 var a1 = new A(); var a2 = new A(); 那么 a1.doSomething 事实上会指向Object.getPrototypeOf(a1).doSomething，它就是你在 A.prototype.doSomething 中定义的内容。比如：Object.getPrototypeOf(a1).doSomething == Object.getPrototypeOf(a2).doSomething == A.prototype.doSomething。</code></p>
+<p><code>简而言之， prototype 是用于类型的，而 Object.getPrototypeOf() 是用于实例的（instances），两者功能一致。</code></p>
+<p><code>[[Prototype]] 看起来就像**递归**引用， 如a1.doSomething，Object.getPrototypeOf(a1).doSomething，Object.getPrototypeOf(Object.getPrototypeOf(a1)).doSomething 等等等， 直到它找到 doSomething 这个属性或者 Object.getPrototypeOf 返回 null。</code></p>
+<p><code>因此，当你执行：</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> o = <span class="keyword">new</span> Foo();</div></pre></td></tr></table></figure>
+<p><code>JavaScript 实际上执行的是：</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> o = <span class="keyword">new</span> <span class="built_in">Object</span>();</div><div class="line">o.[[Prototype]] = Foo.prototype;</div><div class="line">Foo.call(o);</div></pre></td></tr></table></figure>
+<p><code>（或者类似上面这样的），然后当你执行：</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">o.someProp;</div></pre></td></tr></table></figure>
+<p><code>它会检查是否存在 someProp 属性。如果没有，它会查找Object.getPrototypeOf(o).someProp ,如果仍旧没有，它会继续查找Object.getPrototypeOf(Object.getPrototypeOf(o)).someProp ，一直查找下去，直到它找到这个属性 或者 Object.getPrototypeOf() 返回 null 。</code></p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a><code>结论</code></h2><p><code>在用原型继承编写复杂代码前理解原型继承模型十分**重要**。同时，还要清楚代码中原型链的长度，并在必要时结束原型链，以避免可能存在的性能问题。此外，除非为了兼容新 JavaScript 特性，否则，永远**不要**扩展原生的对象原型。</code></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/JavaScript内存管理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -333,11 +873,11 @@
 </ol>
 <p>在所有语言中第一和第二部分都很清晰。最后一步在低级语言中很清晰，但是在像JavaScript 等高级语言中，这一步是隐藏的、透明的。</p>
 <h3 id="JavaScript-的内存分配"><a href="#JavaScript-的内存分配" class="headerlink" title="JavaScript 的内存分配"></a>JavaScript 的内存分配</h3><h4 id="值的初始化"><a href="#值的初始化" class="headerlink" title="值的初始化"></a>值的初始化</h4><p>为了不让程序员费心分配内存，JavaScript 在定义变量时就完成了内存分配。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">var n = 123; // 给数值变量分配内存</div><div class="line">var s = &quot;azerty&quot;; // 给字符串分配内存</div><div class="line"></div><div class="line">var o = &#123;</div><div class="line">  a: 1,</div><div class="line">  b: null</div><div class="line">&#125;; // 给对象及其包含的值分配内存</div><div class="line"></div><div class="line">// 给数组及其包含的值分配内存（就像对象一样）</div><div class="line">var a = [1, null, &quot;abra&quot;]; </div><div class="line"></div><div class="line">function f(a)&#123;</div><div class="line">  return a + 2;</div><div class="line">&#125; // 给函数（可调用的对象）分配内存</div><div class="line"></div><div class="line">// 函数表达式也能分配一个对象</div><div class="line">someElement.addEventListener(&apos;click&apos;, function()&#123;</div><div class="line">  someElement.style.backgroundColor = &apos;blue&apos;;</div><div class="line">&#125;, false);</div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> n = <span class="number">123</span>; <span class="comment">// 给数值变量分配内存</span></div><div class="line"><span class="keyword">var</span> s = <span class="string">"azerty"</span>; <span class="comment">// 给字符串分配内存</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> o = &#123;</div><div class="line">  a: <span class="number">1</span>,</div><div class="line">  b: <span class="literal">null</span></div><div class="line">&#125;; <span class="comment">// 给对象及其包含的值分配内存</span></div><div class="line"></div><div class="line"><span class="comment">// 给数组及其包含的值分配内存（就像对象一样）</span></div><div class="line"><span class="keyword">var</span> a = [<span class="number">1</span>, <span class="literal">null</span>, <span class="string">"abra"</span>]; </div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">f</span>(<span class="params">a</span>)</span>&#123;</div><div class="line">  <span class="keyword">return</span> a + <span class="number">2</span>;</div><div class="line">&#125; <span class="comment">// 给函数（可调用的对象）分配内存</span></div><div class="line"></div><div class="line"><span class="comment">// 函数表达式也能分配一个对象</span></div><div class="line">someElement.addEventListener(<span class="string">'click'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">  someElement.style.backgroundColor = <span class="string">'blue'</span>;</div><div class="line">&#125;, <span class="literal">false</span>);</div></pre></td></tr></table></figure>
 <h4 id="通过函数调用的内存分配"><a href="#通过函数调用的内存分配" class="headerlink" title="通过函数调用的内存分配"></a>通过函数调用的内存分配</h4><p>有些函数调用结果是分配对象内存：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">var d = new Date(); // 分配一个 Date 对象</div><div class="line"></div><div class="line">var e = document.createElement(&apos;div&apos;); // 分配一个 DOM 元素</div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> d = <span class="keyword">new</span> <span class="built_in">Date</span>(); <span class="comment">// 分配一个 Date 对象</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> e = <span class="built_in">document</span>.createElement(<span class="string">'div'</span>); <span class="comment">// 分配一个 DOM 元素</span></div></pre></td></tr></table></figure>
 <p>有些方法分配新变量或者新对象：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">var s = &quot;azerty&quot;;</div><div class="line">var s2 = s.substr(0, 3); // s2 是一个新的字符串</div><div class="line">// 因为字符串是不变量，</div><div class="line">// JavaScript 可能决定不分配内存，</div><div class="line">// 只是存储了 [0-3] 的范围。</div><div class="line"></div><div class="line">var a = [&quot;ouais ouais&quot;, &quot;nan nan&quot;];</div><div class="line">var a2 = [&quot;generation&quot;, &quot;nan nan&quot;];</div><div class="line">var a3 = a.concat(a2); </div><div class="line">// 新数组有四个元素，是 a 连接 a2 的结果</div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> s = <span class="string">"azerty"</span>;</div><div class="line"><span class="keyword">var</span> s2 = s.substr(<span class="number">0</span>, <span class="number">3</span>); <span class="comment">// s2 是一个新的字符串</span></div><div class="line"><span class="comment">// 因为字符串是不变量，</span></div><div class="line"><span class="comment">// JavaScript 可能决定不分配内存，</span></div><div class="line"><span class="comment">// 只是存储了 [0-3] 的范围。</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> a = [<span class="string">"ouais ouais"</span>, <span class="string">"nan nan"</span>];</div><div class="line"><span class="keyword">var</span> a2 = [<span class="string">"generation"</span>, <span class="string">"nan nan"</span>];</div><div class="line"><span class="keyword">var</span> a3 = a.concat(a2); </div><div class="line"><span class="comment">// 新数组有四个元素，是 a 连接 a2 的结果</span></div></pre></td></tr></table></figure>
 <h3 id="值的使用"><a href="#值的使用" class="headerlink" title="值的使用"></a>值的使用</h3><p>使用值的过程实际上是对分配内存进行读取与写入的操作。读取与写入可能是写入一个变量或者一个对象的属性值，甚至传递函数的参数。</p>
 <h3 id="当内存不再需要使用时释放"><a href="#当内存不再需要使用时释放" class="headerlink" title="当内存不再需要使用时释放"></a>当内存不再需要使用时释放</h3><p>大多数内存管理的问题都在这个阶段。在这里最艰难的任务是找到“所分配的内存确实已经不再需要了”。它往往要求开发人员来确定在程序中哪一块内存不再需要并且释放它。</p>
 <p>高级语言解释器嵌入了“垃圾回收器”，它的主要工作是跟踪内存的分配和使用，以便当分配的内存不再使用时，自动释放它。这只能是一个近似的过程，因为要知道是否仍然需要某块内存是<a href="http://en.wikipedia.org/wiki/Decidability_%28logic%29" target="_blank" rel="external">无法判定的</a> (无法通过某种算法解决).</p>
@@ -345,11 +885,11 @@
 <h3 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h3><p>垃圾回收算法主要依赖于<strong>引用</strong>（<em>reference</em>）的概念。在内存管理的环境中，一个对象如果有访问另一个对象的权限（隐式或者显式），叫做一个对象引用另一个对象。例如，一个Javascript对象具有对它<a href="https://developer.mozilla.org/en/JavaScript/Guide/Inheritance_and_the_prototype_chain" target="_blank" rel="external">原型</a>的引用（隐式引用）和对它属性的引用（显式引用）。</p>
 <p>在这里，“对象”的概念不仅特指 JavaScript 对象，还包括函数作用域（或者全局词法作用域）。</p>
 <h3 id="引用计数垃圾收集"><a href="#引用计数垃圾收集" class="headerlink" title="引用计数垃圾收集"></a>引用计数垃圾收集</h3><p>这是最简单的垃圾收集算法。此算法把“对象是否不再需要”简化定义为“对象有没有其他对象引用到它”。如果没有引用指向该对象（零引用），对象将被垃圾回收机制回收。</p>
-<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">var o = &#123; </div><div class="line">  a: &#123;</div><div class="line">    b:2</div><div class="line">  &#125;</div><div class="line">&#125;; </div><div class="line">// 两个对象被创建，一个作为另一个的属性被引用，另一个被分配给变量o</div><div class="line">// 很显然，没有一个可以被垃圾收集</div><div class="line"></div><div class="line"></div><div class="line">var o2 = o; // o2变量是第二个对“这个对象”的引用</div><div class="line"></div><div class="line">o = 1;      // 现在，“这个对象”的原始引用o被o2替换了</div><div class="line"></div><div class="line">var oa = o2.a; // 引用“这个对象”的a属性</div><div class="line">// 现在，“这个对象”有两个引用了，一个是o2，一个是oa</div><div class="line"></div><div class="line">o2 = &quot;yo&quot;; // 最初的对象现在已经是零引用了</div><div class="line">           // 他可以被垃圾回收了</div><div class="line">           // 然而它的属性a的对象还在被oa引用，所以还不能回收</div><div class="line"></div><div class="line">oa = null; // a属性的那个对象现在也是零引用了</div><div class="line">           // 它可以被垃圾回收了</div></pre></td></tr></table></figure>
+<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> o = &#123; </div><div class="line">  a: &#123;</div><div class="line">    b:<span class="number">2</span></div><div class="line">  &#125;</div><div class="line">&#125;; </div><div class="line"><span class="comment">// 两个对象被创建，一个作为另一个的属性被引用，另一个被分配给变量o</span></div><div class="line"><span class="comment">// 很显然，没有一个可以被垃圾收集</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">var</span> o2 = o; <span class="comment">// o2变量是第二个对“这个对象”的引用</span></div><div class="line"></div><div class="line">o = <span class="number">1</span>;      <span class="comment">// 现在，“这个对象”的原始引用o被o2替换了</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> oa = o2.a; <span class="comment">// 引用“这个对象”的a属性</span></div><div class="line"><span class="comment">// 现在，“这个对象”有两个引用了，一个是o2，一个是oa</span></div><div class="line"></div><div class="line">o2 = <span class="string">"yo"</span>; <span class="comment">// 最初的对象现在已经是零引用了</span></div><div class="line">           <span class="comment">// 他可以被垃圾回收了</span></div><div class="line">           <span class="comment">// 然而它的属性a的对象还在被oa引用，所以还不能回收</span></div><div class="line"></div><div class="line">oa = <span class="literal">null</span>; <span class="comment">// a属性的那个对象现在也是零引用了</span></div><div class="line">           <span class="comment">// 它可以被垃圾回收了</span></div></pre></td></tr></table></figure>
 <h4 id="限制：循环引用"><a href="#限制：循环引用" class="headerlink" title="限制：循环引用"></a>限制：循环引用</h4><p>该算法有个限制：无法处理循环引用。在下面的例子中，两个对象被创建，并互相引用，形成了一个循环。它们被调用之后不会离开函数作用域，所以它们已经没有用了，可以被回收了。然而，引用计数算法考虑到它们互相都有至少一次引用，所以它们不会被回收</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">function f()&#123;</div><div class="line">  var o = &#123;&#125;;</div><div class="line">  var o2 = &#123;&#125;;</div><div class="line">  o.a = o2; // o 引用 o2</div><div class="line">  o2.a = o; // o2 引用 o</div><div class="line"></div><div class="line">  return &quot;azerty&quot;;</div><div class="line">&#125;</div><div class="line"></div><div class="line">f();</div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">f</span>(<span class="params"></span>)</span>&#123;</div><div class="line">  <span class="keyword">var</span> o = &#123;&#125;;</div><div class="line">  <span class="keyword">var</span> o2 = &#123;&#125;;</div><div class="line">  o.a = o2; <span class="comment">// o 引用 o2</span></div><div class="line">  o2.a = o; <span class="comment">// o2 引用 o</span></div><div class="line"></div><div class="line">  <span class="keyword">return</span> <span class="string">"azerty"</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line">f();</div></pre></td></tr></table></figure>
 <h4 id="实际例子"><a href="#实际例子" class="headerlink" title="实际例子"></a>实际例子</h4><p>IE 6, 7 使用引用计数方式对 DOM 对象进行垃圾回收。该方式常常造成对象被循环引用时内存发生泄露：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">var div;</div><div class="line">window.onload = function()&#123;</div><div class="line">  div = document.getElementById(&quot;myDivElement&quot;);</div><div class="line">  div.circularReference = div;</div><div class="line">  div.lotsOfData = new Array(10000).join(&quot;*&quot;);</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> div;</div><div class="line"><span class="built_in">window</span>.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">  div = <span class="built_in">document</span>.getElementById(<span class="string">"myDivElement"</span>);</div><div class="line">  div.circularReference = div;</div><div class="line">  div.lotsOfData = <span class="keyword">new</span> <span class="built_in">Array</span>(<span class="number">10000</span>).join(<span class="string">"*"</span>);</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
 <p>在上面的例子里，<code>myDivElement</code> 这个 DOM 元素里的 <code>circularReference 属性</code>引用了 <code>myDivElement</code>，造成了循环引用。如果该属性没有显示移除或者设为 null，引用计数式垃圾收集器将总是且至少有一个引用，并将一直保持在内存里的 DOM 元素，即使其从DOM 树中删去了。如果这个 DOM 元素拥有大量的数据 (如上的 <code>lotsOfData</code> 属性)，而这个数据占用的内存将永远不会被释放。</p>
 <h3 id="标记-清除算法"><a href="#标记-清除算法" class="headerlink" title="标记-清除算法"></a>标记-清除算法</h3><p>这个算法把“对象是否不再需要”简化定义为“对象是否可以获得”。</p>
 <p>这个算法假定设置一个叫做<strong>根</strong>（root）的对象（在Javascript里，根是全局对象）。定期的，垃圾回收器将从根开始，找所有从根开始引用的对象，然后找这些对象引用的对象……从根开始，垃圾回收器将找到所有可以获得的对象和所有不能获得的对象。</p>
@@ -2011,521 +2551,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/基于类 vs 基于原型的语言/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="tomoat">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="tomoat的笔记">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/blog/2017/03/基于类 vs 基于原型的语言/" itemprop="url">
-                  基于类vs基于原型的语言
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-06T22:07:49+08:00">
-                2017-03-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="基于类-vs-基于原型的语言"><a href="#基于类-vs-基于原型的语言" class="headerlink" title="基于类 vs 基于原型的语言"></a>基于类 vs 基于原型的语言</h2><p>JavaScript 是一种基于原型的面向对象语言，而不是基于类的。正是由于这一根本的区别，其如何创建对象的层级结构以及对象的属性与属性值是如何继承的并不是那么清晰。本节试着阐明。</p>
-<p>基于类的面向对象语言，比如 Java 和 C++，是构建在两个不同实体的概念之上的：即类和实例。</p>
-<ul>
-<li><strong>类</strong>（<em>class</em>）：定义了所有用于具有某一组特征对象的属性（可以将 Java 中的方法和变量以及 C++ 中的成员都视作属性）。类是抽象的事物，而不是其所描述的全部对象中的任何特定的个体。例如 <code>Employee</code> 类可以用来表示所有雇员的集合。</li>
-<li><strong>实例</strong>（<em>instance</em>）：类的实例化体现；或者说，是类的一个成员。例如， <code>Victoria</code> 可以是 <code>Employee</code> 类的一个实例，表示一个特定的雇员个体。实例具有和其父类完全一致的属性。</li>
-</ul>
-<p>基于原型的语言（如 JavaScript）并不存在这种区别：它只有对象。基于原型的语言具有所谓<strong>原型对象</strong>（<em>prototypical object</em>）的概念。原型对象可以作为一个模板，新对象可以从中获得原始的属性。任何对象都可以指定其自身的属性，既可以是创建时也可以在运行时创建。而且，任何对象都可以作为另一个对象的<strong>原型</strong>（<em>prototype</em>），从而允许后者共享前者的属性。</p>
-<h3 id="定义类"><a href="#定义类" class="headerlink" title="定义类"></a>定义类</h3><p>在基于类的语言中，需要专门的<strong>类定义符</strong>（<em>class definition</em>）定义类。在定义类时，允许定义特殊的方法，称为构造器（constructor），来创建该类的实例。在构造器方法中，可以指定实例的属性的初始值以及一些其他的操作。您可以通过将<code>new</code> 操作符和构造器方法结合来创建类的实例。</p>
-<p>JavaScript 也遵循类似的模型，但却不同于基于类的语言。在 JavaScript 中你只需要定义构造函数来创建具有一组特定的初始属性和属性值的对象。任何 JavaScript 函数都可以用作构造器。 也可以使用 <code>new</code> 操作符和构造函数来创建一个新对象。</p>
-<h3 id="子类和继承"><a href="#子类和继承" class="headerlink" title="子类和继承"></a>子类和继承</h3><p>基于类的语言是通过对类的定义中构建类的层级结构的。在类定义中，可以指定新的类是一个现存的类的<strong>子类</strong>。子类将继承父类的全部属性，并可以添加新的属性或者修改继承的属性。例如，假设 <code>Employee</code> 类只有 <code>name</code> 和 <code>dept</code> 属性，而 <code>Manager</code> 是 <code>Employee</code> 的子类并添加了 <code>reports</code> 属性。这时，<code>Manager</code> 类的实例将具有所有三个属性：<code>name，``dept 和</code> <code>reports</code>。</p>
-<p>JavaScript 通过将构造器函数与原型对象相关联的方式来实现继承。这样，您可以创建完全一样的 <code>Employee</code> — <code>Manager</code> 示例，不过需要使用略微不同的术语。首先，定义 <code>Employee</code> 构造器函数，指定 <code>name</code> 和 <code>dept</code> 属性；然后，定义 <code>Manager</code> 构造器函数，指定 <code>reports</code> 属性。最后，将一个新的 <code>Employee</code> 对象赋值给 <code>Manager</code> 构造器函数的 <code>prototype</code> 属性。这样，当创建一个新的 <code>Manager</code> 对象时，它将从 <code>Employee</code> 对象中继承 <code>name</code> and <code>dept</code> 属性。</p>
-<h3 id="添加和移除属性"><a href="#添加和移除属性" class="headerlink" title="添加和移除属性"></a>添加和移除属性</h3><p>在基于类的语言中，通常在编译时创建类，然后在编译时或者运行时对类的实例进行实例化。一旦定义了类，无法对类的属性进行更改。然而，在 JavaScript 中，允许运行时添加或者移除任何对象的属性。如果您为一个对象中添加了一个属性，而这个对象又作为其它对象的原型，则以该对象作为原型的所有其它对象也将获得该属性。</p>
-<h3 id="区别摘要"><a href="#区别摘要" class="headerlink" title="区别摘要"></a>区别摘要</h3><p>下面的表格摘要给出了上述区别。本节的后续部分将描述有关使用 JavaScript 构造器和原型创建对象层级结构的详细信息，并将其与在 Java 中的做法加以对比。</p>
-<table>
-<thead>
-<tr>
-<th>基于类的（Java）</th>
-<th>基于原型的（JavaScript）</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>类和实例是不同的事物。</td>
-<td>所有对象均为实例。</td>
-</tr>
-<tr>
-<td>通过类定义来定义类；通过构造器方法来实例化类。</td>
-<td>通过构造器函数来定义和创建一组对象。</td>
-</tr>
-<tr>
-<td>通过 <code>new</code> 操作符创建单个对象。</td>
-<td>相同。</td>
-</tr>
-<tr>
-<td>通过类定义来定义现存类的子类，从而构建对象的层级结构。</td>
-<td>指定一个对象作为原型并且与构造函数一起构建对象的层级结构</td>
-</tr>
-<tr>
-<td>遵循类链继承属性。</td>
-<td>遵循原型链继承属性。</td>
-</tr>
-<tr>
-<td>类定义指定类的所有实例的<strong>所有</strong>属性。无法在运行时动态添加属性。</td>
-<td>构造器函数或原型指定初始的属性集。允许动态地向单个的对象或者整个对象集中添加或移除属性。</td>
-</tr>
-</tbody>
-</table>
-<h2 id="Employee-示例"><a href="#Employee-示例" class="headerlink" title="Employee 示例"></a>Employee 示例</h2><p>本节的余下部分将使用如下图所示的 Employee 层级结构。</p>
-<p><img src="https://developer.mozilla.org/@api/deki/files/4452/=figure8.1.png" alt="img"></p>
-<p><strong>图8.1：一个简单的对象层级</strong></p>
-<p>例子中会使用以下对象：</p>
-<ul>
-<li><code>Employee</code> 具有 <code>name</code> 属性（默认值为空的字符串）和 <code>dept</code> 属性（默认值为 “general”）。</li>
-<li><code>Manager</code> 是 <code>Employee的子类。它添加了</code> <code>reports</code> 属性（默认值为空的数组，以 <code>Employee</code> 对象数组作为它的值）。</li>
-<li><code>WorkerBee</code> 是 <code>Employee的子类</code>。它添加了 <code>projects</code> 属性（默认值为空的数组，以字符串数组作为它的值）。</li>
-<li><code>SalesPerson</code> 是 <code>WorkerBee的子类</code>。它添加了 <code>quota</code> 属性（其值默认为 100）。它还重载了 <code>dept</code> 属性值为 “sales”，表明所有的销售人员都属于同一部门。</li>
-<li><code>Engineer</code> 基于 <code>WorkerBee</code>。它添加了 <code>machine</code> 属性（其值默认为空的字符串）同时重载了 <code>dept</code> 属性值为 “engineering”。</li>
-</ul>
-<h2 id="创建层级结构"><a href="#创建层级结构" class="headerlink" title="创建层级结构"></a>创建层级结构</h2><p>可以有几种不同的方式来定义适当的构造器函数，从而实现雇员的层级结构。如何选择很大程度上取决于您希望在您的应用程序中能做到什么。</p>
-<p>本节介绍了如何使用非常简单的（同时也是相当不灵活的）定义，使得继承得以实现。在定义完成后，就无法在创建对象时指定属性的值。新创建的对象仅仅获得了默认值，当然允许随后加以修改。图例 8.2 展现了这些简单的定义形成的层级结构。</p>
-<p>在实际应用程序中，您很可能想定义构造器，以允许您在创建对象时指定属性值。（参见 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Details_of_the_Object_Model#more_flexible_constructors" target="_blank" rel="external">更灵活的构造器</a> 获得进一步的信息）。当前，这些简单的定义只是说明了继承是如何实现的。</p>
-<p><img src="https://developer.mozilla.org/@api/deki/files/4390/=figure8.2.png" alt="figure8.2.png"><br><strong>图 8.2：Employee 对象定义</strong></p>
-<p>下面关于 <code>Employee</code> 的 Java 和 JavaScript 的定义是非常类似的。唯一的不同是在 Java 中需要指定每个属性的类型，而在 JavaScript 中则不需要，同时 Java 的类必须创建一个显式的构造器方法。</p>
-<table>
-<thead>
-<tr>
-<th>JavaScript</th>
-<th>Java</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>function Employee () {  this.name = &quot;&quot;;  this.dept = &quot;general&quot;;}</code></td>
-<td><code>public class Employee {   public String name;   public String dept;   public Employee () {      this.name = &quot;&quot;;      this.dept = &quot;general&quot;;   }}</code></td>
-</tr>
-</tbody>
-</table>
-<p><code>Manager</code> 和 <code>WorkerBee</code> 的定义表示在如何指定继承链中上一层对象时，两者存在不同点。在 JavaScript 中，您会添加一个原型实例作为构造器函数<code>prototype</code> 属性的值，而这一动作可以在构造器函数定义后的任意时刻执行。而在 Java 中，则需要在类定义中指定父类，且不能在类定义之外改变父类。</p>
-<table>
-<thead>
-<tr>
-<th>JavaScript</th>
-<th>Java</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>function Manager () {  this.reports = [];}Manager.prototype = new Employee;function WorkerBee () {  this.projects = [];}WorkerBee.prototype = new Employee;</code></td>
-<td><code>public class Manager extends Employee {   public Employee[] reports;   public Manager () {      this.reports = new Employee[0];   }}public class WorkerBee extends Employee {   public String[] projects;   public WorkerBee () {      this.projects = new String[0];   }}</code></td>
-</tr>
-</tbody>
-</table>
-<p><code>在对Engineer</code> 和 <code>SalesPerson</code> 定义时，创建了继承自 <code>WorkerBee</code> 的对象，该对象会进而继承自<code>Employee</code>。这些对象会具有在这个链之上的所有对象的属性。另外，它们在定义时，又重载了继承的 <code>dept</code> 属性值，赋予新的属性值。</p>
-<table>
-<thead>
-<tr>
-<th>JavaScript</th>
-<th>Java</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>function SalesPerson () {   this.dept = &quot;sales&quot;;   this.quota = 100;}SalesPerson.prototype = new WorkerBee;function Engineer () {   this.dept = &quot;engineering&quot;;   this.machine = &quot;&quot;;}Engineer.prototype = new WorkerBee;</code></td>
-<td><code>public class SalesPerson extends WorkerBee {   public double quota;   public SalesPerson () {      this.dept = &quot;sales&quot;;      this.quota = 100.0;   }}public class Engineer extends WorkerBee {   public String machine;   public Engineer () {      this.dept = &quot;engineering&quot;;      this.machine = &quot;&quot;;   }}</code></td>
-</tr>
-</tbody>
-</table>
-<p>在上述对象的定义完成后，您就可以创建这些对象的实例并获取其属性的默认值。图8.3 表示了使用JavaScript 创建新对象的过程并显示了新对象中的属性值。</p>
-<p><strong>Note:</strong> 术语 <em>实例（instance）</em>在基于类的语言中具有特定的技术含义。在这些语言中，实例是指类的个体成员，与类有着根本性的不同。在 JavaScript 中，“实例”并不具有这种技术含义，因为 JavaScript 中不存在类和实例之间的这种差异。然而，在谈论 JavaScript 时，“实例”可以非正式地用于表示用特定的构造器函数创建的对象。所以，在这个例子中，你可以非正式地称<code>jane</code> 是 <code>Engineer</code> 的一个实例。与之类似，尽管术语<em>父（parent）</em>，<em>子（child）</em>，<em>祖先（ancestor）</em>，和<em>后代（descendant）</em>在 JavaScript 中并没有正式的含义，您可以非正式地使用这些术语用于指代原型链中处于更高层次或者更低层次的对象。</p>
-<p><img src="https://developer.mozilla.org/@api/deki/files/4403/=figure8.3.png" alt="figure8.3.png"><br><strong>图例 8.3：通过简单的定义创建对象</strong></p>
-<h2 id="对象的属性"><a href="#对象的属性" class="headerlink" title="对象的属性"></a>对象的属性</h2><p>本节将讨论对象如何从原型链中的其它对象中继承属性，以及在运行时添加属性的相关细节。</p>
-<h3 id="继承属性"><a href="#继承属性" class="headerlink" title="继承属性"></a>继承属性</h3><p>假设您通过如下语句创建一个 <code>mark</code> 对象作为 <code>WorkerBee 的实例</code>（如 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Details_of_the_Object_Model#figure8.3" target="_blank" rel="external">图例 8.3</a> 所示）：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> mark = <span class="keyword">new</span> WorkerBee;</div></pre></td></tr></table></figure>
-<p>当 JavaScript 发现 <code>new</code> 操作符时，它会创建一个通用(generic)对象，并将其作为关键字 <code>this</code> 的值传递给 <code>WorkerBee</code> 的构造器函数。该构造器函数显式地设置 <code>projects</code> 属性的值，然后隐式地将其内部的 <code>__proto__</code> 属性设置为 <code>WorkerBee.prototype</code> 的值（属性的名称前后均有两个下划线）。<code>__proto__</code> 属性决定了用于返回属性值的原型链。一旦这些属性设置完成，JavaScript 返回新创建的对象，然后赋值语句会将变量 <code>mark</code> 的值指向该对象。</p>
-<p>这个过程不会显式的将 <code>mark所继承的原型链中的属性值作为本地变量存放在</code> <code>mark</code> 对象中。当请求属性的值时，JavaScript 将首先检查对象自身中是否存在属性的值，如果有，则返回该值。如果不存在，JavaScript会通过 <code>__proto__对原型链进行检查</code>。如果原型链中的某个对象包含该属性的值，则返回这个值。如果没有找到该属性，JavaScript 则认为对象中不存在该属性。这样，<code>mark</code> 对象中将具有如下的属性和对应的值：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">mark.name = <span class="string">""</span>;</div><div class="line">mark.dept = <span class="string">"general"</span>;</div><div class="line">mark.projects = [];</div></pre></td></tr></table></figure>
-<p><code>mark</code> 对象从 <code>mark.__proto__</code> 中保存的原型对象中继承了 <code>name</code> 和 <code>dept</code> 属性的值。并由 <code>WorkerBee</code> 构造器函数为 <code>projects</code> 属性设置了本地值。 这就是 JavaScript 中的属性和属性值的继承。这个过程的一些微妙之处将在 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Details_of_the_Object_Model#再谈属性继承" target="_blank" rel="external">再谈属性继承</a> 中进一步讨论。</p>
-<p>由于这些构造器不支持为实例设置特定的值，所以这些属性值仅仅是创建自 <code>WorkerBee</code> 的所有对象所共享的默认值。当然这些属性的值是可以修改的，所以您可以为 <code>mark指定特定的信息</code>，如下所示：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">mark.name = <span class="string">"Doe, Mark"</span>;</div><div class="line">mark.dept = <span class="string">"admin"</span>;</div><div class="line">mark.projects = [<span class="string">"navigator"</span>];</div></pre></td></tr></table></figure>
-<h3 id="添加属性"><a href="#添加属性" class="headerlink" title="添加属性"></a>添加属性</h3><p>在 JavaScript 中，您可以在运行时为任何对象添加属性，而不必受限于构造器函数提供的属性。添加特定于某个对象的属性，只需要为该对象指定一个属性值，如下所示：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mark.bonus = <span class="number">3000</span>;</div></pre></td></tr></table></figure>
-<p>这样 <code>mark</code> 对象就有了 <code>bonus</code> 属性，而其它 <code>WorkerBee</code> 则没有该属性。</p>
-<p>如果您向某个构造器函数的原型对象中添加新的属性，那么该属性将添加到从这个原型中继承属性的所有对象的中。例如，可以通过如下的语句向所有雇员中添加 <code>specialty</code> 属性：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Employee.prototype.specialty = <span class="string">"none"</span>;</div></pre></td></tr></table></figure>
-<p>只要 JavaScript 执行了该语句，则 <code>mark</code> 对象也将具有 <code>specialty</code> 属性，其值为 <code>&quot;none&quot;</code>。下图则表示了在 <code>Employee</code> 原型中添加该属性，然后在 <code>Engineer</code>的原型中重载该属性的效果。</p>
-<p><img src="https://developer.mozilla.org/@api/deki/files/4422/=figure8.4.png" alt="img"><br><strong>图 8.4: 添加属性</strong></p>
-<h2 id="更灵活的构造器"><a href="#更灵活的构造器" class="headerlink" title="更灵活的构造器"></a>更灵活的构造器</h2><p>截至到现在，构造器函数都不允许在创建新的实例时指定属性值。其实我们也可以像Java一样，为构造器提供参数以初始化实例的属性值。下图即实现方式之一。</p>
-<p><img src="https://developer.mozilla.org/@api/deki/files/4423/=figure8.5.png" alt="img"><br><strong>Figure 8.5: Specifying properties in a constructor, take 1</strong></p>
-<p>下面的表格中罗列了这些对象在 Java 和 JavaScript 中的定义。</p>
-<table>
-<thead>
-<tr>
-<th>JavaScript</th>
-<th>Java</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>`function Employee (name, dept) {  this.name = name</td>
-<td></td>
-<td>“”;  this.dept = dept</td>
-<td></td>
-<td>“general”;}`</td>
-<td><code>public class Employee {   public String name;   public String dept;   public Employee () {      this(&quot;&quot;, &quot;general&quot;);   }   public Employee (String name) {      this(name, &quot;general&quot;);   }   public Employee (String name, String dept) {      this.name = name;      this.dept = dept;   }}</code></td>
-</tr>
-<tr>
-<td>`function WorkerBee (projs) {  this.projects = projs</td>
-<td></td>
-<td>[];}WorkerBee.prototype = new Employee;`</td>
-<td><code>public class WorkerBee extends Employee {   public String[] projects;   public WorkerBee () {      this(new String[0]);   }   public WorkerBee (String[] projs) {      projects = projs;   }}</code></td>
-</tr>
-<tr>
-<td>`function Engineer (mach) {   this.dept = “engineering”;   this.machine = mach</td>
-<td></td>
-<td>“”;}Engineer.prototype = new WorkerBee;`</td>
-<td><code>public class Engineer extends WorkerBee {   public String machine;   public Engineer () {      dept = &quot;engineering&quot;;      machine = &quot;&quot;;   }   public Engineer (String mach) {      dept = &quot;engineering&quot;;      machine = mach;   }}</code></td>
-</tr>
-</tbody>
-</table>
-<p>上面使用 JavaScript 定义过程使用了一种设置默认值的特殊惯用法：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">this</span>.name = name || <span class="string">""</span>;</div></pre></td></tr></table></figure>
-<p>JavaScript 的逻辑或操作符（<code>||）会对</code>第一个参数进行判断。如果该参数值运算后结果为真，则操作符返回该值。否则，操作符返回第二个参数的值。因此，这行代码首先检查 <code>name</code> 是否是对<code>name</code> 属性有效的值。如果是，则设置其为 <code>this.name</code> 的值。否则，设置 <code>this.name</code> 的值为空的字符串。尽管这种用法乍看起来有些费解，为了简洁起见，本章将使用这种习惯用法。</p>
-<p>注意：如果调用构造器函数时，指定了可以转换为 <code>false</code> 的参数（比如 <code>0</code> （零）和空字符串<code>（&quot;&quot;）），结果可能出乎调用者意料。此时，将使用默认值（译者注：而不是指定的参数值 0 和 &quot;&quot;）。</code></p>
-<p>由上面的定义，当创建对象的实例时，您可以为本地定义的属性指定值。正如 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Details_of_the_Object_Model#figure8.5" target="_blank" rel="external">图例 8.5</a> 所示一样，您可以通过如下语句创建新的 <code>Engineer</code>：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> jane = <span class="keyword">new</span> Engineer(<span class="string">"belau"</span>);</div></pre></td></tr></table></figure>
-<p>此时，<code>Jane</code> 的属性如下所示：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">jane.name == <span class="string">""</span>;</div><div class="line">jane.dept == <span class="string">"engineering"</span>;</div><div class="line">jane.projects == [];</div><div class="line">jane.machine == <span class="string">"belau"</span></div></pre></td></tr></table></figure>
-<p>注意，由上面对类的定义，您无法为诸如 <code>name</code> 这样的继承属性指定初始值。如果想在JavaScript中为继承的属性指定初始值，您需要在构造器函数中添加更多的代码。</p>
-<p>到目前为止，构造器函数已经能够创建一个普通对象，然后为新对象指定本地的属性和属性值。您还可以通过直接调用原型链上的更高层次对象的构造器函数，让构造器添加更多的属性。下图即实现了这一功能。</p>
-<p><img src="https://developer.mozilla.org/@api/deki/files/4430/=figure8.6.png" alt="img"><br><strong>图 8.6 Specifying properties in a constructor, take 2</strong></p>
-<p>下面是 <code>Engineer</code> 构造器的定义：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Engineer</span> (<span class="params">name, projs, mach</span>) </span>&#123;</div><div class="line">  <span class="keyword">this</span>.base = WorkerBee;</div><div class="line">  <span class="keyword">this</span>.base(name, <span class="string">"engineering"</span>, projs);</div><div class="line">  <span class="keyword">this</span>.machine = mach || <span class="string">""</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>假设您创建了一个新的 <code>Engineer</code> 对象，如下所示：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> jane = <span class="keyword">new</span> Engineer(<span class="string">"Doe, Jane"</span>, [<span class="string">"navigator"</span>, <span class="string">"javascript"</span>], <span class="string">"belau"</span>);</div></pre></td></tr></table></figure>
-<p>执行时，JavaScript 会有以下步骤：</p>
-<ol>
-<li><code>new</code> 操作符创建了一个新的通用对象，并将其 <code>__proto__</code> 属性设置为 <code>Engineer.prototype</code>。</li>
-<li><code>new</code> 操作符将该新对象作为 <code>this</code> 的值传递给 <code>Engineer</code> 构造器。</li>
-<li>构造器为该新对象创建了一个名为 <code>base</code> 的新属性，并指向 <code>WorkerBee</code> 的构造器。这使得 <code>WorkerBee</code> 构造器成为 <code>Engineer</code> 对象的一个方法。<code>base</code> 属性的名称并没有什么特殊性，我们可以使用任何其他合法的名称来代替；<code>base</code> 仅仅是为了贴近它的用意。</li>
-<li>构造器调用 <code>base</code> 方法，将传递给该构造器的参数中的两个，作为参数传递给 <code>base</code> 方法，同时还传递一个字符串参数  <code>&quot;engineering&quot;。显式地在构造器中使用</code> <code>&quot;engineering&quot;</code> 表明所有 <code>Engineer</code> 对象继承的 <code>dept</code> 属性具有相同的值，且该值重载了继承自 <code>Employee</code> 的值。</li>
-<li>因为 <code>base</code> 是 <code>Engineer</code> 的一个方法，在调用 <code>base</code> 时，JavaScript 将在步骤 1 中创建的对象绑定给 <code>this</code> 关键字。这样，<code>WorkerBee</code> 函数接着将 <code>&quot;Doe, Jane&quot;</code> 和 <code>&quot;engineering&quot;</code> 参数传递给 <code>Employee</code> 构造器函数。当从 <code>Employee</code> 构造器函数返回时，<code>WorkerBee</code> 函数用剩下的参数设置 <code>projects</code> 属性。</li>
-<li>当从 <code>base</code> 方法返回后，<code>Engineer</code> 构造器将对象的 <code>machine</code> 属性初始化为 <code>&quot;belau&quot;</code>。</li>
-<li>当从构造器返回时，JavaScript 将新对象赋值给 <code>jane</code> 变量。</li>
-</ol>
-<p>您可以认为，在 <code>Engineer</code> 的构造器中调用了 <code>WorkerBee</code> 的构造器，也就为 <code>Engineer</code> 对象设置好了继承关系。事实并非如此。调用 <code>WorkerBee</code> 构造器确保了<code>Engineer</code> 对象以所有在构造器中所指定的属性被调用。但是，如果后续在 <code>Employee</code> 或者 <code>WorkerBee</code> 原型中添加了属性，那些属性不会被 <code>Engineer</code> 对象继承。例如，假设如下语句：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Engineer</span> (<span class="params">name, projs, mach</span>) </span>&#123;</div><div class="line">  <span class="keyword">this</span>.base = WorkerBee;</div><div class="line">  <span class="keyword">this</span>.base(name, <span class="string">"engineering"</span>, projs);</div><div class="line">  <span class="keyword">this</span>.machine = mach || <span class="string">""</span>;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> jane = <span class="keyword">new</span> Engineer(<span class="string">"Doe, Jane"</span>, [<span class="string">"navigator"</span>, <span class="string">"javascript"</span>], <span class="string">"belau"</span>);</div><div class="line">Employee.prototype.specialty = <span class="string">"none"</span>;</div></pre></td></tr></table></figure>
-<p>对象 <code>jane</code> 不会继承 <code>specialty</code> 属性。您必须显式地设置原型才能确保动态的继承。如果修改成如下的语句：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Engineer</span> (<span class="params">name, projs, mach</span>) </span>&#123;</div><div class="line">  <span class="keyword">this</span>.base = WorkerBee;</div><div class="line">  <span class="keyword">this</span>.base(name, <span class="string">"engineering"</span>, projs);</div><div class="line">  <span class="keyword">this</span>.machine = mach || <span class="string">""</span>;</div><div class="line">&#125;</div><div class="line">Engineer.prototype = <span class="keyword">new</span> WorkerBee;</div><div class="line"><span class="keyword">var</span> jane = <span class="keyword">new</span> Engineer(<span class="string">"Doe, Jane"</span>, [<span class="string">"navigator"</span>, <span class="string">"javascript"</span>], <span class="string">"belau"</span>);</div><div class="line">Employee.prototype.specialty = <span class="string">"none"</span>;</div></pre></td></tr></table></figure>
-<p>现在 <code>jane</code> 对象的 <code>specialty</code> 属性为 “none” 了。</p>
-<p>继承的另一种途径是使用<a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function/call" target="_blank" rel="external"><code>call()</code></a> / <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function/apply" target="_blank" rel="external"><code>apply()</code></a> 方法。下面的方式都是等价的：</p>
-<table>
-<thead>
-<tr>
-<th>`function Engineer (name, projs, mach) {  this.base = WorkerBee;  this.base(name, “engineering”, projs);  this.machine = mach</th>
-<th></th>
-<th>“”;}`</th>
-<th>`function Engineer (name, projs, mach) {  WorkerBee.call(this, name, “engineering”, projs);  this.machine = mach</th>
-<th></th>
-<th>“”;}`</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td></td>
-</tr>
-</tbody>
-</table>
-<p>使用 javascript 的 <code>call()</code> 方法相对明了一些，因为无需 <code>base</code> 方法了。</p>
-<h2 id="再谈属性的继承"><a href="#再谈属性的继承" class="headerlink" title="再谈属性的继承"></a>再谈属性的继承</h2><p>前面的小节中描述了 JavaScript 构造器和原型如何提供层级结构和继承的实现。本节中对之前未讨论的一些细节进行阐述。</p>
-<h3 id="本地值和继承值"><a href="#本地值和继承值" class="headerlink" title="本地值和继承值"></a>本地值和继承值</h3><p>正如本章前面所述，在访问一个对象的属性时，JavaScript 将执行下面的步骤：</p>
-<ol>
-<li>检查本地值是否存在。如果存在，返回该值。</li>
-<li>如果本地值不存在，检查原型链（通过 <code>__proto__</code> 属性）。</li>
-<li>如果原型链中的某个对象具有指定属性的值，则返回该值。</li>
-<li>如果这样的属性不存在，则对象没有该属性。</li>
-</ol>
-<p>以上步骤的结果依赖于您是如何定义的。最早的例子中具有如下定义：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Employee</span> (<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="keyword">this</span>.name = <span class="string">""</span>;</div><div class="line">  <span class="keyword">this</span>.dept = <span class="string">"general"</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">WorkerBee</span> (<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="keyword">this</span>.projects = [];</div><div class="line">&#125;</div><div class="line">WorkerBee.prototype = <span class="keyword">new</span> Employee;</div></pre></td></tr></table></figure>
-<p>基于这些定义，假定通过如下的语句创建 <code>WorkerBee</code> 的实例 <code>amy：</code></p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> amy = <span class="keyword">new</span> WorkerBee;</div></pre></td></tr></table></figure>
-<p>则 <code>amy</code> 对象将具有一个本地属性，<code>projects。``name</code> 和 <code>dept</code> 属性则不是 <code>amy</code> 对象本地的，而是从 <code>amy</code> 对象的 <code>__proto__</code> 属性获得的。因此，<code>amy</code> 将具有如下的属性值：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">amy.name == <span class="string">""</span>;</div><div class="line">amy.dept == <span class="string">"general"</span>;</div><div class="line">amy.projects == [];</div></pre></td></tr></table></figure>
-<p>现在，假设修改了与 <code>Employee</code> 的相关联原型中的 <code>name</code> 属性的值：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Employee.prototype.name = <span class="string">"Unknown"</span></div></pre></td></tr></table></figure>
-<p>乍一看，您可能觉得新的值会传播给所有 <code>Employee</code> 的实例。然而，并非如此。</p>
-<p>在创建 <code>Employee</code> 对象的<em>任意</em>实例时，该实例的 <code>name</code> 属性将获得一个本地值（空的字符串）。这就意味着在创建一个新的 <code>Employee</code> 对象作为 <code>WorkerBee</code> 的原型时，<code>WorkerBee.prototype</code> 的 <code>name</code> 属性将具有一个本地值。因此，当 JavaScript 查找 <code>amy</code> 对象（<code>WorkerBee</code> 的实例）的 <code>name</code> 属性时，JavaScript 将找到 <code>WorkerBee.prototype</code> 中的本地值。因此，也就不会继续在原型链中向上找到 <code>Employee.prototype</code> 了。</p>
-<p>如果想在运行时修改一个对象的属性值并且希望该值被所有该对象的后代所继承，您就不能在该对象的构造器函数中定义该属性。而应该将该属性添加到该对象所关联的原型中。例如，假设将前面的代码作如下修改：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Employee</span> (<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="keyword">this</span>.dept = <span class="string">"general"</span>;</div><div class="line">&#125;</div><div class="line">Employee.prototype.name = <span class="string">""</span>;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">WorkerBee</span> (<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="keyword">this</span>.projects = [];</div><div class="line">&#125;</div><div class="line">WorkerBee.prototype = <span class="keyword">new</span> Employee;</div><div class="line"></div><div class="line"><span class="keyword">var</span> amy = <span class="keyword">new</span> WorkerBee;</div><div class="line"></div><div class="line">Employee.prototype.name = <span class="string">"Unknown"</span>;</div></pre></td></tr></table></figure>
-<p>在这种情况下，<code>amy</code> 的 <code>name</code> 属性将为 “Unknown”。</p>
-<p>正如这些例子所示，如果希望对象的属性具有默认值，并且希望在运行时修改这些默认值，应该在对象的原型中设置这些属性，而不是在构造器函数中。</p>
-<h3 id="判断实例的关系"><a href="#判断实例的关系" class="headerlink" title="判断实例的关系"></a>判断实例的关系</h3><p>JavaScript 的属性查找机制首先在对象自身的属性中查找，如果指定的属性名称没有找到，将在对象的特殊属性 <code>__proto__</code> 中查找。这个过程是递归的；被称为“在原型链中查找”。</p>
-<p>特殊的 <code>__proto__</code> 属性是在构建对象时设置的；设置为构造器的 <code>prototype</code> 属性的值。所以表达式 <code>new Foo()</code> 将创建一个对象，其 <code>__proto__ ==Foo.prototype</code>。因而，修改 <code>Foo.prototype</code> 的属性，将改变所有通过 <code>new Foo()</code> 创建的对象的属性的查找。</p>
-<p>每个对象都有一个 <code>__proto__</code> 对象属性（除了 <code>Object）；每个函数都有一个</code> <code>prototype</code> 对象属性。因此，通过“原型继承（prototype inheritance）”，对象与其它对象之间形成关系。通过比较对象的 <code>__proto__</code> 属性和函数的 <code>prototype</code> 属性可以检测对象的继承关系。JavaScript 提供了便捷方法：<code>instanceof</code> 操作符可以用来将一个对象和一个函数做检测，如果对象继承自函数的原型，则该操作符返回真。例如：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> f = <span class="keyword">new</span> Foo();</div><div class="line"><span class="keyword">var</span> isTrue = (f <span class="keyword">instanceof</span> Foo);</div></pre></td></tr></table></figure>
-<p>作为详细一点的例子，假定我们使用和在 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Details_of_the_Object_Model#继承属性" target="_blank" rel="external">继承属性</a> 中相同的一组定义。创建 <code>Engineer</code> 对象如下：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> chris = <span class="keyword">new</span> Engineer(<span class="string">"Pigman, Chris"</span>, [<span class="string">"jsd"</span>], <span class="string">"fiji"</span>);</div></pre></td></tr></table></figure>
-<p>对于该对象，以下所有语句均为真：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">chris.__proto__ == Engineer.prototype;</div><div class="line">chris.__proto__.__proto__ == WorkerBee.prototype;</div><div class="line">chris.__proto__.__proto__.__proto__ == Employee.prototype;</div><div class="line">chris.__proto__.__proto__.__proto__.__proto__ == <span class="built_in">Object</span>.prototype;</div><div class="line">chris.__proto__.__proto__.__proto__.__proto__.__proto__ == <span class="literal">null</span>;</div></pre></td></tr></table></figure>
-<p>基于此，可以写出一个如下所示的 <code>instanceOf</code> 函数：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">instanceOf</span>(<span class="params">object, constructor</span>) </span>&#123;</div><div class="line">   <span class="keyword">while</span> (object != <span class="literal">null</span>) &#123;</div><div class="line">      <span class="keyword">if</span> (object == <span class="keyword">constructor</span>.prototype)</div><div class="line">         return true;</div><div class="line">      if (typeof object == 'xml') &#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">constructor</span>.prototype == XML.prototype;</div><div class="line">      &#125;</div><div class="line">      object = object.__proto__;</div><div class="line">   &#125;</div><div class="line">   return false;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><strong>Note:</strong> 在上面的实现中，检查对象的类型是否为 “xml” 的目的在于解决新近版本的 JavaScript 中表达 XML 对象的特异之处。如果您想了解其中琐碎细节，可以参考 <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=634150" target="_blank" rel="external">bug 634150</a>。</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">instanceOf (chris, Engineer)</div><div class="line">instanceOf (chris, WorkerBee)</div><div class="line">instanceOf (chris, Employee)</div><div class="line">instanceOf (chris, <span class="built_in">Object</span>)</div></pre></td></tr></table></figure>
-<p>但如下表达式为假：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">instanceOf (chris, SalesPerson)</div></pre></td></tr></table></figure>
-<h3 id="构造器中的全局信息"><a href="#构造器中的全局信息" class="headerlink" title="构造器中的全局信息"></a>构造器中的全局信息</h3><p>在创建构造器时，在构造器中设置全局信息要小心。例如，假设希望为每一个雇员分配一个唯一标识。可能会为 <code>Employee</code> 使用如下定义：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> idCounter = <span class="number">1</span>;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Employee</span> (<span class="params">name, dept</span>) </span>&#123;</div><div class="line">   <span class="keyword">this</span>.name = name || <span class="string">""</span>;</div><div class="line">   <span class="keyword">this</span>.dept = dept || <span class="string">"general"</span>;</div><div class="line">   <span class="keyword">this</span>.id = idCounter++;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>基于该定义，在创建新的 <code>Employee</code> 时，构造器为其分配了序列中的下一个标识符。然后递增全局的标识符计数器。因此，如果，如果随后的语句如下，则 <code>victoria.id</code> 为 1 而 <code>harry.id</code> 为 2：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> victoria = <span class="keyword">new</span> Employee(<span class="string">"Pigbert, Victoria"</span>, <span class="string">"pubs"</span>)</div><div class="line"><span class="keyword">var</span> harry = <span class="keyword">new</span> Employee(<span class="string">"Tschopik, Harry"</span>, <span class="string">"sales"</span>)</div></pre></td></tr></table></figure>
-<p>乍一看似乎没问题。但是，无论什么目的，在每一次创建 <code>Employee</code> 对象时，<code>idCounter</code> 都将被递增一次。如果创建本章中所描述的整个 <code>Employee</code> 层级结构，每次设置原型的时候，<code>Employee</code> 构造器都将被调用一次。假设有如下代码：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> idCounter = <span class="number">1</span>;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Employee</span> (<span class="params">name, dept</span>) </span>&#123;</div><div class="line">   <span class="keyword">this</span>.name = name || <span class="string">""</span>;</div><div class="line">   <span class="keyword">this</span>.dept = dept || <span class="string">"general"</span>;</div><div class="line">   <span class="keyword">this</span>.id = idCounter++;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Manager</span> (<span class="params">name, dept, reports</span>) </span>&#123;...&#125;</div><div class="line">Manager.prototype = <span class="keyword">new</span> Employee;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">WorkerBee</span> (<span class="params">name, dept, projs</span>) </span>&#123;...&#125;</div><div class="line">WorkerBee.prototype = <span class="keyword">new</span> Employee;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Engineer</span> (<span class="params">name, projs, mach</span>) </span>&#123;...&#125;</div><div class="line">Engineer.prototype = <span class="keyword">new</span> WorkerBee;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">SalesPerson</span> (<span class="params">name, projs, quota</span>) </span>&#123;...&#125;</div><div class="line">SalesPerson.prototype = <span class="keyword">new</span> WorkerBee;</div><div class="line"></div><div class="line"><span class="keyword">var</span> mac = <span class="keyword">new</span> Engineer(<span class="string">"Wood, Mac"</span>);</div></pre></td></tr></table></figure>
-<p>还可以进一步假设上面省略掉的定义中包含 <code>base</code> 属性而且调用了原型链中高于它们的构造器。即便在现在这个情况下，在 <code>mac</code> 对象创建时，<code>mac.id</code> 为 5。</p>
-<p>依赖于应用程序，计数器额外的递增可能有问题，也可能没问题。如果确实需要准确的计数器，则以下构造器可以作为一个可行的方案：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Employee</span> (<span class="params">name, dept</span>) </span>&#123;</div><div class="line">   <span class="keyword">this</span>.name = name || <span class="string">""</span>;</div><div class="line">   <span class="keyword">this</span>.dept = dept || <span class="string">"general"</span>;</div><div class="line">   <span class="keyword">if</span> (name)</div><div class="line">      <span class="keyword">this</span>.id = idCounter++;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>在用作原型而创建新的 <code>Employee</code> 实例时，不会指定参数。使用这个构造器定义，如果不指定参数，构造器不会指定标识符，也不会递增计数器。而如果想让 <code>Employee</code> 分配到标识符，则必需为雇员指定姓名。在这个例子中，<code>mac.id</code> 将为 1。</p>
-<h3 id="没有多继承"><a href="#没有多继承" class="headerlink" title="没有多继承"></a>没有多继承</h3><p>某些面向对象语言支持多重继承。也就是说，对象可以从无关的多个父对象中继承属性和属性值。JavaScript 不支持多重继承。</p>
-<p>JavaScript 属性值的继承是在运行时通过检索对象的原型链来实现的。因为对象只有一个原型与之关联，所以 JavaScript 无法动态地从多个原型链中继承。</p>
-<p>在 JavaScript 中，可以在构造器函数中调用多个其它的构造器函数。这一点造成了多重继承的假象。例如，考虑如下语句：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Hobbyist</span> (<span class="params">hobby</span>) </span>&#123;</div><div class="line">   <span class="keyword">this</span>.hobby = hobby || <span class="string">"scuba"</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Engineer</span> (<span class="params">name, projs, mach, hobby</span>) </span>&#123;</div><div class="line">   <span class="keyword">this</span>.base1 = WorkerBee;</div><div class="line">   <span class="keyword">this</span>.base1(name, <span class="string">"engineering"</span>, projs);</div><div class="line">   <span class="keyword">this</span>.base2 = Hobbyist;</div><div class="line">   <span class="keyword">this</span>.base2(hobby);</div><div class="line">   <span class="keyword">this</span>.machine = mach || <span class="string">""</span>;</div><div class="line">&#125;</div><div class="line">Engineer.prototype = <span class="keyword">new</span> WorkerBee;</div><div class="line"></div><div class="line"><span class="keyword">var</span> dennis = <span class="keyword">new</span> Engineer(<span class="string">"Doe, Dennis"</span>, [<span class="string">"collabra"</span>], <span class="string">"hugo"</span>)</div></pre></td></tr></table></figure>
-<p>进一步假设使用本章前面所属的 <code>WorkerBee</code> 的定义。此时 <code>dennis</code> 对象具有如下属性：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">dennis.name == <span class="string">"Doe, Dennis"</span></div><div class="line">dennis.dept == <span class="string">"engineering"</span></div><div class="line">dennis.projects == [<span class="string">"collabra"</span>]</div><div class="line">dennis.machine == <span class="string">"hugo"</span></div><div class="line">dennis.hobby == <span class="string">"scuba"</span></div></pre></td></tr></table></figure>
-<p><code>dennis</code> 确实从 <code>Hobbyist</code> 构造器中获得了 <code>hobby</code> 属性。但是，假设添加了一个属性到 <code>Hobbyist</code> 构造器的原型：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Hobbyist.prototype.equipment = [<span class="string">"mask"</span>, <span class="string">"fins"</span>, <span class="string">"regulator"</span>, <span class="string">"bcd"</span>]</div></pre></td></tr></table></figure>
-<p><code>dennis</code> 对象不会继承这个新属性。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/02/Object.observe/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="tomoat">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/blog/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="tomoat的笔记">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/blog/2017/02/Object.observe/" itemprop="url">
-                  关于Object.observe的知识
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-19T19:16:21+08:00">
-                2017-02-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="Object-observe"><a href="#Object-observe" class="headerlink" title="Object.observe"></a>Object.observe</h2><p>当前MVC模式在Angular.JS等冲击下已经变成了View视图和Model模型两个， 控制器由事件驱动机制替代，见 ：<a href="http://www.jdon.com/46833" target="_blank" rel="external">MVI是一种Reactive MVC</a>。</p>
-<p>那么为什么JS不能自然支持事件通知机制呢？ES7引入了Object.observe：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;&#125;;j</div><div class="line"><span class="keyword">var</span> changesHandler = changes =&gt; <span class="built_in">console</span>.log(changes);</div><div class="line"><span class="built_in">Object</span>.observe(person, changesHandler);</div></pre></td></tr></table></figure>
-<p>这样，当person的内容有更改，将自动触发changes函数，如下：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">person = &#123;</div><div class="line">　　name: <span class="string">" jdon"</span></div><div class="line">&#125;</div><div class="line">　　如果person的名称从jdon改为jdon.com:</div><div class="line">person = &#123;</div><div class="line">　　name: <span class="string">" jdon.com"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>这种name内容变化，将触发函数changes输出：</p>
-<hr>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[</div><div class="line">    &#123;</div><div class="line">        "type":"update",</div><div class="line">        "name":"name",</div><div class="line">        "oldValue: "jdon"</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
-<p>如果person增加内容：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">person = &#123;</div><div class="line">　　name: <span class="string">" jdon.com"</span></div><div class="line">　　employer: <span class="string">"banq"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>激活函数输出：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[</div><div class="line">    &#123;</div><div class="line">        <span class="string">"type"</span>:<span class="string">"new"</span>,</div><div class="line">        <span class="string">"name"</span>:<span class="string">"employer"</span>,</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
-<p>如果person删除内容employer，那么输出是：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[</div><div class="line">    &#123;</div><div class="line">        "type":"delete",</div><div class="line">        "name":"employer",</div><div class="line">        "oldValue: "banq"</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
-<p>解除观察是：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">Object</span>.unobserve(person, changesHandler);</div></pre></td></tr></table></figure>
-<p>为了防止事件风暴，ES7使用了 Event Loop Queue + Microtasks，当事件处理器EventHandler发出改变事件给ChangeHandler以后，ChangeHandler不会排队在队列后面，而是替换当前EventHandler位置，这样在浏览器渲染页面之前完成所有事件通知：</p>
-<p><img src="http://karat.cc/img/93256ccb-d34f-4419-bd82-5cbb8c1cde88.png" alt="js7.png"></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2575,7 +2600,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/blog/archives">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">18</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
