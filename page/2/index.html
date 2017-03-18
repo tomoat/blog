@@ -247,6 +247,157 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/关于JS的继承/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="tomoat">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="tomoat的笔记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/blog/2017/03/关于JS的继承/" itemprop="url">
+                  关于JS的继承
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-08T10:28:55+08:00">
+                2017-03-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="关于JS的继承"><a href="#关于JS的继承" class="headerlink" title="关于JS的继承"></a>关于JS的继承</h1><p>众所周知，在 ES 6 之前没有类的概念，所以不能像 Java 中一个 extends 关键字就搞定了继承关系，需要一些 tricks 来实现，下面就收集一些比较常用的方法。</p>
+<h2 id="一-原型链继承："><a href="#一-原型链继承：" class="headerlink" title="(一) 原型链继承："></a>(一) 原型链继承：</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Parent</span>(<span class="params">name</span>) </span>&#123; </div><div class="line">    <span class="keyword">this</span>.name = name;</div><div class="line">&#125;</div><div class="line">Parent.prototype.sayName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'parent name:'</span>, <span class="keyword">this</span>.name);</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Child</span>(<span class="params">name</span>) </span>&#123;</div><div class="line">    <span class="keyword">this</span>.name = name;</div><div class="line">&#125;</div><div class="line"></div><div class="line">Child.prototype = <span class="keyword">new</span> Parent(<span class="string">'father'</span>);</div><div class="line">Child.prototype.constructor = Child;</div><div class="line"></div><div class="line">Child.prototype.sayName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'child name:'</span>, <span class="keyword">this</span>.name);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> child = <span class="keyword">new</span> Child(<span class="string">'son'</span>);</div><div class="line">child.sayName();    <span class="comment">// child name: son</span></div></pre></td></tr></table></figure>
+<p>只要是原型链中出现过的原型，都可以说是该原型链派生的实例的原型。</p>
+<p>这种方法存在两个缺点：</p>
+<ol>
+<li>子类型无法给超类型传递参数，在面向对象的继承中，我们总希望通过 var child = new Child(‘son’, ‘father’); 让子类去调用父类的构造器来完成继承。而不是通过像这样 new Parent(‘father’) 去调用父类。</li>
+<li>Child.prototype.sayName 必须写在 Child.prototype = new Parent(‘father’); 之后，不然就会被覆盖掉。(在node-v7.6.0下运行无任何问题)</li>
+</ol>
+<h2 id="二-类式继承："><a href="#二-类式继承：" class="headerlink" title="(二) 类式继承："></a>(二) 类式继承：</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Parent</span>(<span class="params">name</span>) </span>&#123; </div><div class="line">    <span class="keyword">this</span>.name = name;</div><div class="line">&#125;</div><div class="line">Parent.prototype.sayName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'parent name:'</span>, <span class="keyword">this</span>.name);</div><div class="line">&#125;</div><div class="line">Parent.prototype.doSomthing = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'parent do something!'</span>);</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Child</span>(<span class="params">name, parentName</span>) </span>&#123;</div><div class="line">    Parent.call(<span class="keyword">this</span>, parentName);</div><div class="line">    <span class="keyword">this</span>.name = name;</div><div class="line">&#125;</div><div class="line"></div><div class="line">Child.prototype.sayName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'child name:'</span>, <span class="keyword">this</span>.name);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> child = <span class="keyword">new</span> Child(<span class="string">'son'</span>);</div><div class="line">child.sayName();      <span class="comment">// child name: son</span></div><div class="line">child.doSomthing();   <span class="comment">// TypeError: child.doSomthing is not a function</span></div></pre></td></tr></table></figure>
+<p>相当于 Parent 这个函数在 Child 函数中执行了一遍，并且将所有与 this 绑定的变量都切换到了 Child 上，这样就克服了第一种方式带来的问题。</p>
+<p>缺点：</p>
+<ol>
+<li>没有原型，每次创建一个 Child 实例对象时候都需要执行一遍 Parent 函数，无法复用一些公用函数。</li>
+</ol>
+<h2 id="三-组合式继承：前两种方式的结合"><a href="#三-组合式继承：前两种方式的结合" class="headerlink" title="(三) 组合式继承：前两种方式的结合"></a>(三) 组合式继承：前两种方式的结合</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Parent</span>(<span class="params">name</span>) </span>&#123; </div><div class="line">    <span class="keyword">this</span>.name = name;</div><div class="line">&#125;</div><div class="line"></div><div class="line">Parent.prototype.sayName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'parent name:'</span>, <span class="keyword">this</span>.name);</div><div class="line">&#125;</div><div class="line">Parent.prototype.doSomething = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'parent do something!'</span>);</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Child</span>(<span class="params">name, parentName</span>) </span>&#123;</div><div class="line">    Parent.call(<span class="keyword">this</span>, parentName);</div><div class="line">    <span class="keyword">this</span>.name = name;</div><div class="line">&#125;</div><div class="line"></div><div class="line">Child.prototype.sayName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'child name:'</span>, <span class="keyword">this</span>.name);</div><div class="line">&#125;</div><div class="line"></div><div class="line">Child.prototype = <span class="keyword">new</span> Parent();      </div><div class="line">Child.prototype.construtor = Child;</div><div class="line"></div><div class="line"><span class="keyword">var</span> child = <span class="keyword">new</span> Child(<span class="string">'son'</span>);</div><div class="line">child.sayName();       <span class="comment">// child name: son</span></div><div class="line">child.doSomething();   <span class="comment">// parent do something!</span></div></pre></td></tr></table></figure>
+<p>组合式继承是比较常用的一种继承方法，其背后的思路是使用原型链实现对原型属性和方法的继承，而通过借用构造函数来实现对实例属性的继承。</p>
+<p>这样，既通过在原型上定义方法实现了函数复用，又保证每个实例都有它自己的属性。</p>
+<p><strong>组合式继承是 JS 最常用的继承模式，但组合继承使用过程中会被调用两次：一次是创建子类型的时候，另一次是在子类型构造函数的内部。</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Parent</span>(<span class="params">name</span>) </span>&#123; </div><div class="line">    <span class="keyword">this</span>.name = name;</div><div class="line">&#125;</div><div class="line">Parent.prototype.sayName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'parent name:'</span>, <span class="keyword">this</span>.name);</div><div class="line">&#125;</div><div class="line">Parent.prototype.doSomething = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'parent do something!'</span>);</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Child</span>(<span class="params">name, parentName</span>) </span>&#123;</div><div class="line">    Parent.call(<span class="keyword">this</span>, parentName);      <span class="comment">// 第二次调用</span></div><div class="line">    <span class="keyword">this</span>.name = name;</div><div class="line">&#125;</div><div class="line"></div><div class="line">Child.prototype.sayName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'child name:'</span>, <span class="keyword">this</span>.name);</div><div class="line">&#125;</div><div class="line"></div><div class="line">Child.prototype = <span class="keyword">new</span> Parent();         <span class="comment">// 第一次调用</span></div><div class="line">Child.prototype.construtor = Child;</div><div class="line"></div><div class="line"><span class="keyword">var</span> child = <span class="keyword">new</span> Child(<span class="string">'son'</span>);</div><div class="line">child.sayName();      </div><div class="line">child.doSomething();</div></pre></td></tr></table></figure>
+<p>显然从上述的代码中可以看出，第一次调用构造函数显然是没有必要的，因为第一次调用构造函数时候不需要函数内部的那些实例属性，这么写只是想获得其原型上的方法罢了，所以这时候你可能会这样写：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Child.prototype = Parent.prototype;</div></pre></td></tr></table></figure>
+<p>这样写显然是不对的：</p>
+<ol>
+<li>首先，你这样写的话相当于是子类和父类都指向同一个对象，这时候如果你添加了新的方法给 Child 但实际上 Parent 并不需要，相当于强行给 Parent 添加了一个未知的方法。</li>
+<li>其次，仔细想想，这样体现不出继承的多态性，比如此时子类想要重写父类的 getName 的方法，那么父类的方法也就会随之修改，这显然违背了多态性。</li>
+</ol>
+<p>也就是说我们第一次调用构造函数的时候，其实是不管构造函数里面的内容，所以我们何不 new 一个空函数，将其 prototype 指向 Parent.prototype，代码如下：</p>
+<h2 id="四-寄生组合式继承："><a href="#四-寄生组合式继承：" class="headerlink" title="(四) 寄生组合式继承："></a>(四) 寄生组合式继承：</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Parent</span>(<span class="params">name</span>) </span>&#123;</div><div class="line">    <span class="keyword">this</span>.name = name;</div><div class="line">&#125;</div><div class="line">Parent.prototype.sayName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'parent name:'</span>, <span class="keyword">this</span>.name);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Child</span>(<span class="params">name, parentName</span>) </span>&#123;</div><div class="line">    Parent.call(<span class="keyword">this</span>, parentName);  </div><div class="line">    <span class="keyword">this</span>.name = name;    </div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">create</span>(<span class="params">proto</span>) </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">function</span> <span class="title">F</span>(<span class="params"></span>)</span>&#123;&#125;</div><div class="line">    F.prototype = proto;</div><div class="line">    F.prototype.construtor = F;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> F();</div><div class="line">&#125;</div><div class="line"></div><div class="line">Child.prototype = create(Parent.prototype);</div><div class="line">Child.prototype.sayName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'child name:'</span>, <span class="keyword">this</span>.name);</div><div class="line">&#125;</div><div class="line">Child.prototype.construtor = Child;</div><div class="line"></div><div class="line"><span class="keyword">var</span> parent = <span class="keyword">new</span> Parent(<span class="string">'father'</span>);</div><div class="line">parent.sayName();    <span class="comment">// parent name: father</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">var</span> child = <span class="keyword">new</span> Child(<span class="string">'son'</span>, <span class="string">'father'</span>);</div><div class="line">child.sayName();     <span class="comment">// child name: son</span></div></pre></td></tr></table></figure>
+<p>这就是所谓的<strong>寄生组合式继承方式</strong>，跟组合式继承的区别在于，他不需要在一次实例中调用两次父类的构造函数，假如说父类的构造器代码很多，还需要调用两次的话对系统肯定会有影响，<strong>寄生组合式继承的思想在于：用一个 F 空的构造函数去取代执行了 Parent 这个构造函数。</strong></p>
+<p>在上面的代码中，我们手动创建了一个 create 函数，但是其实是存在于 Object 对象中，不需要我们手动去创建，所以上面的代码可以改为：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Parent</span>(<span class="params">name</span>) </span>&#123;</div><div class="line">    <span class="keyword">this</span>.name = name;</div><div class="line">&#125;</div><div class="line">Parent.prototype.sayName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'parent name:'</span>, <span class="keyword">this</span>.name);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Child</span>(<span class="params">name, parentName</span>) </span>&#123;</div><div class="line">    Parent.call(<span class="keyword">this</span>, parentName);  </div><div class="line">    <span class="keyword">this</span>.name = name;    </div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">inheritPrototype</span>(<span class="params">Parent, Child</span>) </span>&#123;</div><div class="line">    Child.prototype = <span class="built_in">Object</span>.create(Parent.prototype);   <span class="comment">//修改</span></div><div class="line">    Child.prototype.construtor = Child;</div><div class="line">&#125;</div><div class="line"></div><div class="line">inheritPrototype(Parent, Child);</div><div class="line"></div><div class="line">Child.prototype.sayName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'child name:'</span>, <span class="keyword">this</span>.name);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> parent = <span class="keyword">new</span> Parent(<span class="string">'father'</span>);</div><div class="line">parent.sayName();      <span class="comment">// parent name: father</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> child = <span class="keyword">new</span> Child(<span class="string">'son'</span>, <span class="string">'father'</span>);</div><div class="line">child.sayName();       <span class="comment">// child name: son</span></div></pre></td></tr></table></figure>
+<h2 id="五-ES-6-继承："><a href="#五-ES-6-继承：" class="headerlink" title="(五) ES 6 继承："></a>(五) ES 6 继承：</h2><p>当然，如果你学习过 ES 6，那么写继承关系就会特别简单，如果你学过 Java 就会发现，ES 6 中的继承跟 Java 太像了，上述的代码可改为：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Parent</span> </span>&#123;</div><div class="line">    <span class="keyword">constructor</span>(name) &#123;</div><div class="line">	<span class="keyword">this</span>.name = name;</div><div class="line">    &#125;</div><div class="line">    doSomething() &#123;</div><div class="line">	<span class="built_in">console</span>.log(<span class="string">'parent do something!'</span>);</div><div class="line">    &#125;</div><div class="line">    sayName() &#123;</div><div class="line">	<span class="built_in">console</span>.log(<span class="string">'parent name:'</span>, <span class="keyword">this</span>.name);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Child</span> <span class="keyword">extends</span> <span class="title">Parent</span> </span>&#123;</div><div class="line">    <span class="keyword">constructor</span>(name, parentName) &#123;</div><div class="line">	<span class="keyword">super</span>(parentName);</div><div class="line">	<span class="keyword">this</span>.name = name;</div><div class="line">    &#125;</div><div class="line">    sayName() &#123;</div><div class="line"> 	<span class="built_in">console</span>.log(<span class="string">'child name:'</span>, <span class="keyword">this</span>.name);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">const</span> child = <span class="keyword">new</span> Child(<span class="string">'son'</span>, <span class="string">'father'</span>);</div><div class="line">child.sayName();            <span class="comment">// child name: son</span></div><div class="line">child.doSomething();        <span class="comment">// parent do something!</span></div><div class="line"></div><div class="line"><span class="keyword">const</span> parent = <span class="keyword">new</span> Parent(<span class="string">'father'</span>);</div><div class="line">parent.sayName();           <span class="comment">// parent name: father</span></div></pre></td></tr></table></figure>
+<p><em>本文来源于网络</em>：<a href="https://gold.xitu.io/entry/58be60de570c350059b65399" target="_blank" rel="external">30 分钟学会 JS 继承 - 掘金</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/基于类 vs 基于原型的语言/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1938,7 +2089,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/blog/archives">
-                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-count">19</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

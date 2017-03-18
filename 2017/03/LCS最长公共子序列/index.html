@@ -1,0 +1,799 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/blog/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/blog/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/blog/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/blog/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="LCS（最长公共子序列）O(n^2)的时间复杂度,O(n^2)的空间复杂度；
+与之类似但不同的最长公共子串方法。最长公共子串用动态规划可实现O(n^2)的时间复杂度，O(n^2)的空间复杂度；还可以进一步优化，用后缀数组的方法优化成线性时间O(nlogn)；空间也可以用其他方法优化成线性。3.LIS（最长递增序列）DP方法可实现O(n^2)的时间复杂度，进一步优化最佳可达到O(nlogn)
+
+一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="动态规划方法（算法）">
+<meta property="og:url" content="https://tomoat.github.io/2017/03/LCS最长公共子序列/index.html">
+<meta property="og:site_name" content="tomoat的笔记">
+<meta property="og:description" content="LCS（最长公共子序列）O(n^2)的时间复杂度,O(n^2)的空间复杂度；
+与之类似但不同的最长公共子串方法。最长公共子串用动态规划可实现O(n^2)的时间复杂度，O(n^2)的空间复杂度；还可以进一步优化，用后缀数组的方法优化成线性时间O(nlogn)；空间也可以用其他方法优化成线性。3.LIS（最长递增序列）DP方法可实现O(n^2)的时间复杂度，进一步优化最佳可达到O(nlogn)
+
+一">
+<meta property="og:image" content="https://segmentfault.com/img/bVlvzf">
+<meta property="og:image" content="https://segmentfault.com/img/bVlvzm">
+<meta property="og:image" content="https://segmentfault.com/img/bVlfds">
+<meta property="og:image" content="https://segmentfault.com/img/bVlfdw">
+<meta property="og:image" content="https://segmentfault.com/img/bVlfeN">
+<meta property="og:updated_time" content="2017-03-18T04:27:44.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="动态规划方法（算法）">
+<meta name="twitter:description" content="LCS（最长公共子序列）O(n^2)的时间复杂度,O(n^2)的空间复杂度；
+与之类似但不同的最长公共子串方法。最长公共子串用动态规划可实现O(n^2)的时间复杂度，O(n^2)的空间复杂度；还可以进一步优化，用后缀数组的方法优化成线性时间O(nlogn)；空间也可以用其他方法优化成线性。3.LIS（最长递增序列）DP方法可实现O(n^2)的时间复杂度，进一步优化最佳可达到O(nlogn)
+
+一">
+<meta name="twitter:image" content="https://segmentfault.com/img/bVlvzf">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/blog/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://tomoat.github.io/2017/03/LCS最长公共子序列/"/>
+
+
+
+
+
+  <title> 动态规划方法（算法） | tomoat的笔记 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/blog/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">tomoat的笔记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/blog/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/blog/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/blog/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://tomoat.github.io/blog/2017/03/LCS最长公共子序列/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="tomoat">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="tomoat的笔记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                动态规划方法（算法）
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-18T11:46:54+08:00">
+                2017-03-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <ol>
+<li>LCS（最长公共子序列）<code>O(n^2)</code>的时间复杂度,<code>O(n^2)</code>的空间复杂度；</li>
+<li>与之类似但不同的最长公共子串方法。<br>最长公共子串用动态规划可实现<code>O(n^2)</code>的时间复杂度，<code>O(n^2)</code>的空间复杂度；还可以进一步优化，用后缀数组的方法优化成线性时间<code>O(nlogn)</code>；空间也可以用其他方法优化成线性。<br>3.LIS（最长递增序列）DP方法可实现<code>O(n^2)</code>的时间复杂度，进一步优化最佳可达到<code>O(nlogn)</code></li>
+</ol>
+<p>一些定义：<br>字符串 <code>X</code>， <code>Y</code> 长度 分别<code>m</code>，<code>n</code></p>
+<p>子串：字符串S的子串<code>r[i,...,j],i&lt;=j</code>,表示<code>r</code>串从i到j这一段，也就是顺次排列<code>r[i],r[i+1],...,r[j]</code>形成的字符串</p>
+<p>前缀：<code>Xi =﹤x1，⋯，xi﹥</code> 即 <code>X</code> 序列的前 <code>i</code> 个字符 <code>(1≤i≤m)</code>；<br><code>Yj=﹤y1，⋯，yj﹥</code>即 <code>Y</code> 序列的前 <code>j</code> 个字符 <code>(1≤j≤n)</code>；<br>假定 <code>Z=﹤z1，⋯，zk﹥∈LCS(X , Y)</code></p>
+<p><a href="http://segmentfault.com/a/1190000002646526" target="_blank" rel="external">有关后缀数组的定义</a></p>
+<h1 id="LCS"><a href="#LCS" class="headerlink" title="LCS"></a>LCS</h1><h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>定义：<br>一个数列 S，如果分别是两个或多个已知数列的子序列，且是所有符合此条件序列中最长的，则 S 称为已知序列的最长公共子序列。<br>例如：输入两个字符串 BDCABA 和 ABCBDAB，字符串 BCBA 和 BDAB 都是是它们的最长公共子序列，则输出它们的长度 4，并打印任意一个子序列. （Note: 不要求连续）</p>
+<p>判断字符串相似度的方法之一 - LCS 最长公共子序列越长，越相似。</p>
+<h2 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h2><p>对于一般性的 LCS 问题（即任意数量的序列）是属于 NP-hard。但当序列的数量确定时，问题可以使用动态规划（Dynamic Programming）在多项式时间解决。可达时间复杂度：<code>O(m*n)</code><br><a href="http://www.julyedu.com/video/play/id/9" target="_blank" rel="external">July 10分钟讲LCS视频</a>，</p>
+<h2 id="暴力方法"><a href="#暴力方法" class="headerlink" title="暴力方法"></a>暴力方法</h2><p><img src="https://segmentfault.com/img/bVlvzf" alt="img"></p>
+<h2 id="动态规划方法"><a href="#动态规划方法" class="headerlink" title="动态规划方法"></a>动态规划方法</h2><p><strong>最优子结构性质：</strong><br>设序列 <code>X=&lt;x1, x2, …, xm&gt;</code> 和 <code>Y=&lt;y1, y2, …, yn&gt;</code> 的一个最长公共子序列 <code>Z=&lt;z1, z2, …, zk&gt;</code>，则：</p>
+<ol>
+<li>若 <code>xm = yn</code>，则 <code>zk = xm = yn</code> 则 <code>Zk-1</code> 是 <code>Xm-1</code> 和 <code>Yn-1</code> 的最长公共子序列；<br><img src="https://segmentfault.com/img/bVlvzm" alt="img"></li>
+<li>若 <code>xm ≠ yn</code>， 要么<code>Z</code>是 <code>Xm-1</code> 和 <code>Y</code> 的最长公共子序列，要么 <code>Z</code> 是<code>X</code>和 <code>Yn-1</code> 的最长公共子序列。<br>2.1 若 <code>xm ≠ yn</code> 且 <code>zk≠xm</code> ，则 <code>Z</code>是 <code>Xm-1</code> 和 <code>Y</code> 的最长公共子序列；<br>2.2 若 <code>xm ≠ yn 且 zk ≠yn</code> ，则 <code>Z</code> 是<code>X</code>和 <code>Yn-1</code> 的最长公共子序列。<br>综合一下2 就是求二者的大者</li>
+</ol>
+<p><strong>递归结构：</strong><br><img src="https://segmentfault.com/img/bVlfds" alt="img"> 递归结构容易看到最长公共子序列问题具有子问题<strong>重叠性质</strong>。例如，在计算 <code>X</code> 和 <code>Y</code> 的最长公共子序列时，可能要计算出 <code>X</code> 和 <code>Yn-1</code> 及 <code>Xm-1</code> 和 <code>Y</code>的最长公共子序列。而这两个子问题都包含一个公共子问题，即计算 <code>Xm-1</code> 和 <code>Yn-1</code> 的最长公共子序列。<br><img src="https://segmentfault.com/img/bVlfdw" alt="img"></p>
+<p>递归结构容易看到最长公共子序列问题具有子问题重叠性质。例如，在计算 <code>X</code> 和 <code>Y</code> 的最长公共子序列时，可能要计算出 <code>X</code> 和 <code>Yn-1</code>及 <code>Xm-1</code> 和 <code>Y</code> 的最长公共子序列。而这两个子问题都包含一个公共子问题，即计算<code>Xm-1</code> 和 <code>Yn-1</code> 的最长公共子序列。</p>
+<p><strong>计算最优值：</strong><br>子问题空间中，总共只有<code>O(m*n)</code> 个不同的子问题，因此，用动态规划算法自底向上地计算最优值能提高算法的效率。</p>
+<p>长度表C 和 方向变量B：<br><img src="https://segmentfault.com/img/bVlfeN" alt="img"> java实现：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div></pre></td><td class="code"><pre><div class="line"> /* 动态规划</div><div class="line"> * 求最长公共子序列</div><div class="line"> * @ author by gsm</div><div class="line"> * @ 2015.4.1</div><div class="line"> */</div><div class="line">import java.util.Random;</div><div class="line">public class LCS &#123;</div><div class="line"></div><div class="line">    public static int[][] lengthofLCS(char[] X, char[] Y)&#123;</div><div class="line">        /* 构造二维数组c[][]记录X[i]和Y[j]的LCS长度 (i,j)是前缀</div><div class="line">         * c[i][j]=0; 当 i = j = 0;</div><div class="line">         * c[i][j]=c[i-1][j-1]+1; 当 i = j &gt; 0; Xi == Y[i]</div><div class="line">         * c[i][j]=max(c[i-1][j],c[i][j+1]); 当 i = j &gt; 0; Xi != Y[i]</div><div class="line">         * 需要计算 m*n 个子问题的长度 即 任意c[i][j]的长度</div><div class="line">         * -- 填表过程</div><div class="line">         */</div><div class="line">        int[][]c = new int[X.length+1][Y.length+1];</div><div class="line"></div><div class="line">        // 动态规划计算所有子问题</div><div class="line">        for(int i=1;i&lt;=X.length;i++)&#123;</div><div class="line">            for (int j=1;j&lt;=Y.length;j++)&#123;</div><div class="line">                if(X[i-1]==Y[j-1])&#123;</div><div class="line">                    c[i][j] = c[i-1][j-1]+1;</div><div class="line">                &#125;</div><div class="line">                else if(c[i-1][j] &gt;= c[i][j-1])&#123;</div><div class="line">                    c[i][j] = c[i-1][j];</div><div class="line">                &#125;</div><div class="line">                else&#123;</div><div class="line">                    c[i][j] = c[i][j-1];</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        // 打印C数组</div><div class="line">        for(int i=0;i&lt;=X.length;i++)&#123;</div><div class="line">            for (int j=0;j&lt;=Y.length;j++)&#123;</div><div class="line">                System.out.print(c[i][j]+&quot; &quot;);</div><div class="line">            &#125;</div><div class="line">            System.out.println();</div><div class="line">        &#125;</div><div class="line">        return c;</div><div class="line">    &#125;</div><div class="line">    // 输出LCS序列</div><div class="line">    public static void print(int[][] arr, char[] X, char[] Y, int i, int j) &#123;</div><div class="line">        if(i == 0 || j == 0)</div><div class="line">            return;</div><div class="line">        if(X[i-1] == Y[j-1]) &#123;</div><div class="line">            System.out.print(&quot;element &quot; + X[i-1] + &quot; &quot;);</div><div class="line">            // 寻找的</div><div class="line">            print(arr, X, Y, i-1, j-1);</div><div class="line">        &#125;else if(arr[i-1][j] &gt;= arr[i][j-1]) &#123;</div><div class="line">            print(arr, X, Y, i-1, j);</div><div class="line">        &#125;else&#123;</div><div class="line">            print(arr, X, Y, i, j-1);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        // TODO Auto-generated method stub</div><div class="line">        char[] x =&#123;&apos;A&apos;,&apos;B&apos;,&apos;C&apos;,&apos;B&apos;,&apos;D&apos;,&apos;A&apos;,&apos;B&apos;&#125;; </div><div class="line">        char[] y =&#123;&apos;B&apos;,&apos;D&apos;,&apos;C&apos;,&apos;A&apos;,&apos;B&apos;,&apos;A&apos;&#125;; </div><div class="line">        int[][] c = lengthofLCS(x,y);</div><div class="line">        print(c, x, y, x.length, y.length);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="最长公共子串"><a href="#最长公共子串" class="headerlink" title="最长公共子串"></a>最长公共子串</h1><h2 id="一个问题"><a href="#一个问题" class="headerlink" title="一个问题"></a>一个问题</h2><p>定义 2 个字符串 query 和 text, 如果 query 里最大连续字符子串在 text 中存在，则返回子串长度. 例如: query=”acbac”，text=”acaccbabb”， 则最大连续子串为 “cba”, 则返回长度 3.</p>
+<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><h3 id="时间复杂度：O-m-n-的DP"><a href="#时间复杂度：O-m-n-的DP" class="headerlink" title="时间复杂度：O(m*n)的DP"></a>时间复杂度：<code>O(m*n)</code>的DP</h3><p>这个 LCS 跟前面说的最长公共子序列的 LCS 不一样，不过也算是 LCS 的一个变体，在 LCS 中，子序列是不必要求连续的，而子串则是 “连续” 的</p>
+<p>我们还是像之前一样 “从后向前” 考虑是否能分解这个问题，类似最长公共子序列的分析，这里，我们使用<code>c[i,j]</code> 表示 以 <code>Xi</code> 和 <code>Yj</code>结尾的最长公共子串的长度，<strong>因为要求子串连续，所以对于 Xi 与 Yj 来讲，它们要么与之前的公共子串构成新的公共子串；要么就是不构成公共子串。故状态转移方程</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">X[i-1] == Y[j-1]，c[i,j] = c[i-1,j-1] + 1；</div><div class="line"></div><div class="line">X[i-1] != Y[j-1]，c[i,j] = 0；</div></pre></td></tr></table></figure>
+<p>对于初始化，<code>i==0 或者 j==0，c[i,j] = 0</code><br>代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">public class LCString &#123;</div><div class="line">    public  static int lengthofLCString(String X, String Y)&#123;</div><div class="line">        /* 构造二维数组c[][]记录X[i]和Y[j]的LCS长度 (i,j)是前缀</div><div class="line">         * c[i][j]=0; 当 i = j = 0;</div><div class="line">         * c[i][j]=c[i-1][j-1]+1; 当 i = j &gt; 0; Xi == Y[i]</div><div class="line">         * c[i][j]=0; 当 i = j &gt; 0; Xi != Y[i]</div><div class="line">         * 需要计算 m*n 个子问题的长度 即 任意c[i][j]的长度</div><div class="line">         * -- 填表过程</div><div class="line">         */</div><div class="line">        int[][]c = new int[X.length()+1][Y.length()+1];</div><div class="line">        int maxlen = 0;</div><div class="line">        int maxindex = 0;</div><div class="line">        for(int i =1;i&lt;=X.length();i++)&#123;</div><div class="line">            for(int j=1;j&lt;=Y.length();j++)&#123;</div><div class="line">                if(X.charAt(i-1) == Y.charAt(j-1))&#123;</div><div class="line">                    c[i][j] = c[i-1][j-1]+1;</div><div class="line">                    if(c[i][j] &gt; maxlen)</div><div class="line">                    &#123;</div><div class="line">                        maxlen = c[i][j];</div><div class="line">                        maxindex = i + 1 - maxlen;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        return maxlen;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        String X = &quot;acbac&quot;;</div><div class="line">        String Y = &quot;acaccbabb&quot;;</div><div class="line">        System.out.println(lengthofLCString(X,Y)); </div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="时间复杂度O-nlogn-的后缀数组的方法"><a href="#时间复杂度O-nlogn-的后缀数组的方法" class="headerlink" title="时间复杂度O(nlogn)的后缀数组的方法"></a>时间复杂度<code>O(nlogn)</code>的后缀数组的方法</h3><p><a href="http://segmentfault.com/a/1190000002646526" target="_blank" rel="external">有关后缀数组以及求最长重复子串</a><br>前面提过后缀数组的基本定义，与子串有关，可以尝试这方面思路。由于后缀数组最典型的是寻找一个字符串的重复子串，所以，对于两个字符串，我们可以将其连接到一起，如果某一个子串 s 是它们的公共子串，则 s 一定会在连接后字符串后缀数组中出现两次，这样就将最长公共子串转成最长重复子串的问题了，这里的后缀数组我们使用基本的实现方式。</p>
+<p>值得一提的是，在找到两个重复子串时，不一定就是 X 与 Y 的公共子串，也可能是 X 或 Y 的自身重复子串，故在连接时候我们在 X 后面插入一个特殊字符‘#’，即连接后为 X#Y。这样一来，只有找到的两个重复子串恰好有一个在 #的前面，这两个重复子串才是 X 与 Y 的公共子串</p>
+<h3 id="各方案复杂度对比"><a href="#各方案复杂度对比" class="headerlink" title="各方案复杂度对比"></a>各方案复杂度对比</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">设字符串 X 的长度为 m，Y 的长度为 n，最长公共子串长度为 l。</div><div class="line"></div><div class="line">对于基本算法（brute force），X 的子串（m 个）和 Y 的子串（n 个）一一对比，最坏情况下，复杂度为 O(m*n*l)，空间复杂度为 O(1)。</div><div class="line"></div><div class="line">对于 DP 算法，由于自底向上构建最优子问题的解，时间复杂度为 O(m*n)；空间复杂度为 O(m*n)，当然这里是可以使用滚动数组来优化空间的，滚动数组在动态规划基础回顾中多次提到。</div><div class="line"></div><div class="line">对于后缀数组方法，连接到一起并初始化后缀数组的时间复杂度为 O(m+n)，对后缀数组的字符串排序，由于后缀数组有 m+n 个后缀子串，子串间比较，故复杂度为 O((m+n)*l*lg(m+n))，求得最长子串遍历后缀数组，复杂度为 O(m+n)，所以总的时间复杂度为 O((m+n)*l*lg(m+n))，空间复杂度为 O(m+n)。</div><div class="line"></div><div class="line">总的来说使用后缀数组对数据做一些 “预处理”，在效率上还是能提升不少的。</div></pre></td></tr></table></figure>
+<h1 id="LIS-最长递增子序列"><a href="#LIS-最长递增子序列" class="headerlink" title="LIS 最长递增子序列"></a>LIS 最长递增子序列</h1><p>问题描述：找出一个n个数的序列的最长单调递增子序列： 比如<code>A = {5,6,7,1,2,8}</code> 的LIS是<code>5,6,7,8</code></p>
+<h2 id="1-O-n-2-的复杂度："><a href="#1-O-n-2-的复杂度：" class="headerlink" title="1. O(n^2)的复杂度："></a>1. <code>O(n^2)</code>的复杂度：</h2><p><strong>1.1 最优子结构：</strong><br><code>LIS[i]</code> 是以<code>arr[i]</code>为末尾的LIS序列的长度。则：<br><code>LIS[i] = {1+Max(LIS(j))}</code>; <code>j&lt;i, arr[j]&lt;arr[i]</code>;<br><code>LIS[i] = 1, j&lt;i</code>, 但是不存在<code>arr[j]&lt;arr[i]</code>;<br>所以问题转化为计算<code>Max(LIS(j))</code> <code>0&lt;i&lt;n</code></p>
+<p><strong>1.2 重叠的子问题：</strong><br>以<code>arr[i] (1&lt;= i &lt;= n)</code>每个元素结尾的LIS序列的值是 重叠的子问题。<br>所以填表时候就是建立一个数组<code>DP[i]</code>, 记录以<code>arr[i]</code>为序列末尾的LIS长度。</p>
+<p><strong>1.3 DP[i]怎么计算？</strong><br>遍历所有<code>j&lt;i</code>的元素，检查是否<code>DP[j]+1&gt;DP[i] &amp;&amp; arr[j]&lt;arry[i]</code> 若是，则可以更新<code>DP[i]</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">int maxLength = 1, bestEnd = 0;</div><div class="line">DP[0] = 1;</div><div class="line">prev[0] = -1;</div><div class="line"></div><div class="line">for (int i = 1; i &lt; N; i++)</div><div class="line">&#123;</div><div class="line">   DP[i] = 1;</div><div class="line">   prev[i] = -1;</div><div class="line"></div><div class="line">   for (int j = i - 1; j &gt;= 0; j--)</div><div class="line">      if (DP[j] + 1 &gt; DP[i] &amp;&amp; array[j] &lt; array[i])</div><div class="line">      &#123;</div><div class="line">         DP[i] = DP[j] + 1;</div><div class="line">         prev[i] = j;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">   if (DP[i] &gt; maxLength)</div><div class="line">   &#123;</div><div class="line">      bestEnd = i;</div><div class="line">      maxLength = DP[i];</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<h2 id="2-O-nlog-的复杂度"><a href="#2-O-nlog-的复杂度" class="headerlink" title="2. O(nlog)的复杂度"></a>2. <code>O(nlog)</code>的复杂度</h2><p><strong>基本思想：</strong></p>
+<p>首先通过一个数组<code>MaxV[nMaxLength]</code>来缓存递增子序列LIS的<code>末尾元素</code>最小值；通过<code>nMaxLength</code> 记录到当前遍历为止的最长子序列的长度;</p>
+<p>然后我们从第2元素开始，遍历给定的数组<code>arr</code>，</p>
+<ol>
+<li><code>arr[i] &gt; MaxV[nMaxLength]</code>, 将<code>arr[i]</code>插入到<code>MaxV[++nMaxLength]</code>的末尾 – 意味着我们找到了一个新的最大LIS</li>
+<li><code>arr[i] &lt;= MaxV[nMaxLength]</code>, 找到<code>MaxV[]</code>中刚刚大于<code>arr[i]</code>的元素，<code>arr[j]</code>.<code>arr[i]替换arr[j]</code><br>因为MaxV是一个有序数组，查找过程可以使用<code>log(N)</code>的折半查找。<br>这样运行时间: <code>n</code>个整数和每个都需要折半查找 – <code>n*logn = O(nlogn)</code></li>
+</ol>
+<ul>
+<li><code>if &gt;</code> 说明<code>j</code>能够放在最长子序列的末尾形成一个新的最长子序列.</li>
+<li><code>if&lt;</code> 说明<code>j</code>需要<code>替换</code>前面一个<code>刚刚大</code>与<code>array[j]</code>的元素</li>
+</ul>
+<p>最后，输出LIS时候，我们会用一个<code>LIS[]</code>数组，这边<code>LIS[i]</code>记录的是以元素<code>arr[i]</code>为结尾的最长序列的长度</p>
+<hr>
+<p><strong>初始化准备工作：</strong></p>
+<p><code>MaxV[1]</code>首先会被设置成序列第一个元素 即 <code>MaxV[1] = arr[0]</code>，在遍历数组的过程中会不断的更新。<br><code>nMaxLength = 1</code></p>
+<hr>
+<p><strong>举个栗子：</strong><br><code>arr = {2 1 5 3 6 4 8 9 7}</code></p>
+<ul>
+<li>首先<code>i=1</code>, 遍历到1， 1 通过跟MaxV[nMaxLength]比较: <code>1&lt;MaxV[nMaxLength]</code>,<br>发现1更有<code>潜力</code>（更小的有潜力，更小的替换之）<br>1 更有潜力, 那么<code>1</code>就<code>替换MaxV[nMaxLength]</code> 即 <code>MaxV[nMaxLength] =1</code> ;<br>这个时候 <code>MaxV={1}， nMaxlength = 1，LIS[1] = 1</code>;</li>
+<li>然后 <code>i =2</code>, 遍历到5， 5通过跟<code>MaxV[nMaxLength]</code>比较, <code>5&gt;MaxV[nMaxLength]</code>,<br>发现5 <code>更大</code>； 链接到目前得到的LIS尾部；<br>这个时候 <code>MaxV={1，5}</code>， <code>nMaxlength++ = 2</code>， <code>MaxV[nMaxLength]=5</code>， <code>LIS[i] = 1+1 = 2</code>;</li>
+<li>然后 <code>i =3</code>，遍历到3, 3 通过跟MaxV[nMaxLength]比较, <code>3&lt;MaxV[nMaxLength]</code>,<br>发现3更有 <code>潜力</code>，然后从 <code>nMaxLength</code>往前比较，找到第一个刚刚比3大元素替换之。（稍后解释什么叫刚刚大）<br>这个时候 <code>MaxV={1,3}， nMaxlength = 2</code>; 3只是替换， <code>LIS[i]不变 = LIS[3]= 2</code>;</li>
+<li>然后 <code>i =4</code>，遍历到6， 6 通过跟 <code>MaxV[nMaxLength]</code>比较, <code>6&gt;MaxV[nMaxLength]</code>,<br>发现6更大； 6就应该链接到目前得到的LIS尾部；<br>这个时候，<code>MaxV={1,3,6} ，nMaxlength = 3</code>，<code>MaxV[nMaxLength+1]=6 , LIS[4] = 3</code></li>
+<li>然后<code>i =5</code>，遍历到4, 4 通过跟<code>MaxV[nMaxLength] = 6</code>比较, <code>4&lt;MaxV[nMaxLength]</code>,<br>发现4更有<code>潜力</code>，然后从<code>nMaxLength</code>往前比较，找到刚刚比4大元素 也就是 6替换之。<br>这个时候 <code>MaxV={1,3,4}， nMaxlength = 3</code>，4只是替换， <code>LIS[i]不变 = LIS[5]= 3</code>;</li>
+<li>然后<code>i=6</code>, 遍历到8， 8通过跟<code>MaxV[nMaxLength]</code>比较, <code>8&gt;MaxV[nMaxLength]</code>,<br>发现8<code>更大</code>； 8就应该链接到目前得到的LIS尾部；<br>这个时候 <code>MaxV={1,3,4,8}， nMaxlength = 4, Maxv[nMaxlength]=8 LIS[6]=4</code>,</li>
+<li>然后<code>i=7</code>, 遍历到9， 9通过跟<code>MaxV[nMaxLength]</code>比较, <code>9&gt;MaxV[nMaxLength]</code>,<br>发现9<code>更大</code>； 9就应该链接到目前得到的LIS尾部；<br>这个时候 <code>MaxV={1,3,4,8，9}， nMaxlength = 5, Maxv[nmaxlength]=9, LIS[7] = 5;</code></li>
+<li>然后<code>i=8</code>, 遍历到7, 7 通过跟<code>MaxV[nMaxLength] = 9</code>比较, <code>7&lt;MaxV[nMaxLength]</code>,<br>发现7更有<code>潜力</code>，然后从<code>nMaxLength</code>往前比较，找到第一个比7大元素 也就是 8替换之。<br>这个时候 <code>MaxV={1,3,4,7,9}</code>, <code>nMaxLength = 5, Maxv[nMaxlength]=9</code><br><code>LIS[8] = LIS[替换掉的index] = 4</code>;</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>–</th>
+<th>2</th>
+<th>1</th>
+<th>5</th>
+<th>3</th>
+<th>6</th>
+<th>4</th>
+<th>8</th>
+<th>9</th>
+<th>7</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>i</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>8</td>
+<td>9</td>
+</tr>
+<tr>
+<td>LIS</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>2</td>
+<td>3</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>4</td>
+</tr>
+<tr>
+<td>MaxV</td>
+<td>2</td>
+<td>1</td>
+<td>1,5</td>
+<td>1,3</td>
+<td>1,3,6</td>
+<td>1,3,4</td>
+<td>1,3,4,8</td>
+<td>1,3,4,8,9</td>
+<td>1,3,4,7</td>
+</tr>
+</tbody>
+</table>
+<p>java实现：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line">import java.util.*;</div><div class="line"></div><div class="line">public class LIS &#123;</div><div class="line">    public static int lengthofLCS(int[] arr)&#123;</div><div class="line">        // 辅助变量</div><div class="line">        int[] MaxV = new int [arr.length+1]; // 记录递增子序列 LIS 的末尾元素最小值 </div><div class="line">        int nMaxLength = 1; // 当前LIS的长度</div><div class="line">        int [] LIS = new int[arr.length+1]; //LIS[i]记录的是以第i个元素为结尾的最长序列的长度</div><div class="line">        // 初始化</div><div class="line">        MaxV[0] = -100;</div><div class="line">        MaxV[nMaxLength] = arr[0];</div><div class="line">        LIS[0] = 0;LIS[1] = 1;</div><div class="line"></div><div class="line">        for(int i=1;i&lt;arr.length;i++)&#123;</div><div class="line">            if(arr[i] &gt;MaxV[nMaxLength])&#123;</div><div class="line">                MaxV[++nMaxLength] = arr[i];</div><div class="line">                LIS[i] = LIS[i-1]+1;</div><div class="line">            &#125;</div><div class="line">            else&#123;</div><div class="line">                // 新元素 更小，更有“潜力”，替换大的元素</div><div class="line">                int index = binarySearch(MaxV,arr[i],0,nMaxLength);     </div><div class="line">                //*     </div><div class="line">                LIS[i] =index;</div><div class="line">                MaxV[index] = arr[i];</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        Arrays.sort(LIS);</div><div class="line">        return LIS[LIS.length-1];</div><div class="line">    &#125;</div><div class="line">    // 在MaxV数组中查找一个元素刚刚大于arr[i]</div><div class="line">    // 返回这个元素的index</div><div class="line">    public static int binarySearch(int []arr, int n, int start, int end)&#123;</div><div class="line">        while(start&lt;end)&#123;</div><div class="line">            int mid = (start + end)/2;</div><div class="line">            if(arr[mid]&lt; n)&#123;</div><div class="line">                start = mid+1;</div><div class="line">            &#125;</div><div class="line">            else if(arr[mid]&gt; n) &#123;</div><div class="line">                end = mid -1;</div><div class="line">            &#125;</div><div class="line">            else </div><div class="line">                return mid;</div><div class="line">        &#125;</div><div class="line">        return end;</div><div class="line">    &#125;</div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        int[] arr = &#123;2,1,5,3,6,4,8,9,7&#125;;</div><div class="line">        System.out.println(lengthofLCS(arr));</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>* : MaxV里面的数组下标代表了长度为index的最长子序列末尾元素，反过来就是末尾元素在MaxV里对应的下标就是他子序列的长度</p>
+<hr>
+<h1 id="可以转化为LCS的问题"><a href="#可以转化为LCS的问题" class="headerlink" title="可以转化为LCS的问题"></a>可以转化为LCS的问题</h1><ul>
+<li>给一个字符串，求这个字符串最少增加几个字符能变成回文</li>
+<li>要在一条河的南北两边的各个城市之间造若干座桥．桥两边的城市分别是 a(1)…a(n) 和 b(1)…b(n). 且南边 a(1)…a(n) 是乱序的，北边同理，但是要求 a(i) 只可以和 b(i) 之间造桥, 同时两座桥之间不能交叉. 希望可以得到一个尽量多座桥的方案.</li>
+</ul>
+<hr>
+<p>总结：</p>
+<p>- 通常DP是一个不算最好，但是比最直接的算法好很多的方法。 DP一般是O（n^2）;但是如果想进一步优化 O（nlogn）就要考虑其他的了</p>
+<p>- 对，要想更好的方法就是要挖掘题目本身更加隐匿的性质了</p>
+<blockquote>
+<p><a href="https://segmentfault.com/a/1190000002641054" target="_blank" rel="external">算法设计 - LCS 最长公共子序列&amp;&amp;最长公共子串 &amp;&amp;LIS 最长递增子序列</a></p>
+<p><a href="http://segmentfault.com/blog/exploring/" target="_blank" rel="external">http://segmentfault.com/blog/exploring/</a></p>
+</blockquote>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2017/03/在Node.js中查找JavaScript内存泄漏简略指南/" rel="next" title="在Node.js中查找JavaScript内存泄漏简略指南">
+                <i class="fa fa-chevron-left"></i> 在Node.js中查找JavaScript内存泄漏简略指南
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/blog/images/avatar.gif"
+               alt="tomoat" />
+          <p class="site-author-name" itemprop="name">tomoat</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/blog/archives">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#LCS"><span class="nav-number">1.</span> <span class="nav-text">LCS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题描述"><span class="nav-number">1.1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#复杂度"><span class="nav-number">1.2.</span> <span class="nav-text">复杂度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#暴力方法"><span class="nav-number">1.3.</span> <span class="nav-text">暴力方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#动态规划方法"><span class="nav-number">1.4.</span> <span class="nav-text">动态规划方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#最长公共子串"><span class="nav-number">2.</span> <span class="nav-text">最长公共子串</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一个问题"><span class="nav-number">2.1.</span> <span class="nav-text">一个问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法"><span class="nav-number">2.2.</span> <span class="nav-text">方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#时间复杂度：O-m-n-的DP"><span class="nav-number">2.2.1.</span> <span class="nav-text">时间复杂度：O(m*n)的DP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#时间复杂度O-nlogn-的后缀数组的方法"><span class="nav-number">2.2.2.</span> <span class="nav-text">时间复杂度O(nlogn)的后缀数组的方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#各方案复杂度对比"><span class="nav-number">2.2.3.</span> <span class="nav-text">各方案复杂度对比</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LIS-最长递增子序列"><span class="nav-number">3.</span> <span class="nav-text">LIS 最长递增子序列</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-O-n-2-的复杂度："><span class="nav-number">3.1.</span> <span class="nav-text">1. O(n^2)的复杂度：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-O-nlog-的复杂度"><span class="nav-number">3.2.</span> <span class="nav-text">2. O(nlog)的复杂度</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#可以转化为LCS的问题"><span class="nav-number">4.</span> <span class="nav-text">可以转化为LCS的问题</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">tomoat</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/blog/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/blog/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/blog/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/blog/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+</body>
+</html>
