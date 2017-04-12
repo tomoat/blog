@@ -442,6 +442,155 @@
 <p>还有一个可能咬你更多的细节和我们已经谈过它- <em>可点击</em>拖动领域。<em>index.css</em>必须将关闭按钮定义为不可拖动。</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">.settings &#123;</div><div class="line">    ...</div><div class="line">    -webkit-app-region：no-drag;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>就是这样，我们的应用程序现在可以通过关闭按钮关闭。通过检查事件或传递参数，通过<em>ipc进行通信</em>可能会变得复杂，我们稍后会看到一个传递参数的例子。</p>
+<h3 id="通过全局键盘快捷键播放声音"><a href="#通过全局键盘快捷键播放声音" class="headerlink" title="通过全局键盘快捷键播放声音"></a>通过全局键盘快捷键播放声音</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># Follow along with the tag 03-closable-sound-machine:</span></div><div class="line">git checkout 03-closable-sound-machine</div></pre></td></tr></table></figure>
+<p>我们的基本音响机器工作很棒。但是我们确实有一个可用性的问题 - 一个声音机器有什么用途，它必须一直坐在所有窗口的前面，并重复点击？</p>
+<p>这是全球键盘<a href="https://github.com/atom/electron/blob/master/docs/api/global-shortcut.md" target="_blank" rel="external">快捷键的</a>地方。Electron提供了一个<a href="https://github.com/atom/electron/blob/master/docs/api/global-shortcut.md" target="_blank" rel="external">全球快捷键</a>模块，可让您聆听自定义的键盘组合并作出反应。键盘组合被称为<a href="https://github.com/atom/electron/blob/master/docs/api/accelerator.md" target="_blank" rel="external"><em>加速器</em></a>，并且是按键组合的字符串表示（例如“Ctrl + Shift + 1”）。</p>
+<p><img src="https://cdn-images-1.medium.com/max/800/1*xx7pP0czBfFTskrN5tmyZQ@2x.png" alt="img"></p>
+<p>插上呃，按播放！</p>
+<p>由于我们想要捕获一个本机GUI事件（全局键盘快捷键）并执行一个应用程序窗口事件（播放声音），我们将使用我们的可信<em>ipc</em>模块将消息从<em>主进程</em>发送到<em>渲染器进程</em>。</p>
+<p>在潜入代码之前，需要考虑两件事情：</p>
+<ol>
+<li>在<em>应用程序“ready”</em>事件（代码应该在该块中）之后，必须注册全局快捷方式</li>
+<li>当通过<em>ipc</em>从<em>主进程</em>发送消息到<em>渲染器进程</em>时，必须使用该窗口的<em>引用（</em>像<em>“createdWindow.webContents.send（’channel’）</em>）</li>
+</ol>
+<p>考虑到这一点，让我们改变我们的<em>main.js</em>并<em> </em>添加以下代码：</p>
+<script src="https://gist.github.com/bojzi/e805132f2c737d1a39c4.js"></script>
+
+<p>首先，我们需要<em>全局快捷方式</em>。然后，一旦我们的应用程序准备就绪，我们会注册两个快捷方式 - 一个将按Ctrl，Shift和1一起响应，另一个会一起响应Ctrl，Shift和2。其中的每一个都将在“ <em>全局快捷方式</em> ”通道上发送一条消息，其中包含一个参数。我们将使用该参数来播放正确的声音。将以下内容添加到<em>index.js中</em>：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//index.js</span></div><div class="line">ipc.on(<span class="string">'global-shortcut'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">arg</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> event = <span class="keyword">new</span> MouseEvent(<span class="string">'click'</span>);</div><div class="line">    soundButtons[arg].dispatchEvent(event);</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>为了简单起见，我们将模拟一个按钮单击，并使用我们在绑定按钮播放声音时创建的soundButtons选择器。一旦一个消息带有参数1，我们将使用<em>soundButtons [1]</em>元素并触发鼠标点击（<em>注意</em>：在生产应用程序中，您将要封装声音播放代码并执行）。</p>
+<h3 id="通过新窗口中的用户设置配置修改键"><a href="#通过新窗口中的用户设置配置修改键" class="headerlink" title="通过新窗口中的用户设置配置修改键"></a>通过新窗口中的用户设置配置修改键</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># Follow along with the tag 04-global-shortcuts-bound:</span></div><div class="line">git checkout 04-global-shortcuts-bound</div></pre></td></tr></table></figure>
+<p>有许多应用程序在同一时间运行，可能非常好，我们设想的快捷方式已经被采用。这就是为什么我们要介绍一个设置屏幕，并存储我们要使用哪些修饰符（Ctrl，Alt和/或Shift）。</p>
+<p>要完成所有这些，我们将需要以下内容：</p>
+<ul>
+<li>我们主窗口中的设置按钮，</li>
+<li>设置窗口（附带HTML，CSS和JavaScript文件），</li>
+<li><em>ipc</em>消息打开和关闭设置窗口并更新我们的全局快捷方式和</li>
+<li>从用户系统存储/读取设置JSON文件。</li>
+</ul>
+<p>呃，这是一个很好的名单。</p>
+<h4 id="设置按钮和设置窗口"><a href="#设置按钮和设置窗口" class="headerlink" title="设置按钮和设置窗口"></a>设置按钮和设置窗口</h4><p>类似关闭主窗口，我们要一个上发送消息<em>通道</em>从<em>index.js</em>的设置按钮被点击时。将以下内容添加到<em>index.js中</em>：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> settingsEl = <span class="built_in">document</span>.querySelector(<span class="string">'.settings'</span>);</div><div class="line">settingsEl.addEventListener(<span class="string">'click'</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">    ipc.send(<span class="string">'open-settings-window'</span>);</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>点击设置按钮后，会在频道“ <em>open-settings-window</em> ”上发送一条消息。<em>main.js</em>现在可以对该事件做出反应并打开新窗口。将以下内容添加到<em>main.js中</em>：</p>
+<script src="https://gist.github.com/bojzi/9bda0bbc4e6bd9ba043b.js"></script>
+
+<p>没有什么新鲜事可以看到，我们正在打开一个新窗口，就像我们在主窗口中一样。唯一的区别是，我们正在检查设置窗口是否已经打开，以便我们不打开两个实例。</p>
+<p>一旦工作，我们需要一种关闭设置窗口的方法。再次，我们将在频道上发送消息，但这次是从<em>settings.js</em>（这是设置关闭按钮所在的位置）。使用以下内容创建（或替换）<em>settings.js</em>的内容：</p>
+<script src="https://gist.github.com/bojzi/eee51448178ebceafc24.js"></script>
+
+<p>并在<em>main.js中</em>监听该<em>频道</em>。添加以下内容：**</p>
+<script src="https://gist.github.com/bojzi/c18a4af41b82a4d51c77.js"></script>
+
+<p>我们的设置窗口现在可以实现自己的逻辑了。</p>
+<h4 id="存储和阅读用户设置"><a href="#存储和阅读用户设置" class="headerlink" title="存储和阅读用户设置"></a>存储和阅读用户设置</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">跟随标签05-settings-window-working：</div><div class="line"> git checkout 05-settings-window-working</div></pre></td></tr></table></figure>
+<p>与设置窗口进行交互，存储设置并将其推广到我们的应用程序的过程将如下所示：</p>
+<ul>
+<li>创建一种在JSON文件中存储和读取用户设置的方法，</li>
+<li>使用这些设置显示设置窗口的初始状态，</li>
+<li>更新用户交互时的设置</li>
+<li>让<em>主流程</em>知道变化。</li>
+</ul>
+<p>我们可以在<em>main.js</em>文件中实现对设置的存储和读取，但它似乎是一个很好的用例来编写一个可以包含在各个地方的小模块。</p>
+<p><strong>使用JSON配置</strong></p>
+<p>这就是为什么我们要创建<em>configure.js</em>文件<em> </em>，并在需要时要求它。Node.js使用<a href="https://nodejs.org/docs/latest/api/modules.html" target="_blank" rel="external">CommonJS模块模式</a>，这意味着您仅导出API，而其他文件需要/使用该API上可用的功能。</p>
+<p><img src="https://cdn-images-1.medium.com/max/800/1*YnvmoGoSwPb-EMDK5GJwzA@2x.png" alt="img"></p>
+<p>main.js和settings.js都使用了configure.js。</p>
+<p>为了使存储和阅读更容易，我们将使用<em>nconf</em>模块，为我们提供JSON文件的读取和写入。这是一个很好的合适。但首先，我们必须将它包含在项目中，并在CLI中执行以下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm install --save nconf</div></pre></td></tr></table></figure>
+<p>这告诉npm将<em>nconf</em>模块安装为<em>应用</em>程序依赖关系，当我们为最终用户打包应用程序时（与使用仅包含用于开发目的的模块的<em>save-dev</em>参数进行安装相反），它将被包含和使用。</p>
+<p>该<em>configuration.js</em>文件是非常简单的，所以让我们充分研究它。在项目根目录中创建一个<em>配置</em>文件，具有以下内容：</p>
+<script src="https://gist.github.com/bojzi/54598153b65bf4b832c2.js"></script>
+
+<p><em>nconf</em>只想知道在哪里存储你的设置，我们给它的位置的用户主文件夹和文件名。获取用户主文件夹仅仅是要求Node.js（<em>process.env</em>）和区分各种平台（如在<em>getUserHome（）</em>函数中所观察到的）。</p>
+<p>然后，使用<em>nconf</em>（<em>set（）</em>存储用于使用<em>save（）</em>读取的<em>get **（）</em>和用于文件操作的<em>load（））</em>的内置方法并使用标准的CommonJS <em>模块</em>导出API来实现存储或读取设置<em>。导出</em>语法。</p>
+<p><strong>初始化默认快捷键修饰符</strong></p>
+<p>在进行设置交互之前，让我们初始化设置，以防我们第一次启动应用程序。我们将把修饰符键存储为一个带有“ <em>shortcutKeys</em> ” 键的数组，并在<em>main.js中进行</em>初始化。对于所有这些工作，我们必须首先要求我们的<em>配置</em>模块：</p>
+<script src="https://gist.github.com/bojzi/69dca93b69eec3c6b25a.js"></script>
+
+<p>如果设置键“ <em>shortcutKeys</em> ” 下有任何东西存储，我们尝试阅读。如果没有，我们设置一个初始值。</p>
+<p>作为<em>main.js</em>中的另外一件事，我们将重写全局快捷键的注册，作为我们稍后在更新设置时可以调用的功能。从<em>main.js</em>中删除注册快捷键，并以这种方式更改文件：</p>
+<script src="https://gist.github.com/bojzi/2e12c414223085dd1387.js"></script>
+
+<p>该功能重置全局快捷方式，以便我们可以设置新的，从设置读取修饰符键数组，将其转换为<a href="https://github.com/atom/electron/blob/master/docs/api/accelerator.md" target="_blank" rel="external">Accelerator兼容的</a>字符串，并执行通常的全局快捷键注册。</p>
+<p><strong>在设置窗口中进行交互</strong></p>
+<p>回到<em>settings.js</em>文件，我们需要绑定将要更改我们的全局快捷方式的点击事件。首先，我们将遍历复选框并标记活动的（从配置模块读取值）：</p>
+<script src="https://gist.github.com/bojzi/4f69b66856d1011d3a13.js"></script>
+
+<p>现在我们将绑定复选框行为。考虑到设置窗口（及其<em>渲染器进程）</em>不允许更改GUI绑定。这意味着我们需要从<em>settings.js</em>发送一条<em>ipc</em>消息（稍后再处理该消息）<strong>：</strong></p>
+<script src="https://gist.github.com/bojzi/05e26e3da937e5c1c3f5.js"></script>
+
+<p>这是一个更大的代码，但仍然很简单。<br>我们遍历所有复选框，绑定一个点击事件，并且每次点击检查设置数组是否包含修饰符键 - 并根据该结果修改阵列，将结果保存到设置并向<em>主进程</em>发送消息这应该更新我们的全球快捷方式。</p>
+<p>所有剩下要做的就是订阅<em>IPC</em>通道“ <em>设置全局快捷键</em> ”，在<em>main.js</em>和更新我们的全球快捷方式：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">ipc.on(<span class="string">'set-global-shortcuts'</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">    setGlobalShortcuts();</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>就是这样，而且我们的全球快捷键是可配置的！</p>
+<h3 id="菜单上有什么？"><a href="#菜单上有什么？" class="headerlink" title="菜单上有什么？"></a>菜单上有什么？</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">跟随标签06-shortcuts可配置：</div><div class="line"> git checkout 06-shortcuts-configured</div></pre></td></tr></table></figure>
+<p>桌面应用程序中的另一个重要概念是菜单。有一个永远有用的上下文菜单（AKA右键单击菜单），托盘菜单（绑定到托盘图标），应用程序菜单（在OS X上）等。</p>
+<p><img src="https://cdn-images-1.medium.com/max/400/1*HinA-91xPYoCKel_obvuug@2x.png" alt="img"></p>
+<p>Megamenu。</p>
+<p>在本指南中，我们将添加一个带有菜单的托盘图标。我们也将利用这个机会去探索进程间通信的另一种方式- <a href="https://github.com/atom/electron/blob/master/docs/api/remote.md" target="_blank" rel="external"> 在<em>远程</em>模块</a>。</p>
+<p>该<em>远程</em>模块，使从RPC风格调用<em>渲染过程</em>的<em>主要过程</em>。您需要模块并在<em>渲染器进程中</em>使用它们，但是它们正在<em>主流程中</em>实例化，您调用它们的方法正在<em>主进程中</em>执行。实际上，这意味着您可以在<em>index.js中</em>远程请求本机GUI模块，并在其上调用方法，但是它们在<em>main.js中</em>执行。这样，您可以要求来自<em>index.js</em>的BrowserWindow模块并实例化一个新的浏览器窗口。幕后，**</p>
+<p><img src="https://cdn-images-1.medium.com/max/800/1*vLP63PA79c_s3ZdbJCe-yg@2x.png" alt="img"></p>
+<p>打电话给我，可能的话？</p>
+<p>让我们看看如何创建一个菜单，并将其绑定到托盘图标，同时在<em>渲染器进程中执行</em>。将以下内容添加到<em>index.js中</em>：</p>
+<script src="https://gist.github.com/bojzi/19c859e8cedd407bfdac.js"></script>
+
+<p>本地GUI模块（<em>菜单</em>和<em>托盘</em>）是远程需要的，这样可以安全地使用它们。</p>
+<p>托盘图标通过其图标定义。OS X支持图像模板（根据约定，如果文件的文件名以“Template”结尾），则图像被认为是模板图像，这样可以轻松处理黑暗和轻薄的主题。其他操作系统获得常规图标。</p>
+<p>电子有多种方式来建立菜单。这样可以创建一个菜单模板（一个带菜单项的简单数组），并从该模板中构建一个菜单。最后，新菜单附加到托盘图标。</p>
+<h3 id="包装你的应用程序"><a href="#包装你的应用程序" class="headerlink" title="包装你的应用程序"></a>包装你的应用程序</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">跟随标签07-ready-for-packaging：</div><div class="line"> git checkout 07-ready-for-packaging</div></pre></td></tr></table></figure>
+<p>你不能让人下载和使用的应用程序的用途是什么？</p>
+<p><img src="https://cdn-images-1.medium.com/max/400/1*O-ZI4nwQON9kNosiyfEfMw@2x.png" alt="img"></p>
+<p>包起来。</p>
+<p><a href="https://github.com/maxogden/electron-packager" target="_blank" rel="external">使用<em>电子包装机</em></a>轻松<a href="https://github.com/maxogden/electron-packager" target="_blank" rel="external"><em>包装</em></a>所有平台的<a href="https://github.com/maxogden/electron-packager" target="_blank" rel="external">应用</a><a href="https://github.com/maxogden/electron-packager" target="_blank" rel="external"><em>程序</em></a>。简而言之，电子包装机将所有的工作全部抽出来，将电子包裹在您的应用程序中，并生成您要发布的所有平台。</p>
+<p>它可以用作CLI应用程序或构建过程的一部分。构建更复杂的构建方案不在本文的范围之内，但是我们将利用<em>npm</em>脚本的强大功能使打包更容易。使用电子包装机是微不足道的，包装应用的一般形式是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">电子包装机&lt;项目位置&gt; &lt;项目名称&gt; &lt;platform&gt; &lt;architecture&gt; &lt;电子版&gt; &lt;可选选项&gt;</div></pre></td></tr></table></figure>
+<p>哪里：</p>
+<ul>
+<li>项目的位置指向您项目所在的文件夹，</li>
+<li>项目名称定义您的项目的名称，</li>
+<li>平台决定构建哪些平台（<em>全部</em>为Windows，Mac和Linux构建），</li>
+<li>架构决定了要构建的架构（x86或x64，<em>全部</em>为两者）和</li>
+<li>电子版可让您选择要使用的电子版本。</li>
+</ul>
+<p>第一个包将需要一段时间，因为所有平台的所有二进制文件都必须下载。随后的包快得多。</p>
+<p>我通常像这样（在Mac上）打包声音机：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">电子包装机〜/工程/声音机SoundMachine --all --version = 0.30.2 --out =〜/ Desktop --overwrite --icon =〜/ Projects / sound-machine / app / img / app-icon .icns</div></pre></td></tr></table></figure>
+<p>命令中包含的新选项是不言自明的。要获得一个漂亮的图标，您首先必须将其转换为.icns（适用于Mac）和/或.ico（Windows）。只要搜索到您的PNG文件转换为这些格式就像一个工具<a href="https://iconverticons.com/online/" target="_blank" rel="external">这一块</a>（一定要下载的文件与  <em>.icns</em>扩展，而不是  <em>.HQX</em>）。如果从非Windows操作系统打包Windows，则需要葡萄酒（Mac用户可以使用brew，而Linux用户可以使用apt-get）。</p>
+<p>每次运行这个大命令是没有意义的。我们可以在<em>package.json</em>中添加另一个脚本。首先，安装电子包装机作为开发依赖：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm安装--save-dev电子包装机</div></pre></td></tr></table></figure>
+<p>现在我们可以在我们的<em>package.json</em>文件中添加一个新脚本：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">"scripts": &#123;</div><div class="line">  "start": "electron .",</div><div class="line">  "package": "electron-packager ./ SoundMachine --all --out ~/Desktop/SoundMachine --version 0.30.2 --overwrite --icon=./app/img/app-icon.icns"</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><em>包装变得容易得多</em></p>
+<p>然后在CLI中运行以下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm start</div></pre></td></tr></table></figure>
+<p>软件包命令启动电子打包器，查看当前目录并构建到桌面。如果您使用Windows，应该更改脚本，但这是微不足道的。</p>
+<p>目前状态下的声音机器最终重量高达100 MB。不要担心，一旦存档（zip或您选择的存档类型），它将失去一半以上的大小。</p>
+<p>如果你真的想去镇上，看看<a href="https://github.com/loopline-systems/electron-builder" target="_blank" rel="external"><em>电子制造商</em></a>，它采用<em>电子包装机</em>生产的<em>包装</em>，并创建自动安装。</p>
+<hr>
+<h3 id="附加功能添加"><a href="#附加功能添加" class="headerlink" title="附加功能添加"></a>附加功能添加</h3><p>随着应用程序打包并准备好，您现在可以开始开发自己的功能。</p>
+<p>这里有一些想法：</p>
+<ul>
+<li>一个帮助屏幕，包括应用程序的信息，其快捷方式和作者，</li>
+<li>添加图标和菜单项以打开信息屏幕，</li>
+<li>构建一个漂亮的包装脚本，以加快构建和分配，</li>
+<li>使用<a href="https://github.com/mikaelbr/node-notifier" target="_blank" rel="external">节点通知器</a>添加<a href="https://github.com/mikaelbr/node-notifier" target="_blank" rel="external">通知</a>，让用户知道他们正在播放哪些声音，</li>
+<li>在更大程度上使用<em>lodash</em>来实现更清晰的代码库（如通过数组迭代）</li>
+<li>在打包之前使用构建工具缩小所有CSS和JavaScript，</li>
+<li>将上述节点通知器与服务器调用相结合，以检查应用程序的新版本并通知用户…</li>
+</ul>
+<p>对于一个很好的挑战 - 尝试提取您的声音机浏览器窗口逻辑，并使用像browserify这样的一个网页创建一个与刚才创建的相同的声音机器。一个代码库 - 两个产品（桌面应用程序和Web应用程序）。漂亮！</p>
+<hr>
+<h3 id="深入浅出Electron"><a href="#深入浅出Electron" class="headerlink" title="深入浅出Electron"></a>深入浅出Electron</h3><p>我们只是刮了电子带给桌子的表面。很容易做到像在主机上观看电源事件或在屏幕上获取各种信息（如光标位置）等操作。</p>
+<p>对于所有这些内置实用程序（通常在使用Electron开发应用程序时），<a href="https://github.com/atom/electron/tree/master/docs/api" target="_blank" rel="external">请查看Electron API文档</a>。</p>
+<p>这些Electron API文档是Electron GitHub存储库中docs文件夹的一部分，该文件夹非常值得一试。</p>
+<p>Sindre Sorhus指出<a href="https://github.com/sindresorhus/awesome-electron" target="_blank" rel="external">一系列电子资源</a>，您可以在其中找到非常酷的项目和信息，如一个典型的电子应用程序架构的优秀概述，可以作为我们迄今开发的代码的复习。</p>
+<p>最终，Electron基于io.js（将被并入Node.js），大部分Node.js模块是兼容的，可用于扩展应用程序。只需浏览<a href="https://www.npmjs.com/" target="_blank" rel="external">npmjs.com</a>并抓住所需的内容。</p>
+<hr>
+<h3 id="这就是全部？"><a href="#这就是全部？" class="headerlink" title="这就是全部？"></a>这就是全部？</h3><p>不，这才是开始</p>
+<p>现在是时候建立更大的应用程序了。我主要跳过在本指南中使用额外的库或构建工具来专注于重要问题，但您可以轻松地在ES6或Typescript中编写应用程序，使用Angular或React并简化您的构建与gulp或grunt。</p>
+<p>使用您最喜欢的语言，框架和构建工具，为什么不使用Flickr API和node-flickrapi或使用Google官方Node.js客户端库的GMail客户端构建Flickr同步桌面应用程序？</p>
+<p>选择一个想法点子，它将促进激励你进一步学习，初始化一个存储库，马上开始行动吧！</p>
+<p>[Electron已经经历了一些API流失。特别：<code>const {app} = require（&#39;electron&#39;）const {BrowserWindow} = require（&#39;electron&#39;）</code>此外，<code>loadUrl</code>函数也被重命名为<code>loadURL</code></p>
 <blockquote>
 <p><a href="https://medium.com/developers-writing/building-a-desktop-application-with-electron-204203eeb658" target="_blank" rel="external">Building a desktop application with Electron – Developers Writing – Medium</a></p>
 </blockquote>
